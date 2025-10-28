@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>Filters</title>
+    </head>
+	<body bgColor=#CFCCFC>
+            <h1>Common Filter Functionality</h1>
+            <p>The filters available for certain BIQ sections, such as Techs and Units, have received a significant boost in capabilities in version 1.27, and an additional boost in 1.28.  This page documents their powerful new capabilities that are shared
+            across all filters.  In this documentation, the term "specifier" will refer to an individual part of a filter query, such as "cost>20".</p>
+            <h2>Documentation for Specific Sections</h2>
+            <p>To learn about filters available for specific sections of the BIQ, view:</p>
+            <ul>
+                <li><b>Buildings (BLDG):</b> <a href="bldgFilters.html">Link</a></li>
+                <li><b>Resources/Goods (GOOD):</b> <a href="goodFilters.html">Link</a></li>
+                <li><b>Units (PRTO):</b> <a href="unitFilters.html">Link</a></li>
+                <li><b>Technologies (TECH):</b> <a href="TECH.html">Link</a></li>
+            </ul>
+            <h2>Available Operators</h2>
+            <p>There are two specific and one implicit operator available.  These are:</p>
+            <ul>
+                <li><b>and:</b> "and" is implicit.  If you write two specifiers immediately next to each other, separated by a space, an "and" will be implicitly added between them.</li>
+                <li><b>or:</b> You may write an "or" between two specifiers, with a query such as "class=sea or class=air".  This will return all results that match either of those specifiers.</li>
+                <li><b>parentheses:</b> Parentheses may be used to override the default order of operations.  They are included at the start or end of specifiers, such as "(class=sea or class=air) cost > 50".  Parentheses may be nested, and only take effect when they are balanced.</li>
+				<li><b>not:</b> "not" is expressed with the != operator.  This returns the opposite of what any filter's equal (=) operation would ordinarily return.  This is particularly useful as a "not equal to none" query to return all items that have, e.g. a required good/tech/etc.</li>
+            </ul>
+            <p>The combination of these can allow complex queries, such as "((class=sea or class=air) attack>7) or (class=land hpBonus>0)".</p>
+            <h2>Order of Operations</h2>
+            <p>The order of operations follows the typical order in boolean logic and programming languages.  When there is a tie, left-to-right order is used.  Operators are evaluated in the following order:</p>
+            <ul>
+                <li><b>parentheses:</b> All parenthetical expressions are evaluated first, starting with the innermost.  In the preceding example, this means (class=sea or class=air) is the first expression evaluated.</li>
+                <li><b>and:</b> "and", including implicit "and", is evaluated next.  If the query is "reqGood=Iron or reqGood=Horses cost>30", this means the expression "reqGood=Horses cost>30" is evaluated first.</li>
+                <li><b>or:</b> "or" is evaluated last.</li>
+            </ul>
+            <p>The "and" example is worth clarifying slightly more - because "and" precedes "or", that query searches for units that require iron, or units that require horses and cost more than 30 
+                shields.  If you wanted instead to search for units that require both iron and horses, and cost more than 30 shields, you would have to write "(reqGood=Iron or reqGood=Horses) cost>30".</p>
+            <h2>Greater Than/Less Than/Equals</h2>
+            <p>All filters currently allow searching by the equals (=) operator.  Some - generally the numeric ones - also allow searching with less than (<) and greater than (>) operators.  These are detailed in the filter's specific documentation.</p>
+            <h2>Negation</h2>
+			<p>Starting in version 1.28, you can also use the != operator, which returns the opposite of what the = operator returns.  As an example, "reqGood!=None" returns all items which require a good.</p>
+            <p>Boolean filters, such as the "draft" filter for units, take either "true" or "false" after the equal sign.  For example, "draft=false" returns all units that do <i>not</i> have the draft ability.  This is equivalent to "draft!=true", but may be more intuitive.</p>
+            <div id="footer"><a href="civ3editor.html">Index</a></div>
+	</body>
+</html>

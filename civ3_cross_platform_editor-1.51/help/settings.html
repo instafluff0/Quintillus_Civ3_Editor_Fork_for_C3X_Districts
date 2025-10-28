@@ -1,0 +1,50 @@
+<html>
+	<body bgColor=#CFCCFC>
+		<h2>Settings</h2>
+		<p>The Settings window lets you configure how the editor works.  It is divided into three parts; the Main and Autosave tabs last across
+		editor sessions; the Map one currently does not.</p>
+		<h3>Main</h3>
+		<ul>
+			<li>Civ3 Install Directory - Where you have Civ3 installed.  If you are running Windows, this will automatically be detected (though
+			if you have Civ3 installed more than once, such as a CD version and a Steam version, you may still want to change this).  Otherwise,
+			you'll be asked to select this the first time the program runs.  If you reinstall Civ3 to a different location, you'll need to change
+			this.</li>
+			<li>Default Opening Directory - This is where the Open dialogs start.  Generally, you'll probably want this to be your Scenarios folder,
+			but you can change it if you modify built-in Conquests scenarios frequently or otherwise prefer somewhere else.</li>
+			<li>Debug Level - This can be changed to modify how much information is stored in the log.  More information can be helpful for debugging,
+			but is also slower.  "info", the default, is generally what you want.  "debug" and "trace" could be noticeably slower.  You could set it
+			to only show warnings or errors if you're really low on disk space (like, running the editor from a floppy disk).</li>
+			<li>Number of processors - Unlike Civ3 itself, sometimes the editor can use more than one processor to speed up its work (currently this
+			is used for opening BIQ files quicker).  But you can tell it not to if you prefer it doesn't.  The default, 0, will result in it using
+			all processors you have, so if you have a triple-core processor, 0 is the same as 3.  You can set it to a number higher than how many
+			processors you have, and it will work fine, but eventually will become slightly slower than the 0 setting.</li>
+			<li>Font - You can change the font used in the editor, as inspired by Civ3 at one point having Lucida Blackletter as its font before it
+			was released.  There are only four choices, as choices aren't added until it's tested that they look at least decent with the editor and
+			are usually present on Windows, OSX, and preferably Linux.  Tahoma is the most-tested, with Trebuchet MS coming in second.  Lucida Sans
+			Regular is what Civ3 uses in-game.  You must restart the editor for this change to take affect.</li>
+			<li>Confirm quit - If checked (the default), you get asked "Do you really want to quit?" when you try to quit.  
+			Can be quite helpful for avoiding
+			accidentally losing changes with errant mouse clicks or Alt+F4's.  But if you never make such mistakes, you can disable it - just don't
+			blame me if you accidentally close the editor!</li>
+			<li>Map enabled - If checked, the map editor portion will load up when the BIQ has a custom map.  Enabled by default since 0.79, this
+			option does require more resources, particularly memory, since it loads up all the graphics (about 215 MB for the Conquests WWII 
+			scenario, versus 45 MB without the map, for example).</li>
+			<li>Horizontal mousewheel scrolling - If checked, you can scroll horizontally by holding down Shift and moving the mouse wheel.  Otherwise,	you'll have to use the scrollbar.  This doesn't work particularly well with trackpads or Macs, so it is disabled by default.
+			If you run Windows with a mouse, it's probably best to turn this on.</li>
+		</ul>
+		<h3>Map</h3>
+		<p>The map tab lets you configure which overlays appear on the map (if it's enabled on the general tab).  By default, everything is enabled
+		except the grid, but you can turn layers off just like you can with Ctrl+Shift+M in Civ3, to get a less cluttered map (this shortcut doesn't
+		work in the editor, however).</p>
+		<p>You can also change the settings for the zoom quality - this particularly affects speed and image quality while you are zoomed out.  Generally, Quick and Balanced are relatively close to each other, while Quality is noticeably slower, but also noticeably better in certain areas such as city names and borders.  While at 50% zoom, city names are not legible with Balanced, they still are legible, if small, at 40% zoom with Quality.</p>
+		<h3>Autosave</h3>
+		<p>The autosave tab lets you configure how many autosaves should be kept and how often an autosave should be made.  By default, up to 10
+		autosaves are stored, and an autosave is made every 4 minutes.  Autosaves can run from about 500 KB for a standard size map to a few
+		megabytes with a large map.</p>
+		<h4>Auto Archive</h4>
+		<p>Auto archive is a feature introduced in version 0.89 that complements
+		autosave.  The way it works is that if it is enabled (the default in 0.89; this
+		may change in future versions), then whenever you save the scenario, a backup of your old save is also made, with the date of the save in the name.  For example, if you were working on SecretScenario.biq, and made a save, overwriting the old name, a backup with a name such as SecretScenario_Archive_2014_02_08 2359.biq would also be made.  This way, if you notice something isn't working that used to, you can go back and figure out which changes caused it, provided you save somewhat often.  Autosave still has its place (depending on how you work, autosaves may happen more frequently than manual saves), and can co-exist with auto archiving, but addresses the case where the problematic change is older than the oldest remaining autosave.</p>
+		<div id="footer"><a href="civ3editor.html">Index</a></div>
+	</body>
+</html>

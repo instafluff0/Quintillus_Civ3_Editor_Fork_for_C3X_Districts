@@ -1,0 +1,255 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.civfanatics.civ3</groupId>
+  <artifactId>xplatformeditor</artifactId>
+  <name>Civ3 Cross-Platform Editor</name>
+  <version>1.12</version>
+  <packaging>jar</packaging>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <repositories>
+    <!--These are needed for Swing/Netbeans -->
+    <!-- Old NetBeans old decommed -->
+    <repository>
+      <id>maven2-repository.netbeans.maven2</id>
+      <name>Netbeans Maven Repository</name>
+      <url>http://bits.netbeans.org/maven2/</url>
+      <layout>default</layout>
+    </repository>
+    <!-- Needed for AbsoluteLayout.  Jaroslav Tulach's mirror of the old bits.netbeans.org/maven2 repo -->
+    <repository>
+      <id>netbeans</id>
+      <name>NetBeans</name>
+      <url>https://netbeans.apidesign.org/maven2/</url>
+    </repository>
+  </repositories>
+  <dependencies>
+	<dependency>
+		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+		<version>1.2.16</version>
+	</dependency>
+	<dependency>
+		<groupId>com.civfanatics.civ3</groupId>
+		<artifactId>xplatformeditor.shared-components</artifactId>
+		<version>${project.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.netbeans.external</groupId>
+		<artifactId>AbsoluteLayout</artifactId>
+		<version>RELEASE69</version>
+	</dependency>
+	<dependency>
+		<groupId>net.java.dev.swing-layout</groupId>
+		<artifactId>swing-layout</artifactId>
+		<version>1.0.2</version>
+		<!-- Ideally we would use 1.0.4 -->
+	</dependency>
+        <!-- The below dependency can allow using JavaFX with Java 7 and Maven.
+             See http://stackoverflow.com/questions/15278215/maven-project-with-javafx-with-jar-file-in-lib
+             We could also use the Maven JavaFX plugin (and including a JavaFX lib with the project?)
+             This method is not great since it requires putting the JavaFX lib
+             on the runtime classpath manually; that may be possible with the launcher,
+             but it's a bit of a hack regardless.  Java 8 makes it much simpler.
+        -->
+        <!-- 
+            <dependency>
+              <groupId>javafx</groupId>
+              <artifactId>jfxrt</artifactId>
+              <version>${java.version}</version>
+              <scope>system</scope>
+              <systemPath>${java.home}/lib/jfxrt.jar</systemPath>
+            </dependency>
+         -->
+	<dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>4.8.1</version>
+         <scope>test</scope>
+      </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <scope>test</scope>
+      <version>2.44.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.opera</groupId>
+      <artifactId>operadriver</artifactId>
+      <scope>test</scope>
+      <version>1.5</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-remote-driver</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+  <build>
+	<defaultGoal>install</defaultGoal>
+	<directory>${basedir}\target</directory>
+	<finalName>${project.artifactId}-${project.version}</finalName>
+	<plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>2.0.2</version>
+              <configuration>
+                <source>1.8</source>
+                <target>1.8</target>
+              </configuration>
+            </plugin>
+            <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.4</version>
+                    <configuration>
+                            <archive>
+                                    <manifest>
+                                            <addClasspath>true</addClasspath>
+                                            <mainClass>com.civfanatics.civ3.xplatformeditor.MainLauncher</mainClass>
+                                    </manifest>
+                            </archive>
+                    </configuration>
+            </plugin>
+            <plugin>
+                <!-- NOTE: We don't need a groupId specification because the group is
+                     org.apache.maven.plugins ...which is assumed by default.
+                 -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-5</version>
+                <configuration>
+                          <archive>
+                                <manifest>
+                                        <mainClass>com.civfanatics.civ3.xplatformeditor.MainLauncher</mainClass>
+                                </manifest>
+                          </archive>
+                  <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                  </descriptorRefs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                  <execution>
+                    <id>copy-resources</id>
+                    <!-- here the phase you need -->
+                    <phase>package</phase>
+                    <goals>
+                      <goal>copy-resources</goal>
+                    </goals>
+                    <configuration>
+                      <outputDirectory>${basedir}/target/langs</outputDirectory>
+                      <resources>
+                        <resource>
+                          <directory>src/main/java/com/civfanatics/civ3/xplatformeditor/langs</directory>
+                          <filtering>true</filtering>
+                        </resource>
+                      </resources>              
+                    </configuration>            
+                  </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <argLine>-Xmx768M</argLine>
+                </configuration>
+            </plugin>
+      </plugins>
+  </build>
+  <reporting>
+	<plugins>
+	
+		 <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-report-plugin</artifactId>
+			<version>2.5</version>
+         </plugin>
+		 <!-- Cobertura keeps reporting 0% coverage
+		 Not sure why, perhaps because it is multithreaded
+	  <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.0</version>
+      </plugin>
+	  -->
+		 
+	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.5</version>
+		<configuration>
+             <configLocation>${basedir}/checkstyle.xml</configLocation>
+        </configuration>
+      </plugin>
+      <!--  Fails in Java 8 because some methods are missing documentation (mainly for parameters).
+            See https://stackoverflow.com/questions/15886209/maven-is-not-working-in-java-8-when-javadoc-tags-are-incomplete#16743137
+            Workarounds don't seem to be working and low priority to fix
+	  <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <reportSets>
+               <reportSet>
+                  <id>html</id>
+                  <configuration>
+                     <show>protected</show>
+                  </configuration>
+                  <reports>
+                     <report>javadoc</report>
+                  </reports>
+               </reportSet>
+            </reportSets>
+         </plugin>
+         -->
+		 <!-- Need license for this, should be free for
+		 non-commercial
+		 <plugin>
+             <artifactId>maven-clover-plugin</artifactId>
+         </plugin>
+		 -->
+                 <!--  Build fails because it can't find rulesets.  Not sure what happened to them.  Probably haven't tried this in years
+		 <plugin>
+			 <groupId>org.apache.maven.plugins</groupId>
+			 <artifactId>maven-pmd-plugin</artifactId>
+			 <configuration>
+				<targetJdk>1.5</targetJdk>
+				<rulesets>
+				   <ruleset>/rulesets/basic.xml</ruleset>
+				   <ruleset>/rulesets/controversial.xml</ruleset>
+				</rulesets>
+				<format>xml</format>
+				<linkXref>true</linkXref>
+				<sourceEncoding>utf-8</sourceEncoding>
+				<minimumTokens>100</minimumTokens>
+			 </configuration>
+		  </plugin>
+                  -->
+                  <!-- Fails saying it can't find configuraton file.  Not sure why.
+		  <plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>findbugs-maven-plugin</artifactId>
+			<version>2.0.1</version>
+		  </plugin>
+                  -->
+		  <!-- This used to generate a nice Checkstyle violation summary
+		  Now it does a Surefire report, which is nice, but not as nice as
+		  the Checkstyle violation summary -->
+		  <plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>dashboard-maven-plugin</artifactId>
+		  </plugin>
+
+    </plugins>
+  </reporting>
+</project>

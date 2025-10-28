@@ -1,0 +1,15 @@
+
+
+***Efficiency***
+
+- It is not worth it to optimize comparisons with StringBuilder instead of
+  String + right now.  Even on somewhat complex comparisons they are taking
+  1/10th of a second.
+
+- File input: approximately 700 milliseconds as of 0.45 (rev 1 of shared)
+  10-12% of that is HDD access; 71% (500 ms) of that is TILE processing on
+  a maximally-sized map.
+
+- Multithreading tile processing cut overall time from 703 ms to 578 ms on
+  average (17.7%).  Of the 500 ms that was tile processing on Huge World.biq,
+  this is a 25% improvement.

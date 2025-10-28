@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.civfanatics.civ3.xplatformeditor.UnitDownloadWindowController">
+   <bottom>
+      <BorderPane prefWidth="200.0" BorderPane.alignment="CENTER">
+          <!--
+         <center>
+            <TextField fx:id="txtDecompressionMethod" text="7z x [filename] -y -o" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets left="5.0" right="10.0" />
+               </BorderPane.margin></TextField>
+         </center>
+         <left>
+            <Label text="Decompression Command:" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets left="10.0" />
+               </BorderPane.margin></Label>
+         </left>
+         -->
+         <bottom>
+            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <buttons>
+                <Button fx:id="btnTest7z" mnemonicParsing="false" onAction="#test7z" text="Test 7-Zip" />
+                  <Button fx:id="btnBrowse" alignment="BOTTOM_RIGHT" mnemonicParsing="false" onAction="#browse" text="Browse for Units">
+                     <opaqueInsets>
+                        <Insets bottom="5.0" left="10.0" />
+                     </opaqueInsets>
+                    <BorderPane.margin>
+                       <Insets bottom="10.0" right="10.0" top="10.0" />
+                    </BorderPane.margin>
+                  </Button>
+              </buttons>
+               <BorderPane.margin>
+                  <Insets right="10.0" />
+               </BorderPane.margin>
+            </ButtonBar>
+         </bottom>
+      </BorderPane>
+   </bottom>
+   <center>
+      <TextArea fx:id="txtDescription" prefHeight="229.0" prefWidth="580.0" text="Welcome to the Unit Download Area.  This area uses a customized web browser to allow you to download units from the CFC downloads database, and have them automatically added to your scenario (while being optionally renamed to better fit your scenario).  All you have to do is find a unit you'd like to add on the Downloads Database, click the download button, and the editor will take care of adding it to your scenario.\n\n\r\nTo help with decompression, the editor will call 7-Zip to perform decompression.  You can test that it is available with the Test 7-Zip button below, and on Windows, the editor can automatically download it if need be.  Then click the Browse for Units button to begin downloading units." wrapText="true" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </BorderPane.margin></TextArea>
+   </center>
+</BorderPane>

@@ -1,0 +1,9 @@
+This is the version for creating a cross-platform Civ3 editor.
+
+It is currently in need of some further progress.
+
+Worked stopped on June 15, 2009, 11:55 PM.
+
+Work resumed October? 2009.
+
+Off-and-on from there onwards.

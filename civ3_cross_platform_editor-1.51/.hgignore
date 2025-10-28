@@ -1,0 +1,28 @@
+\.rej$
+\.chg\..*$
+\.conflict\~$
+\.orig\..*$
+\.orig$
+\*.biq$
+^bin/7z*/*$
+^bin/7z920/*$
+^bin/7z1604/*$
+^bin/7z1801/*$
+^build/*$
+^.idea/*$
+^jre1.8_111/*$
+^out/*$
+^test/com/civfanatics/civ3/xplatformeditor/Custom All\.biq$
+^test/com/civfanatics/civ3/xplatformeditor/Custom None\.biq$
+^test/com/civfanatics/civ3/xplatformeditor/Custom Map Only\.biq$
+^test/com/civfanatics/civ3/xplatformeditor/Custom Rules Only\.biq$
+^test/com/civfanatics/civ3/xplatformeditor/Custom Player Data Only\.biq$
+^test/com/civfanatics/civ3/xplatformeditor/Custom Rules and Plyr Data\.biq$
+^test/com/civfanatics/civ3/xplatformeditor/Custom Map and Plyr Data\.biq$
+^test/com/civfanatics/civ3/xplatformeditor/Custom Rules and Map\.biq$
+^target/*$
+^HGIGNORE_BACKUP$
+\.class$
+\.biq$
+\.log
+log.txt

@@ -1,0 +1,71 @@
+<html>
+	<body bgColor=#CFCCFC>
+		<h1>Civ3 Cross-Platform Editor Guide</h1>
+		<p>Welcome to the guide to the Civ3 cross platform editor.
+		This site serves as the base to the online help system.  For
+		questions, please visit the forum thread at <a href="http://forums.civfanatics.com/showthread.php?t=377188">here</a>.</p>
+		<h3>System Requirements</h3>
+		<p>The only two requirements are a 1024x768 or higher resolution
+		monitor (this is also the minimum for Civ3), and a system that
+		can support Java 1.5.  Such systems include:</p>
+		<ul>
+			<li>Windows 98/ME/2000 or later</li>
+			<li>Mac OSX 10.4 (Tiger) or later</li>
+			<li>Recent versions of Linux (exact requirement unknown)</li>
+		</ul>
+		<p>It is recommended that you use <a href="http://java.sun.com">Sun's Java</a> versions.
+		Other versions may work, but will not be supported.</p>
+		<h3>Setup</h3>
+		<p>Once you have downloaded the file from <a href="https://sites.google.com/site/quintilluscfc/ConquestsEditor0.56.zip">here</a>, 
+		unzip the .zip file.  Then simply double-click on the .jar file, and the editor will
+		start up.  You will be asked to select your Civilization III install folder, so
+		that the editor will be able to load images and set your default file open/save
+		folder to wherever your default Conquests scenario folder is.  You will only be
+		asked to do this the first time you run the program.</p>
+		<b>check Mac/Linux issues</b></p>
+		<h3>Limitations</h3>
+		<p>Currently, the editor only supports BIQ files that:</p>
+		<ul>
+			<li>Are version 12.08 or 12.06 (corresponding to Conquests 1.22)</li>
+			<li>Have custom rules</li>
+		</ul>
+		<h2>Overview</h2>
+		<p>Upon starting the editor, you will see a screen that looks
+		similar to the following:</p>
+		<img src="http://sites.google.com/site/quintilluscfc/files/MainScreen.PNG" alt="Main Screen" />
+		<p>The basic functions - Open and Save - are straightforward, as one would
+		expect.  However, there are concepts to be expounded upon:</p>
+		<ul>
+			<li><a href="inputFromSav.html">Input From SAV</a>: The editor includes support from extracting BIQ files from SAV files that have them embedded.  Note the SAV must be uncompressed.</li>
+			<li><a href="safetyLevels.html">Safety Level</a>: The editor supports a number of different "safety levels".  A lower safety level enables more elements to be modified, beyond what the classic editor allows.</li>
+			<li>BIQC tab:  This tab allows the comparison of multiple BIQ files, automatically and in a format that is (somewhat) easy for humans to read</li>
+		</ul>
+		<p>Specialized instructions are available for these sections of the editor:</p>
+		<ul>
+			<li>None</li>
+		</ul>
+		<h3>Gotchas</h3>
+		<p>Beyond the requirements and limitations, there are a few
+		other potential gotchas.</p>
+		<p><b>Opening multiple files:</b> The editor is not guaranteed
+		to work properly with multiple files open.  It <i>may</i> work
+		correctly, but it is not recommended that you open multiple files
+		at once, unless you are using the BIQC functionality, which does
+		correctly support multiple files.</p>
+		<p><b>Incomplete functionality:</b> Some areas may not include complete functionality.  Details about
+		this can be found on the specialized instructions for the respective
+		tab.</p>
+		<p><b>Red text:</b> Red text indicates that the current value does
+		not fall within the safety level's requirements.  For example, if you
+		tried to give a unit 21 hit points with the default safety level, you
+		would notice that the hit point value (21) was in red text.  The editor does
+		not currently enforce the safety level's limits, but the red text
+		serves as a warning that you are violating the bounds of the tab's current safety
+		level</p>
+		<p><b>Invalid values:</b> It is possible to enter too large a value for
+		a field for it to be processed - for example, the value 5 billion is
+		likely to cause this anywhere.</p>
+		<p><small>Last updated: October 5, 2010</small></p>
+        <script src="http://static.freewebs.getclicky.com/63828581.js" type="text/javascript"></script><noscript><img alt="Clicky" src="http://in.freewebs.getclicky.com/63828581-fwdb4.gif" /></noscript>
+	</body>
+</html>

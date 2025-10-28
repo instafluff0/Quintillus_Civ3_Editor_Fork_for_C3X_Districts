@@ -1,0 +1,308 @@
+Welcome to the Cross-Platform Editor thread!
+
+Offering the ability to do nearly anything that you can do with the Windows editor, the hope is that this editor can allow Mac Civ3 fans the ability to at last rely on their native platform for a good part of their Civ3 editing.
+
+---------------------------------
+
+Broadening its appeal, the editor also provides some [B]new options[/B] for Civ3 modders regardless of platform.  These include:
+
+[LIST]
+[*]Being able to place [B]landmark terrains of any type[/B].
+[*]Being able to have [B]maps of more than 362 tiles[/B] in either width or height (although not both at the same time).
+[*]Being able to [B]bypass arbitary Firaxis limits[/B].  For example, with this editor, you can give a building more than 100 culture per turn, or give buildings negative maintenance costs.
+[*][B]Deepwater harbour[/B] support.
+[/LIST]
+
+Over the years, the purpose of the editor is gradually shifting from providing the standard functionality on the Mac platform - most of which is now present - to exploring and expanding the limits of Civilization III.  Utilities to speed up common tasks, such as map creation, are also being added.
+
+Download from the latest version [B][URL='http://forums.civfanatics.com/downloads.php?do=file&id=15288']here[/URL][/B].  [B]Note[/B] that you must have Java 8 installed to be able to run the program.  If you do not, if you are on Windows Vista or later or OS X 10.9 or later, download and install Java from Oracle [URL='http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html']here[/URL].  Otherwise, see the "Java Download Links" section of this post for a link to a version for your operating system.  The editor runs on systems released as early as 1995.
+
+The editor is also [B]open source[/B].  You can view its code at [URL]https://bitbucket.org/QuintillusCFC/[/URL].  See the source code section below for more details.
+
+[IMG]https://sites.google.com/site/quintilluscfc/EditorScreenshot0.52.png[/IMG]
+[SIZE=1]A (now dated) version of the editor on the Civ page[/SIZE]
+
+[IMG]http://quintillus.warpmail.net/civ3editor/imgs/forumthread/073MapView.PNG[/IMG]
+[SIZE=1]The editor on the Map page[/SIZE]
+
+[B]System Requirements[/B]
+
+To run the editor, you will need to have Java installed, which you can download from the links in the "Java Download Links" spoiler.  Hardware requirements are as follow:
+
+[SPOILER=Hardware requirements]Hardware requirements are moderate; generally, any computer that can run Civ3 will be able to run this editor.
+
+[LIST]
+[*]2 MB of hard drive space is required, plus an additional 2 MB when decompressing the download, and space for Java if it is not already installed.
+[*]32 MB of memory is required for rule editing (48 MB recommended); 256 MB is required if also doing map editing (384 MB recommended). This is in addition to whatever your operating system and other background programs use.
+[*]Any CPU that is powerful enough to run Conquests will run the editor (albeit more slowly than with a more powerful CPU). It's been tested with adequate performance on a 450 MHz Pentium II, which is right around the minimum for Conquests (slightly above, exactly, or slightly below, depending on your source).
+[*]Any graphics card should work.  A 1024x768 or higher resolution is recommended, although the editor will allow scrolling to access all features at lower resolutions
+[/LIST]
+
+In theory, and sometimes in practice, lower-specced hardware may work.  The lowest-specced successful test (mainly due to lack of working older hardware) has been rule editing with the Legacy build on a laptop with a Pentium MX 166 MHz CPU, and 104 MB of total RAM.[/SPOILER]
+
+It is recommended to have Civilization III installed, although if you go to Options -> Settings and uncheck Map Enabled and restart, you can edit the rules without having Civ3 installed (with a few restrictions such as no entirely new scenarios).
+
+The "current" build will work out-of-the-box if you have Java 8, 9, or 10 installed (but not Java 11), and are running Windows Vista or later, OS X 10.8 or later, or most recent versions of Linux.  Windows XP is also supported as a primary supported OS with a separate build.  For Java 11, XP, and all other operating systems, see the spoiler below.
+
+[SPOILER=Support Matrix]There are several different builds available to support different operating systems.  These are:
+
+---------------------------
+
+[B]Cross-Platform Build[/B]
+
+This remains the "main" build, and will work with Java 8, 9, and 10. If you have one of these versions, and one of the following operating systems, this should be your preferred version, as it is always up-to-date:
+
+- Windows Vista or later
+- OS X 10.8 or later
+- Linux
+
+In addition, if you have a somewhat out-of-date build of Java 8 on Windows XP, you can use this build.
+
+-----------------------------
+
+[B]Windows XP (and later) Build [/B]
+
+This build ships with a bundled version of Java 8, and will run on any version of Windows from XP onwards, regardless of which version of Java you have on your system (including if you don't have Java at all).
+
+The Windows XP build is available in [URL='https://forums.civfanatics.com/threads/cross-platform-editor-for-conquests-now-available.377188/page-52#post-15224364']this post[/URL], along with instructions on how to run it. It has been updated to be fully feature-equal with the regular 1.24 release.
+
+While the XP Build is not updated as frequently as the cross-platform build, you can "XP-ize" a new build by downloading the cross-platform build, and copying the settings over from your old XP build, and then restarting as described in the linked instructions.
+
+[URL='https://forums.civfanatics.com/threads/cross-platform-editor-for-conquests-now-available.377188/page-48#post-14968903']This post[/URL] is the reference for Windows XP support.
+
+------------------------------
+
+[B]OS X with Java 11 Build[/B]
+
+[URL='https://forums.civfanatics.com/threads/cross-platform-editor-for-conquests-now-available.377188/page-52#post-15240656']Post 1040[/URL] has a build that will work with OS X (and macOS) with Java 11 installed. It bundles the components that were removed in Java 11, but uses the system version of Java.
+
+If you have OS X with Java 8, 9, or 10, you should use the cross-platform version; this one may work, but that is not guaranteed.
+
+This build cannot currently be auto-upgraded to be compatible with the latest cross-platform build like the Windows XP build can.
+
+-------------------------------
+
+[B]Legacy Build[/B]
+
+The latest Legacy build is Legacy 1.24, which is available from [URL='https://forums.civfanatics.com/threads/cross-platform-editor-for-conquests-now-available.377188/page-52#post-15229969']this post[/URL].
+
+You can run it just like the regular version, by running Conquests Editor.jar. Note that it does not have all the features of the regular 1.24 version, notably missing re-orderable/filterable unit and tech lists.
+
+The Legacy Build lacks some of the recent features, but should run out-of-the-box with Java 5 or later installed on a wide variety of operating systems, including:
+
+- Windows 98 or later
+- OS X 10.4 or later (PowerPC or Intel)
+- Linux
+- Most likely any other OS that supports Java 5.
+
+-----------------------------
+
+[B]Windows 95 Build[/B]
+
+Although Conquests doesn't support Windows 95, Vanilla Civ3 does, and thus it seemed appropriate to have a build for it as well.  There is a 1.09 Legacy build adapted to run on Windows 95 available in [URL='https://forums.civfanatics.com/threads/cross-platform-editor-for-conquests-now-available.377188/page-50#post-15089582']this post[/URL].
+[/SPOILER]
+
+[SPOILER=Java Download Links][B]Java Download Links[/B]
+
+Don't want the details and have a current system, but not Java?  The official link for downloading Java 8 from Oracle for Windows XP+, OS X 10.9+, and current versions of Linux is [URL='http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html']here[/URL].  This is current as of January, 2020.
+
+Confused by Oracle's site, or the link doesn't work anymore?  I've copied the Java installers (current as of July, 2019) for various operating systems to a server I operate:
+
+[URL='http://178.128.224.40/JavaRuntimes/1.8/jre-8u211-windows-x64.exe']64-bit Windows (.exe)[/URL]
+[URL='http://178.128.224.40/JavaRuntimes/1.8/jre-8u211-windows-i586.exe']32-bit Windows (.exe)[/URL]
+[URL='http://178.128.224.40/JavaRuntimes/1.8/jre-8u211-macosx-x64.dmg']64-bit Mac[/URL] (.dmg)
+[URL='http://178.128.224.40/JavaRuntimes/1.8/jre-8u211-linux-x64.rpm']64-bit Linux (.rpm)[/URL]
+[URL='http://178.128.224.40/JavaRuntimes/1.8/jre-8u211-linux-i586.rpm']32-bit Linux (.rpm)[/URL]
+
+Full details, including links for older operating systems, continue onwards.
+
+The editor supports Java 8, but does not currently support Java 11 or more recent versions due to features the editor depends on being removed in Java 11.  This should not cause a major issue, Java 11+ is targeted at developers and servers first, and Java 8 is still (as of Q4 2019) receiving updates.  But, for the latest update on compatibility with Java 11, including if you are having trouble running the editor, check [URL='https://forums.civfanatics.com/threads/cross-platform-editor-for-conquests-now-available.377188/page-52#post-15224365']this post[/URL].
+
+For OSX links pre-Mavericks, there is only one download off of the link.  For Windows, Linux, and OSX 10.9 and later links, select the download for your version (64-bit or 32-bit) and preferred installation (online or offline) off of the links below (and also hit the "I accept the agreement" button).  Thereafter, it's pretty much like installing any other piece of software, and you should be set up to run the editor after the install finishes.
+
+Some versions of Windows and some versions of OSX (IIRC all before 10.8) come bundled with Java.  However, if your computer is older than 2006 or so, it's possible that even if Java came pre-installed, the installed version might be too old to run the editor.
+
+ 
+[LIST]
+[*][URL='http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html']Windows XP** through 10, Linux, and OS X 10.9 "Mavericks"  and later (verified through 10.13 "High Sierra") - Java 8[/URL]
+[*][URL='http://support.apple.com/kb/DL1572']OSX 10.7 "Lion" or 10.8 "Mountain Lion" - Java 6[/URL]
+[*][URL='http://support.apple.com/kb/DL1516']OSX 10.6 "Snow Leopard" - Java 6[/URL]
+[*][URL='http://support.apple.com/kb/DL1359']OSX 10.5 "Leopard" - Java 5, or Java 6 for 64-bit Intel Macs[/URL]
+[*][URL='https://support.apple.com/kb/DL847?viewlocale=en_US&locale=en_US']OSX 10.4 "Tiger" - Java 5[/URL] (link updated January 6, 2020)
+[*][URL='http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html']Alternate for XP x64/Vista/7/8/Linux/Mavericks - Java 7[/URL] (link needs updating)
+[*][URL='http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-javase6-419409.html#jre-6u37-oth-JPR']Windows 2000 - Java 6[/URL]
+[*][URL='http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-javase5-419410.html#jre-1.5.0_22-oth-JPR']Windows 98/ME - Java 5[/URL]
+[*][URL='http://svn.netlabs.org/java#LatestVersion']OS/2 Warp 4 - Java 6[/URL]
+[/LIST]
+
+** - This version doesn't officially support XP, but will install successfully on XP and seems to work well enough on it.  I've tested the editor somewhat on this configuration and haven't noticed any unexpected side effects.  If you do run into issues, so you may wish to go with the Java 7 link below it instead in the near-future, which also has options for XP x64/Vista/7/8/Linux/OSX 10.9 downloads.
+[/SPOILER]
+
+
+[B]Troubleshooting[/B]
+
+[SPOILER][I]Program Will Not Start[/I]
+
+The most likely cause is not having Java installed, or having too old of a version of Java installed and needing to upgrade Java to a newer version.  As of spring 2017, the link to the latest version (Windows XP or later, and OS X 10.9 or later) is [URL='http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html']here[/URL].  You can also see the "Java Downloads Section" of this post for links for other operating systems and older versions of OS X/Windows.
+
+You can also try the Windows XP version[/URL], which includes Java with the editor.
+
+[I]Java Auto Start Difficulties[/I]
+
+Although most Windows and OSX machines will let you start the editor by double-clicking on launcher.jar, some won't.  If double-clicking launcher.jar doesn't bring up the editor, you're probably in that unfortunate group.  There are two ways to proceed.  The easy route, if you are on Windows, is to download [URL='http://quintillus.warpmail.net/civ3editor/start.bat']start.bat[/URL] (22 bytes), and place start.bat in the same folder as the editor.  Then just double-click start.bat, and the editor will start.
+
+The second route, that actually fixes this, is to tell your Java how to behave.  While uninstalling and reinstalling Java [I]probably[/I] will fix the problem (this theory remains untested), the see [URL='http://forums.civfanatics.com/showpost.php?p=10357739&postcount=141']this post to fix the heart of the problem (Windows instructions currently).  I'd include it here, but am out of characters for this post :(.
+
+You can also try the Windows XP version[/URL], which includes Java with the editor.
+
+[I]Editor Not Opening any BIQ files (or saved files not being visible)[/I]
+
+There can be permission problems on Windows 7 (and likely Vista as well) that can result in the editor not being allowed to open any files.  The current recommended remedy is to install Civ3 to somewhere other than C:\Program Files (for example, C:\Civilization III).  Alternately, you can move your BIQs somewhere outside of C:\Program Files to edit them, and then copy them back to test and play them.  Running Civ3 and the editor on Windows 98, ME, 2000, or XP is also a possibility (that's the route I took, before I even started making this editor).
+
+Disabling User Account Control should also solve these problems, and is likely going to be a quicker and more convenient fix than either moving Civ3 or switching operating systems.  I personally recommend disabling it as soon as you start using Vista/7, no matter what, though others may argue that its security benefits are worth its inconvenience.
+
+As the editor is inherently dependent on how Civ3 stores its files, this is an inherent hazard when running Vista or 7, and cannot likely be avoided through changes or updates to the editor.
+
+[I]Preferences not saved[/I]
+
+If you are running Windows Vista or Windows 7 (or later), please make sure you are [I]not[/I]  running the editor from somewhere within C:\Program Files (or C:\Program Files (x86)\, or C:\Windows).  If you are running a different operating system, this is strange.  There should be a civ3editor.ini file created in the editor's folder after you run it for the first time; if not, this could be an issue to post about.[/SPOILER]
+
+[B]Source Code[/B]
+
+The editor is open-source.  The source code is divided into two sections - BIQ support, and the editor itself.  The idea being that you can use the BIQ code for separate projects as well if you wish to do so.
+
+[SPOILER=Links]The BIQ support code is [URL='https://bitbucket.org/QuintillusCFC/civ3_shared_components']here[/URL], and is Mozilla Public Licensed, meaning you can use it in open or closed source programs, but have to make any changes to the shared components themselves (but not the program that uses them) available as open source.  The goal is that everyone who uses it contributes back so we wind up with an even better BIQ-reading library.
+
+The editor code itself is [URL='https://bitbucket.org/QuintillusCFC/civ3_cross_platform_editor']here[/URL], and uses the BIQ support code.  It has the MIT license, which means you can use it pretty much however you want, in either open or closed source programs.  You are encouraged, but not required, to share changes you make back to improve the editor.
+
+If you've come up with some scheme to use the editor/code commercially, I'd appreciate it if you contact me first.  I might be interested in helping you take over the world, and it's preferable to have some friends when doing so.[/SPOILER]
+
+Feel free to use this program for anything Civ related.  You don't have to mention the use of the editor in your mod's credits (though you can if you want).  However, if it does prove really useful in making your mod, I'd appreciate it if you could drop a line in the thread.  It's nice to know how and where it's helping out, and I'm more likely to see that if you make a post in the thread.
+
+[B]General Notes / Summary of Helpful Info[/B]
+
+Many of the restrictions of the editor have been removed over the years.  The editor should be able to read [B]all BIC/BIX/BIQ files[/B], as of the current version, although it will only save in the BIQ format for Civ3 1.22.  Compressed BIQ files are also supported, although the editor always saves them uncompressed.  All combinations of custom rules/player data/maps are supported, and you can add custom rules or maps where they do not already exist.
+
+It also is possible to extract BIQ files from Conquests SAV files with this editor, although that functionality is very lightly tested, seeing as it isn't the main goal of the editor.
+
+Please do post any bugs you find in this thread, and they will be fixed as time permits.
+
+For those of you who are adventurous and would like to explore the actual (rather that Firaxis-imposed) limits of the Civilization III through the editor, please post your results so that the actual boundary conditions can be added to the editor.  Also make note of whether you are using the Windows or Mac version of Conquests - it is possible that the Windows and Mac versions of Civ3 may have different tolerances of BIQs that are outside the limits of the Firaxis editor.
+
+As always, backing up your files before editing them is recommended.  There is an optional feature called Auto Archive (Options --> Settings --> Autosave --> Auto Archive) that will automatically create a copy of your previous version on saving a new version so you can go back if need be; it isn't enabled by default because it can create quite a few files if you edit the BIQ frequently.  There also is autosave functionality that is enabled by default (and configurable for both frequency and number of backups) that is time-based and will let you recover unsaved changes in the event of a mistake, power outage, computer crash, etc.
+
+Download from the latest version [URL='http://forums.civfanatics.com/downloads.php?do=file&id=15288']here[/URL].
+
+[B]Documentation[/B]
+
+The latest documentation is currently included with the editor.  For questions not covered in the documentation (which is not yet complete), please consult the thread (feel free to ask before reading all 20+ pages).
+
+Map editing documentation is currently in [URL='http://forums.civfanatics.com/showpost.php?p=10387055&postcount=162']this post[/URL].  Map editing can be turned on in the Settings in versions 0.7x of the editor, and is currently enabled by default.  The early 0.7x versions have some problems with the map and lack features, but by version 0.78 the map is considered basically stable so long as you don't try to do anything you can't do in Firaxis's editor.  Versions 0.82 and above allow Landmark Terrain editing, to a greater degree than the Firaxis editor allows.
+
+You can view the latest progress (including ideas for future improvements) [URL='https://trello.com/b/VoC07SVK/conquests-editor']here[/URL].  This thread is the main place to submit them, but lately I've been trying to add them there so they don't get lost halfway through the thread and I'm more likely to remember them when I'm deciding what to add next.
+
+[B]Old versions [/B]can be downloaded [URL='https://bitbucket.org/QuintillusCFC/civ3_cross_platform_editor/downloads/?tab=downloads']here[/URL], and recent old versions are available from the CFC downloads page.  Should both of those become unavailable, I've also posted alternate links to old versions below.
+
+If the editor ever becomes unavailable for downloads for any reason (site going down, etc.), feel free to go ahead and re-upload it.
+
+[SPOILER=Old Version Detail]
+[SPOILER=Windows XP Version]Recent versions of Java have caused issues with the editor on XP, so there is an XP release that works around this by including Java with the editor.  See also this post[/URL], which explains the details, including how to XP-ify any future releases that don't have an XP-specific download available yet.
+
+These versions perform identically to the regular downloads for the equivalent versions.
+[/URL]
+[URL='https://bitbucket.org/QuintillusCFC/civ3_cross_platform_editor/downloads/ConquestsEditor1.14XP.7z']1.14 XP[/URL] ([URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor1.14XP.7z']backup link[/URL])
+[/SPOILER]
+[SPOILER=Versions for Windows 98/ME/2000 and OS X 10.4 - 10.7]
+These are the "Legacy" releases.  Note that not all versions have a Legacy release; there was a jump from 0.99 to 1.04, and again to 1.09.  These are still updated once or twice a year, so these systems should be considered in secondary support rather than being unsupported.
+
+Some features do not work on on these systems, so while these updates include some of the updates since previous legacy versions (and 0.98 prior to that), they are not entirely feature-equivalent to the corresponding non-legacy versions.
+[/URL]
+[URL='https://bitbucket.org/QuintillusCFC/civ3_cross_platform_editor/downloads/ConquestsEditor1.09Legacy.zip']1.09 Legacy[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor1.04Legacy.zip']1.04 Legacy[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor0.99Legacy.zip']0.99 Legacy[/URL]
+
+Versions 0.98 and below also work on these systems.
+[/SPOILER][/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor1.03.zip']1.03[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor1.02.zip']1.02[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor1.01.zip']1.01[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor1.00.zip']1.00[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor0.992.zip']0.992[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor0.991.zip']0.991[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor0.99.zip']0.99[/URL]
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor0.98.zip']0.98[/URL] <-- this version and below also support older systems (98/ME/2K/OSX 10.4 - 10.7)
+[URL='http://quintillus.warpmail.net/civ3editor/oldversions/ConquestsEditor0.97.zip']0.97[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.96.zip']0.96[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.95.zip']0.95[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.94.zip']0.94[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.93.zip']0.93[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.92.zip']0.92[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.91.zip']0.91[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.90.zip']0.90[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.89.zip']0.89[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.88.zip']0.88[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.87.zip']0.87[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.86.zip']0.86[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.85.zip']0.85[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.84.zip']0.84[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.83.zip']0.83[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.82.zip']0.82[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.81.zip']0.81[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.80.zip']0.80[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.79.zip']0.79[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.78.zip']0.78[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.77.zip']0.77[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.76.1.zip']0.76.1[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.76.zip']0.76[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.75.zip']0.75[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.74.zip']0.74[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.73.zip']0.73[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.72.zip']0.72[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.71.zip']0.71[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.70.jar']0.70[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.69.jar']0.69[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.68.jar']0.68[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.67.jar']0.67[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.66.jar']0.66[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.65.jar']0.65[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.64.jar']0.64[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.63.jar']0.63[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.62.jar']0.62[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.61.jar']0.61[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/Conquests%20Editor%200.60.jar']0.60[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.57.jar']0.57[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.56.zip']0.56[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.55.zip']0.55[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/ConquestsEditor0.54.zip']0.54[/URL]
+[URL='http://sites.google.com/site/quintilluscfc/Conquests%20Editor%2000.53.zip']0.53[/URL]
+[URL='https://sites.google.com/site/quintilluscfc/ConquestsEditor0.52.zip']0.52[/URL]
+[URL='https://sites.google.com/site/quintilluscfc/ConquestsEditor0.51.zip']0.51[/URL]
+[URL='https://sites.google.com/site/quintilluscfc/files/ConquestsEditor0.50.zip']0.50 (initial release)[/URL][/SPOILER]
+
+Change Log: The file listing the changes in every version is available [URL='http://quintillus.warpmail.net/civ3editor/changelog.txt']here[/URL].
+
+[B]Credits[/B]
+
+This list may not be complete.  Please contact me to have any omissions added.
+
+[SPOILER]
+ 
+[LIST]
+[*]Gramphos, whose [URL='http://apolyton.net/showthread.php/105623-Civilization-III-BIX-BIQ-file-format']thread detailing the BIQ/BIX format[/URL] at Apolyton was essential for the creation of this editor.  By extension, all those who contributed to that thread and the decoding on the BIQ format.  This includes Dianthus, AlanH, Legend, Dave_Shack, in addition to those users who Grampos credited in that thread.
+[*]Steph, who came up with the idea of an custom editor in the first place as well as helped with some of the difficulties in the file format.
+[*]chiefpaco, who wrote a BIQ decompression utility in Java a long time ago that is used here as well to decompress BIQ files.
+[*]Rhye, whose work on civ colors has been used as the basis for a utility on version 0.87 and later that makes it easier to customize civ colors.
+[*]Lee_Dailey, whose idea for a BIQ comparison utility distracted me from pursuing an editor soon after I started work on it.  As the BIQ comparison utility both contributed towards the editor and was a much more achievable initial goal, this may well be responsible for this project actually making it to the stage of usefulness rather than living on my hard drive forever, nowhere near completion.  This utility also proved to be helpful in figuring out how the BIQ data translated onto the on-screen display in later stages.
+[*]Those who came up with the ideas for a Mac editor, including AlanH, Blue Monkey, and timerover51.  If no one had complained about the lack of one, there surely still wouldn't be one!
+[*]Those who have provided ideas for new features, including but not limited to Balthasar, Virote Considon, and The Guardian to name a few who haven't already been mentioned elsewhere.  Not all features have been added yet, but the idea bank is still reviewed periodically, and unadded features may yet see the light of day.
+[*]Maël Hörz, whose [URL='http://mh-nexus.de/en/hxd/']HxD hex editor[/URL] is free (note: Windows only) and was quite useful in both figuring out undocumented sections of the BIQ and debugging.
+[*]DANGERBOY, who provided an [URL='http://forums.civfanatics.com/showthread.php?p=2275554#post2275554']explanation of how terrain .pcx files work[/URL] at CFC several years back.
+[*]Those who have periodically checked in on the status of this editor since I first posted about it in March or April of 2010.
+[/LIST]
+[/SPOILER]
+
+[I]Contact Info[/I]
+
+I don't always see new posts to this thread right away.  Contact me via private message or e-mail (via my profile) if you'd like me to see your questions quicker.
+
+Looking for the download at the bottom of the thread?  [B][URL='http://forums.civfanatics.com/downloads.php?do=file&id=15288']Here's[/URL][/B] another link!

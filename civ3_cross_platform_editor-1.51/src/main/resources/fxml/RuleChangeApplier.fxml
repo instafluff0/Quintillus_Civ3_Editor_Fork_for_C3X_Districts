@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.civfanatics.civ3.ruleModifier.ui.RuleChangeApplierController">
+   <children>
+      <Button id="cmdSelectSAV" fx:id="cmdSelectSAV" layoutX="14.0" layoutY="155.0" mnemonicParsing="false" onAction="#selectSAVFile" text="Select .sav File" />
+      <Button id="cmdSelectBIQ" fx:id="cmdSelectBIQ" layoutX="14.0" layoutY="200.0" mnemonicParsing="false" onAction="#selectBIQFile" text="Select .biq File" />
+      <Label id="lblInstructions" fx:id="lblInstructions" layoutX="14.0" layoutY="14.0" prefHeight="136.0" prefWidth="564.0" text="" wrapText="true" />
+      <TextField fx:id="txtSelectedSAV" layoutX="129.0" layoutY="155.0" prefHeight="25.0" prefWidth="446.0" />
+      <TextField fx:id="txtSelectedBIQ" layoutX="129.0" layoutY="200.0" prefHeight="25.0" prefWidth="446.0" />
+      <Button id="cmdApplyNewRules" fx:id="cmdApplyNewRules" layoutX="480.0" layoutY="261.0" mnemonicParsing="false" onAction="#applyNewRules" text="Apply New Rules" />
+      <Label id="lblRulesApplied" fx:id="lblRulesApplied" layoutX="295.0" layoutY="256.0" prefHeight="17.0" prefWidth="166.0" text="Rules Successfully Applied" visible="false" />
+      <CheckBox fx:id="chkReplaceCitizens" layoutX="166.0" layoutY="239.0" mnemonicParsing="false" selected="true" text="Replace Citizens" />
+      <CheckBox fx:id="chkReplaceCivs" layoutX="286.0" layoutY="239.0" mnemonicParsing="false" selected="true" text="Replace Civs" />
+      <CheckBox fx:id="chkReplaceRules" layoutX="386.0" layoutY="239.0" mnemonicParsing="false" selected="true" text="Replace Rules" />
+      <CheckBox fx:id="chkReplaceTerrains" layoutX="486.0" layoutY="239.0" mnemonicParsing="false" selected="true" text="Replace Terrains" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>Tech Tab</title>
+    </head>
+    <body bgColor=#CFCCFC>
+        <h1>Tech Tab</h1>
+        <p>The technology tab functions similarly to in the Firaxis editor.  This page goes over the differences.</p>
+		<h2>Tech Filtering</h2>
+		<p>You can filter technologies using the search box above the list of technologies.  The available filters are:</p>
+		
+        <b>General</b>
+        <ul>
+            <li><b>name</b>: search for techs whose name includes the text entered.  Does not require an operand</li>
+            <li><b>cost</b>: search for techs with shield cost GT, LT, EQ the specified value</li>
+            <li><b>era</b>: enter 0 for techs that are not in an era, 1 for techs in the first era (Ancient), 2 for techs in the second era, etc.  You may also search with the era name (in quotes if it has spaces in its name), and with era=None for all techs that are not in an era.</li>
+            <li><b>reqTech</b>: search for techs that require a particular technology.  Accepts any technology name, in which case it returns all techs where any of the prerequisite techs is the one specified; or "None" to search for techs that don't have any prerequisite technologies.</li>
+            <li><b>flavor</b>: search for techs that have the specified flavor.  Also may be spelled flavour.</li>
+        </ul>
+        <b>Flags</b>
+		<p>To use these queries, include the filter name, an equals sign, and true or false.  For example, enablesBridges=true returns all technologies that have the Enables Bridges flag.</p>
+        <ul>
+            <li><b>notReqForAdvancement</b>: search by the "Not Required for Era Advancement" flag.</li>
+            <li><b>enablesRecycling</b>: search by the "Enables Recycling" flag.</li>
+            <li><b>diplomats</b>: search by the "Enables Diplomats" flag.</li>
+            <li><b>rightOfPassage</b>: search by the "Enables Right of Passage" flag.</li>
+            <li><b>enablesMPP</b>: search by the "Enables Mutual Protection Pacts" flag.</li>
+            <li><b>tradeEmbargoes</b>: search by the "Enables Trade Embargoes" flag.</li>
+            <li><b>mapTrading</b>: search by the "Enables Map Trading" flag.</li>
+            <li><b>communicationTrading</b>: search by the "Enables Communication Trading" flag.</li>
+            <li><b>irrigationWithoutWater</b>: search by the "Enables irrigation without water" flag.</li>
+            <li><b>stopsDisease</b>: search by the "Disables Flood Plain Disease" flag.</li>
+            <li><b>doublesWorkRate</b>: search by the "Doubles worker work rate" flag.</li>
+            <li><b>bonusTechAwarded</b>: search by the "Bonus Technology Awarded" flag.</li>
+            <li><b>permitsSacrifice</b>: search by the "Permits Sacrifice" flag.</li>
+            <li><b>revealsWorldMap</b>: search by the "Reveals World Map" flag.</li>
+            <li><b>notTradeable</b>: search by the "Cannot Be Traded" flag.</li>
+            <li><b>doublesWealth</b>: search by the "Doubles effect of capitalization" flag.</li>
+            <li><b>tradeBySea</b>: search by the "Enables Trade over Seas" flag.</li>
+            <li><b>tradeByOcean</b>: search by the "Enables Trade over Oceans" flag.</li>
+            <li><b>bridges</b>: search by the "Enables Bridges" flag.</li>
+            <li><b>conscription</b>: search by the "Enables Conscription" flag.</li>
+            <li><b>mobilizationLevels</b>: search by the "Enables Mobilization Levels" flag.</li>
+            <li><b>precisionBombing</b>: search by the "Enables Precision Bombing" flag.</li>
+        </ul>
+        <div id="footer"><a href="civ3editor.html">Index</a></div>
+    </body>
+</html>

@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <title>Scenario Properties Tab</title>
+    </head>
+	<body bgColor=#CFCCFC>
+		<h2>Scenario Properties</h2>
+		<p>The Scenario Properties tab contains a bunch of information relating to various scenario-specific properties.  It is here that you can
+		set the scenario title and description, which show up in CivContent</p>
+		<p><i>Search Folders</i> is an important item.  This is what Civ uses to find custom art, text files, and so forth for your scenario.
+		The order of searching for these items is the order that they are specified in the search folders, followed by the Conquests directory,
+		followed by the PTW one, followed by the vanilla ones.  So, if you have an Infantry unit in both the WWII and Napoleonic Europe search
+		folders, and you have them listed here as "Napoleonic Europe;WWII", the Napoleonic Europe infantry will be used.  Search Folders should always
+		be separated be a semicolon, and "..\" can be used to go up one folder level (using relative paths).  If your scenario folder will 
+		be in the Conquests\Scenarios folder, you don't need "..\"; this is mainly for using the Conquests scenario folders that are in
+		"..\conquests\WWII in the Pacific", etc.  Note that to use relative paths on a Mac you'll need to use "/" instead of "\".  This should still
+		work on Windows (it seems to), but Firaxis's editor doesn't allow it, so try to verify.  The safest route is avoiding "..\" and "../" altogether.</p>
+		<p><i>Debug Mode</i> being enabled reveals the entire map to the player, allows editing of AI cities, and allows placing of units in-game.  This can be useful for examining AI behavior</p>
+		<p>Barbarian Activity controls how many pesky barbarians there are.  Sedentary means they won't leave their camps.  Anything above
+		that results in more and more active barbarians.</p>
+		<p><i>Victory Conditions</i> controls the ways in which you can win.  The default is all except Wonder Victory.</p>
+		<p></i>Game Rules</i> can change the game considerably.  They include:
+		  <ul>
+			<li>Civ specific abilities - allows unique units and civilization traits (religious, industrious, etc.)</li>
+			<li>Culturally Linked Start - Civilizations in the same culture group are more likely to start nearby</li>
+			<li>Respawn AI Players - Defeated AI players start again in an open area of the map if one exists</li>
+			<li>Preserve Random Seed - If you save and reload after a losing battle, and fight the same battle again, you'll get the same results.</li>
+			<li>Accelerated Production - Makes cities produce stuff and grow in half the time they normally would</li>
+			<li>City Elimination - If you lose x cities, you are defeated.  Set the "x" as the City Elimination in Victory Limits.</li>
+			<li>Regicide - You have a King, and if your King dies, you are defeated.  You'll want at least one King unit.</li>
+			<li>Regicide (all Kings) - You have more than one king, and if all die, you are defeated.</li>
+			<li>Victory Point Scoring - This is essentially a new victory condition.  You gain victory points for the items in the
+			"Victory Points" area, and if you reach the amount in the "Victory Points" for "Victory Limits", you win.</li>
+			<li>Capture the Unit - You are trying to capture other civilizations' units whose "Flag Unit" attribute is checked, and
+			bring them back to a victory point which you control.</li>
+			<li>Allow Cultural Conversions - Cities can flip to another civilization with greater cultural value.</li>
+			<li>Reverse Capture the Flag - You have flag units which you are trying to bring to victory locations on the map (you
+			start with the flag and don't have to capture it)</li>
+			<li>Allow Scientific Leaders - If chosen, you have a 3% chance of gaining a scientific leader if you are the first to
+			discover a technology, or 5% if your civilization is Scientific</li>
+		  </ul>
+		</p>
+		<p>The <i>Locked Alliances</i> section is used for what is suggests.  To move civilizations between alliances, right-click on them, and
+		then choose whether you with to remove them from all alliances, or move them to a different alliance.</p>
+		<p>The <I>War</I> area configures locked alliances.  Line it up as you would a spreadsheet, and then examine whether the alliances in the
+		position you want are at war or peace.  Click on the War/Peace button to change War to Peace and vice versa.  An alliance cannot be at
+		war with itself</p>
+		<p>For victory type, there are two options.  Individual victory awards victory to the highest-scoring nation.  Coalition will award victory
+		to the first alliance to reach the victory conditions, or an individual civilization should they succeed first.  For example, you likely
+		want a coalition victory for a WWII scenario, as otherwise you would end up with, for example, a Soviet victory instead of an Allied victory.</p>
+		<p>The <I>Time limit</I> in turns is what's used to set a scenario's length.  I don't know what happens if you give it a Minutes limit.
+		The MP limits are in seconds, and are used so one player can't pause everything by going out to get sushi.  The turn length is calculated
+		by taking each player's number of cities times the per city amount, plus their number of units, plus the base amount, and then taking
+		the highest of that sum amongst all players.</p>
+		<p>To the right of the time limit, you can control how long each turn lasts in-game.  The "units" of time are set with the "Base unit of
+		Time" box at the bottom of the <I>Time</I> area.  For example, if the base unit of time is years, you start in 1000 AD, the first 2
+		turns take 10 years, the next 2 take 20 years, and then next 2 take 3 years, your turns will follow the progression 1000, 1010, 1020, 1040,
+		1060, 1063, 1066.</p>
+		<p>The <I>Plague</I> section does what you expect.  The Earliest Start is used to prevent it from hitting someone on the first turn, if
+		you want to be so merciful.  Set it to negative values for BC years.  The duration is how long, on average, plagues last, and strength is
+		how powerful they are.  The grace period is the minimum amount of time between plagues.  The Variance is how variable the plagues are
+		from the settings you've chosen - with higher variance, it's more likely that plagues will last shorter or longer lengths of time than you
+		specify, and be stronger or weaker.</p>
+		<p>Reveal Entire Map does the same as what Sateillites do in-game.  It does not remove fog of war.<p>
+		<p>Retain Culture on Capture means that cities keep their cultural value and borders when captured, as they do in the Rise of Rome conquest.
+		</p>
+		<p>The <I>Maximum Eruption Period</I> says that in that many years, every volcano will blow up at least once.  Setting it lower results in 
+		increasingly active volcanoes.</p>
+		<div id="footer"><a href="civ3editor.html">Index</a></div>
+	</body>
+</html>

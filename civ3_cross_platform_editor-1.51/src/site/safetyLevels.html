@@ -1,0 +1,43 @@
+<html>
+	<body bgColor=#CFCCFC>
+		<h2>Safety Levels</h2>
+		<p>Safety Levels is a new editor concept.  It came about after
+		the realization that many of the limits in Civ3ConquestsEdit may
+		be artificial rather than technical, and that currently the
+		only way to test those limits was with a hex editor.  Safety Levels
+		allow the user to choose to either stick with the tried-and-mostly-true
+		Firaxis limits, or choose any of several other levels of limitations
+		that allow more (or less) flexibility.</p>
+		<p>There are six safety levels, which are summarized below in
+		order from most strict to least strict:</p>
+		<ul>
+			<li>Total:  This level is equivalent to the default (Firaxis), except
+			that is will attempt to catch conditions that are okay with Civ3ConquestsEdit
+			that will crash Conquests at some point.  <b>Currently equal to Firaxis</b></li>
+			<li>Firaxis:  This level is to be equivalent to what Firaxis's editor allows.
+			It  currently is in most areas.</li>
+			<li>Safe: This level is to allow values that are known to be safe, either because
+			Firaxis's editor allows them, or because they have been tested by
+			members of the community.  <b>Currently equal to Firaxis</b></li>
+			<li>Exploratory: This level is to allow all values that are not known to cause
+			problems, but disallow those known to cause problems.  <b> Currently equal to Minimal</b></li>
+			<li>Minimal: This level will protect against invalid string values (e.g. too long of city names), but will
+			not protect any numerical values.</li>
+			<li>None: This level will allow you to do whatever you want.</li>
+		</ul>
+		<p>Click on the Overall Safety Level: button to modify the safety levels  
+		Safety levels are configurable on a per-tab basis.  The safety level
+		shown on the main window will be the lowest of the individual safety
+		levels chosen, and the background color shown on the main tab will
+		be an average of all the safety levels.</p>
+		<p>Currently, violations of the current safety level will result in the text
+		of the violating field(s) being red, but the violation will exhibit itself
+		purely as that warning.  You can still save the file despite violations of
+		the safety level.</p>
+		<p>Note that levels below Firaxis may render BIQ's not easily
+		editable in Civ3ConquestsEdit, and levels below Minimal may render
+		BIQ's not readable by any editor (including this one).  It is always a good idea to back up your BIQ files before editing, but
+		this is especially true on the lower levels.</p>
+		<p><small>Last updated: July 10, 2010</small></p>
+	</body>
+</html>

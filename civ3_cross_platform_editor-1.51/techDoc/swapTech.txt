@@ -1,0 +1,45 @@
+Examining Swaps of Techs and Dropdowns
+Assuming cmbSource was selected at the start of the swap.
+
+Key:
+<-- selected
+<-[#] destination (at start of method)
+<=[#] destiation (adjusted, aka cmbDest)
+
+Moving from earlier to later
+Source = 2, dest = 5, cmbDest = 5
+
+None            None            None                    None
+Brnz Work       Brnz Work <-- 1 Brnz Work <-- 1         Brnz Work <-- wrong   
+Alphabet <-- 2  Pottery         Pottery                 Pottery
+Pottery         Writing         Writing                 Writingy
+Writing         Mathematics     Mathematics             Mathematics
+Math     <-[5]  Constr    <=[5] Alphabet  <=[5]         Alphabet  <-[5]
+Construction    [empty]         Construction            Construction
+
+So our problem is that by removing the selected one, it's no longer
+selected and the swap does not occur.
+
+Let's also examine if we swap later to earlier.
+Source = 4; dest = (after) 1
+Note in our code we bump cmbDest to 2, b/c in Java the API inserts
+before the element at the index (our UI uses after).
+
+None            None            None                    None               
+Brnz Work <-[1] Brnz Work       Brnz Work               Brnz Work           
+Alphabet        Alphabet <=(2)  Writing  <=(2)          Writing  <-- correct
+Pottery         Pottery  <-- 3  Alphabet                Alphabet
+Writing   <-- 4 Mathematics     Pottery  <-- 4          Pottery    
+Mathematics     Construction    Mathematics             Mathematics
+Construction    [empty]         Construction            Construction
+
+
+Verified this with the debugger.  By inserting Writing before the current
+selection, the selection increases, so it's still the same index and the
+swap occurs.
+
+New idea: If cmbSource was selected at the start, just set it to having
+cmbDest (adjusted) selected.  Now in the first case, it will set 4 at the end
+and should be correct.
+
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.civfanatics.civ3.xplatformeditor.tabs.civilization.CivilizationUnitsController">
+   <children>
+      <Label text="Set the units available to this civilization">
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </VBox.margin></Label>
+      <BorderPane prefWidth="200.0">
+         <right>
+            <Label text="Unavailable" BorderPane.alignment="CENTER" />
+         </right>
+         <left>
+            <Label text="Available" BorderPane.alignment="CENTER" />
+         </left>
+         <padding>
+            <Insets left="100.0" right="100.0" />
+         </padding>
+      </BorderPane>
+      <BorderPane id="brdLists" prefWidth="200.0" VBox.vgrow="ALWAYS">
+         <left>
+            <ListView fx:id="lstAvailable" prefWidth="250.0" BorderPane.alignment="CENTER" />
+         </left>
+         <right>
+            <ListView fx:id="lstUnavailable" prefWidth="250.0" BorderPane.alignment="CENTER" />
+         </right>
+         <center>
+            <BorderPane BorderPane.alignment="CENTER">
+               <bottom>
+                  <Button mnemonicParsing="false" onAction="#moveUnitsToAvailable" text="&lt;" BorderPane.alignment="CENTER" />
+               </bottom>
+               <top>
+                  <Button alignment="CENTER" mnemonicParsing="false" onAction="#moveUnitsToUnavailable" text="&gt;" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets />
+                     </BorderPane.margin>
+                  </Button>
+               </top>
+            </BorderPane>
+         </center>
+         <VBox.margin>
+            <Insets left="10.0" right="10.0" />
+         </VBox.margin>
+      </BorderPane>
+      <HBox alignment="CENTER_RIGHT" fillHeight="false" prefWidth="200.0">
+         <children>
+            <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#cancelUnitsAvailable" text="Cancel">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnApply" mnemonicParsing="false" onAction="#applyUnitsAvailable" text="Apply" HBox.hgrow="NEVER">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+         </children>
+         <VBox.margin>
+            <Insets bottom="10.0" right="10.0" top="10.0" />
+         </VBox.margin>
+      </HBox>
+   </children>
+</VBox>

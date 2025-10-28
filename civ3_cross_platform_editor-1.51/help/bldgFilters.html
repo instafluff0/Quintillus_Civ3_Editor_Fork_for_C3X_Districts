@@ -1,0 +1,138 @@
+<html>
+    <body bgColor=#CFCCFC>
+        <h1>Building Filters</h1>
+        <p>Buildings can be filtered by any building property.  The available queries are listed on this page, grouped by functionality.  For check boxes, valid options are true or false, such as "veteranAir=true".  For integer fields, you can use the greater than, less than, or equal to operators, such as "culture>0".  For fields that link to other parts of the BIQ, you can use either "None" or the name of the other field as a query, such as "reqGood=Iron" or "reqTech=None".  For all queries, you can use != to return the opposite of the = query, such as "gainUnit!=None".</p>
+        <p>The available building filters are:</p>
+        <b>Properties</b>
+        <ul>
+            <li><b>cost</b></li>
+            <li><b>maintenance</b></li>
+            <li><b>culture</b></li>
+            <li><b>productionBonus</b></li>
+            <li><b>pollution</b></li>
+            <li><b>type</b>: Filter by either "Wonder", "Small Wonder", or "Improvement"</li>
+        </ul>
+		<b>Military</b>
+		<ul>
+            <li><b>landBombard</b></li>
+            <li><b>seaBombard</b></li>
+            <li><b>airAttack</b></li>
+            <li><b>seaAttack</b></li>
+            <li><b>defenceBonus</b>: Alias "defenseBonus"</li>
+            <li><b>navalDefence</b>: Alias "navalDefense"</li>
+            <li><b>veteranLand</b></li>
+            <li><b>veteranSea</b></li>
+            <li><b>veteranAir</b></li>
+            <li><b>stealthBarrier</b></li>
+            <li><b>allowsNukes</b>: Alias "nukes"</li>
+            <li><b>icbmDefence</b>: Alias "icbmDefence"</li>
+            <li><b>doubleVsBarbs</b></li>
+            <li><b>armiesWithoutLeader</b></li>
+            <li><b>largerArmies</b></li>
+            <li><b>moreLeaders</b></li>
+            <li><b>safeAtSea</b></li>
+            <li><b>plusOneSea</b></li>
+            <li><b>plusTwoSea</b></li>
+            <li><b>halfCostUpgrades</b></li>
+            <li><b>healInEnemyTerritory</b></li>
+            <li><b>strongerArmies</b></li>
+            <li><b>doubleDefences</b>: Alias "doubleDefenses"</li>
+        </ul>
+        <b>Food</b>
+        <ul>
+            <li><b>extraFoodInWater</b></li>
+            <li><b>storeHalfOfFood</b></li>
+            <li><b>gainTwoPop</b></li>
+            <li><b>allowCitySize2</b></li>
+            <li><b>allowCitySize3</b></li>
+        </ul>
+        <b>Science</b>
+        <ul>
+            <li><b>plus50Science</b></li>
+            <li><b>plus100Science</b></li>
+            <li><b>twoFreeAdvances</b></li>
+            <li><b>gainKnownTechs</b></li>
+        </ul>
+        <b>Gain</b>
+        <ul>
+            <li><b>gainInEveryCity</b>: Building reference or "None"</li>
+            <li><b>gainInContinentalCity</b>: Building reference or "None"</li>
+            <li><b>gainUnit</b>: Unit reference or "None"</li>
+            <li><b>gainUnitFrequency</b>: Note that the default is 1</li>
+        </ul>
+        <b>Requirements</b>
+        <ul>
+            <li><b>reqBuilding</b>: Building reference or "None"</li>
+            <li><b>reqTech</b>: Tech reference or "None"</li>
+            <li><b>reqGovernment</b>: Government reference or "None"</li>
+            <li><b>reqGood</b>: Good reference or "None".  Shows buildings for which any of their required goods match.</li>
+            <li><b>numReqBuildings</b></li>
+            <li><b>numArmies</b></li>
+            <li><b>goodsInCityRadius</b></li>
+            <li><b>nearRiver</b></li>
+            <li><b>victoriousArmy</b></li>
+            <li><b>coastal</b></li>
+            <li><b>byWater</b></li>
+            <li><b>eliteShip</b></li>
+        </ul>
+        <b>Trade</b>
+        <ul>
+            <li><b>airTrade</b></li>
+            <li><b>waterTrade</b></li>
+            <li><b>capitalization</b></li>
+            <li><b>plusFiftyTax</b></li>
+            <li><b>increasedWaterTrade</b></li>
+            <li><b>increasedTrade</b></li>
+            <li><b>paysTradeMaintenance</b></li>
+            <li><b>earnsInterest</b></li>
+            <li><b>reducesCityCorruption</b></li>
+            <li><b>reducesEmpireCorruption</b></li>
+        </ul>
+        <b>Happiness</b>
+        <ul>
+            <li><b>continentalHappiness</b></li>
+            <li><b>happyCity</b></li>
+            <li><b>happyGlobal</b></li>
+            <li><b>unhappyCity</b></li>
+            <li><b>unhappyGlobal</b></li>
+            <li><b>plusFiftyLuxury</b></li>
+            <li><b>moreLuxTrade</b></li>
+            <li><b>reducesWarWeariness</b></li>
+            <li><b>reducesWarWearinessEmpire</b></li>
+            <li><b>doublesHappiness</b></li>
+        </ul>
+        <b>Miscellaneous/Other</b>
+        <ul>
+            <li><b>madeObsoleteBy</b>: Tech reference or "None"</li>
+            <li><b>charmBarrier</b></li>
+            <li><b>generalTelepad</b></li>
+            <li><b>centerOfEmpire</b></li>
+            <li><b>noPopulationPollution</b></li>
+            <li><b>canMeltdown</b></li>
+            <li><b>moreShieldsInWater</b></li>
+            <li><b>spaceshipPart</b>: Recommended to use as "spaceshipPart!=-1"</li>
+            <li><b>touristAttraction</b></li>
+            <li><b>allowsDiplomaticVictory</b></li>
+            <li><b>replacesOthersWithFlag</b></li>
+            <li><b>doublesSacrifice</b></li>
+            <li><b>propagandaResistance</b></li>
+            <li><b>canBuildSpaceship</b></li>
+            <li><b>allowsSpies</b></li>
+        </ul>
+		<b>Characteristics</b>
+		<ul>
+            <li><b>militaristic</b></li>
+            <li><b>religious</b></li>
+            <li><b>commercial</b></li>
+            <li><b>industrial</b></li>
+            <li><b>expansionist</b></li>
+            <li><b>scientific</b></li>
+            <li><b>agricultural</b></li>
+            <li><b>seafaring</b></li>
+		</ul>
+		<b>Flavors</b>
+		<ul>
+			<li><b>flavor</b>: Alias "flavour".  Flavor reference or "None".</li>
+		</ul>
+        <div id="footer"><a href="civ3editor.html">Index</a></div>
+    </body>

@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run "Editor_XP.bat", 0, True

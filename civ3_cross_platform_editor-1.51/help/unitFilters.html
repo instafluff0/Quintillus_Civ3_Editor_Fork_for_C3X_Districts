@@ -1,0 +1,69 @@
+<html>
+    <body bgColor=#CFCCFC>
+        <h1>Unit Filters</h1>
+        <p>Some filters support an equals operand, some support greater than, less than, and equals operand (referred to as GT, LT, EQ; symbols &gt;, &lt;, and =), and the unit name filter does not require an operand.</p>
+        <p>The available unit filters are:</p>
+        <b>General</b>
+        <ul>
+            <li><b>name</b>: search for units whose name includes the text entered.  Does not require an operand</li>
+            <li><b>class</b>: enter "land", "air", or "sea" to filter to only land/air/sea units</li>
+            <li><b>era</b>: enter 0 for units with no prerequisite tech, 1 for units whose prereq tech is in the first era (Ancient), 2 for units whose prereq tech is in the second era, etc.</li>
+            <li><b>availableTo</b>: search for units available to a certain civilization; search using equals to and the civilization's name.  Or, search for units that are available to LT or GT a certain number of civilizations (e.g. availableTo>1)</li>
+            <li><b>uniqueTo</b>: search for units that are unique to a certain civilization; the same as available to, but they must also be available to no other civilization</li>
+            <li><b>reqTech</b>: search for units that require a particular technology.  Accepts any technology name, or "None" for units that don't require any technologies</li>
+            <li><b>reqGood</b>: search for units that require a particular resource.  Accepts any good name, or "None" for units that require no resources.  The matching good may be in any of the "Required Resources" slots.</li>
+            <li><b>ignoreMovementCost</b>: Returns units that ignore the provided terrain type (by name).</li>
+        </ul>
+        <b>Unit Statistics</b>
+        <ul>
+            <li><b>attack</b>:search for units with attack GT, LT, EQ to the specified value</li>
+            <li><b>defence</b>: search for units with defence GT, LT, EQ the specified value.  Also works for "defense".</li>
+            <li><b>movement</b>: search for units with movement GT, LT, EQ the specified value</li>
+            <li><b>bombardStrength</b>: search for units with bombard strength GT, LT, EQ the specified value</li>
+            <li><b>bombardRate</b>: search for units with bombard rate GT, LT, EQ the specified value</li>
+            <li><b>bombardRange</b>: search for units with bombard strength GT, LT, EQ the specified value</li>
+            <li><b>hpBonus</b>: search for units with a hitpoint bonus GT, LT, EQ the specified value</li>
+            <li><b>airDefence</b>: search for units with air defence GT, LT, EQ the specified value</li>
+            <li><b>operationalRange</b>: search for units with operational range GT, LT, EQ the specified value</li>
+            <li><b>transportCapacity</b>: search for units with transport capacity GT, LT, EQ the specified value</li>
+            <li><b>popCost</b>: search for units with population cost GT, LT, EQ the specified value</li>
+            <li><b>cost</b>: search for units with shield cost GT, LT, EQ the specified value</li>
+        </ul>
+        <b>Unit Abilities</b>
+        <p>The Unit Abilities filters take a parameter of "true" or "false".  For example, the filter amphibious=true returns all amphibious units, and the filter stealth=false returns all non-stealth units.</p>
+        <ul>
+            <li><b>allRoads</b>: Whether the unit treats all terrain as roads</li>
+            <li><b>amphibious</b>: Whether the unit is amphibious</li>
+            <li><b>army</b>: Whether the unit is considered to be an army</li>
+            <li><b>blitz</b>: Whether the unit can blitz (attack multiple times per turn)</li>
+            <li><b>cruiseMissile</b>: Whether the unit is a cruise missile</li>
+            <li><b>detectInvisible</b>: Whether the unit can detect invisible units</li>
+            <li><b>draft</b>: Whether the unit can be drafted</li>
+            <li><b>flagUnit</b>: Whether the unit is a flag unit in Capture the Flag</li>
+            <li><b>footUnit</b>: Whether the unit is a foot unit</li>
+            <li><b>hiddenNationality</b>: Whether the unit's nationality is hidden</li>
+            <li><b>immobile</b>: Whether the unit is immobile</li>
+            <li><b>infiniteBombard</b>: Whether the unit has infinite bombard range</li>
+            <li><b>invisible</b>: Whether the unit is invisible</li>
+            <li><b>king</b>: Whether the unit is a king unit in Regicide mode</li>
+            <li><b>leader</b>: Whether the unit is a leader unit</li>
+            <li><b>lethalLand</b>: Whether the unit has lethal land bombardment</li>
+            <li><b>lethalSea</b>: Whether the unit has lethal sea bombardment</li>
+            <li><b>nuclearWeapon</b>: Whether the unit is a nuclear weapon</li>
+            <li><b>radar</b>: Whether the unit has radar</li>
+            <li><b>rangedAttack</b>: Whether the unit has a ranged attack animation</li>
+            <li><b>requiresEscort</b>: Whether the AI considers the unit to require an escort</li>
+            <li><b>rotateBeforeAttack</b>: Whether the unit rotates prior to attacking</li>
+            <li><b>sinksInOcean</b>: Whether the unit will sink in the ocean</li>
+            <li><b>sinksInSea</b>: Whether the unit will sink in the sea</li>
+            <li><b>goldenAge</b>: Whether the unit will trigger a Golden Age upon victory</li>
+            <li><b>stealth</b>: Whether the unit is a stealth unit</li>
+            <li><b>tacticalMissile</b>: Whether the unit is a tactical nuclear missile</li>
+            <li><b>transportsAircraft</b>: Whether the unit can transport aircraft</li>
+            <li><b>transportsFoot</b>: Whether the unit can only transport foot units</li>
+            <li><b>transportsMissiles</b>: Whether the unit can only transport tactical nuclear missiles</li>
+            <li><b>wheeled</b>: Whether the unit is wheeled</li>
+        </ul>
+        <div id="footer"><a href="civ3editor.html">Index</a> > <a href="PRTO.html">Unit Tab</a></div>
+    </body>
+</html>   

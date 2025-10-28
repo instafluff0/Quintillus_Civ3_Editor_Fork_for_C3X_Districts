@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Resource Filters</title>
+    </head>
+    <body bgColor=#CFCCFC>
+        <h1>Resource Filters</h1>
+        <p>Some filters support an equals operand, some support greater than, less than, and equals operand (referred to as GT, LT, EQ; symbols &gt;, &lt;, and =), and the resource name filter does not require an operand.  
+            If a version is indicated in parentheses, the filter was added in that version and will not be available if you are on an older version.  Resource filters were first introduced in version 1.33.</p>
+        <p>The available resource filters are:</p>
+        <ul>
+            <li><b>name</b>: search for resources whose name includes the text entered.  Does not require an operand</li>
+            <li><b>type</b>: enter "strategic", "luxury", or "bonus" to filter to that type of resource</li>
+            <li><b>prerequisite</b>: search for resources that require a particular technology.  Accepts any technology name, or "None" for resources that don't require any technologies</li>
+            <li><b>era</b>: allows filtering to resources that become available in certain eras.  Accepts both era numbers (0 through 4, where 0 is no era), and era names (e.g. None, "Middle Ages").</li>
+            <li><b>food</b>: filters based on the food bonus</li>
+            <li><b>shields</b>, also available as <b>production</b>: filters based on the shield/production bonus</li>
+            <li><b>commerce</b>: filters based on the commerce bonus</li>
+            <li><b>appearance</b>, also available as <b>appearanceRatio</b>: filters based on the appearance ratio</li>
+            <li><b>disappearance</b>, also available as <b>disappearanceRatio</b>: filters based on the disappearance ratio</li>
+            <li><b>icon</b>: filters based on the resource's icon index.  most likely useful for finding out-of-bounds indices
+        </ul>
+        <div id="footer"><a href="civ3editor.html">Index</a></div>
+    </body>
+</html>

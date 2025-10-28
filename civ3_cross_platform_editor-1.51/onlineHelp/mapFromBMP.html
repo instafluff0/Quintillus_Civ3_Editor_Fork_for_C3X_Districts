@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <title>Map from BMP</title>
+    </head>
+	<body bgColor=#CFCCFC>
+		<h2>Import Map From BMP</h2>
+		<p>The Import Map From BMP functionality allows you to create a map from a BMP file, such as one of the Earth taken from sateillites.  You will need to do some work on the map yourself to make it useable, but this should help speed up getting the basics available.</p>
+		<h2>To Use</h2>
+		<p>You'll first need to get a 4-bit or 8-bit bitmap (at most 256 colors).  The program uses bitmaps with limited colors because it asks you which color represents which terrain, and you'd quickly tire of doing that with hundreds or thousands of colors.  I usually use the GIMP to convert a bitmap to "Indexed" mode with 16 to 32 colors, and then save it as a .bmp to accomplish this.</p>
+		<p>There is a certain art to choosing the colors well.  You can let GIMP do it automatically, but that tends to use more of the colors for water than necessary, resulting in less diversity and accuracy on land.  I'd recommend letting GIMP do it first and testing the import, and if you're pleased with the basic functionality, fine-tuning the colors yourself.</p>
+		<p>Also note that GIMP may take a little while to index the colors and save the large bitmaps.  This is a good opportunity to fit in a turn of Civ or a game of Minesweeper.</p>
+		<p>The bitmap also needs to have a size equal to (32 * biq width + 32) by (16 * biq height + 16).  For example, if you want a 100x100 BIQ, you need a 3232x1616 bitmap.  Beyond that and the 65,536 tile limit in Civ3, you can choose the dimensions you like - an 800x100 BIQ is perfectly okay.  The program will let you know if there's a problem with the dimensions.  For the largest maps, this will result in 32 MB-large 4-bit bitmaps or 64 MB-large 8-bit bitmaps.</p>
+		<p>There is a utility in the editor that will take your desired Civ3 map dimensions and give you the dimensions you need for the bitmaps.  You can access this by clicking the "!" icon in the upper right, and choosing "BMP Size Calculator".</p>
+		<p>Once you have the BMP, open a BIQ without a map, and go to the "!" icon in the upper right, and then choose Import Map from BMP.  Choose your bitmap, and wait as it loads (this shouldn't take super-long, but won't be instant with very large bitmaps).  Now you'll be presented with a screen where you map colors to Civ3 terrains.  By default, everything is water, and you'd get an all-ocean map.  You can set as many as you please to each of the terrain options - water, tundra, desert, grassland, plains, and forest/jungle.  The color from the bitmap is displayed in RGB (such as (255,128,0)) to help you identify slightly-different colors.</p>
+		<p>By default, you have 16 terrain choices, corresponding to 16 base terrain combinations (including variations such as forest, pine forest, plains forest, etc.).  You can expand this to 18 base terrains and the landmark terrain for all of them by clicking the "Advanced Mode" button.  All water terrain is represented by the single "Water" option - coast will appear next to land, sea somewhat farther out, and oceans farthers from land.</p>
+		<p>The editor will remember what terrains you've chosen among the base 16 for various RGB colors between runs of the editor.  For example, if you map (20, 65, 20) to Grassland once, it will still be Grassland the next time you use a BMP with that color.</p>
+		<p>Once you've mapped colors to terrain, hit the "Create!" button.  Wait a little while, and once the title of the window reads "Map created!", you can close out of it, go to the editor's Map tab, and peruse the new map.  There certainly will be a need for modification, but hopefully you'll be off to a running start!</p>
+		<div id="footer"><a href="civ3editor.html">Index</a></div>
+	</body>
+</html>

@@ -1,0 +1,27 @@
+Cross-Tab Requirements for swapping TECHNOLOGIES
+
+SECTION     SET     POST-IMPORT     HANDLE SWAP   COMBO    BOOLEAN  DELETE
+BLDG        Yes     Yes             Yes           Yes      Yes      Yes
+CIV         Yes     Yes             Yes           Yes      Yes      Yes
+CTZN        Yes     Yes             Yes           Yes      Yes      Yes
+GOVT        Yes     Yes             Yes           Yes      Yes      Yes
+GOOD        Yes     Yes             Yes           Yes      Yes      Yes
+TRFM        Yes     Yes             Yes           Yes      Yes      Yes
+UNIT        Yes     Yes             Yes           Yes      Yes      Yes
+
+Note: I believe the last two were on the desktop and not synced yet - but
+show up here b/c I had this checklist on the laptop in parallel.
+
+Cross-Tab Requirements for swapping UNITS
+
+SECTION     SET     POST-IMPORT     HANDLE SWAP   COMBO    BOOLEAN  DELETE
+BLDG        Yes     Yes             Yes           Yes      Yes      Yes
+CIV         Yes     Yes             Yes           Yes      Yes      Yes
+RULE        Yes     Yes             Yes           Yes      Yes      Yes
+MAP/UNIT    Yes     Yes             Yes           Yes      Yes      Yes
+UNIT TAB
+PLYR TAB
+
+Note that I think the deleteAction method in UnitTab.java probably needs
+updating.  Has not been updated for quite awhile until I added map unit
+updates.

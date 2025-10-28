@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title>Build Settings</title>
+    </head>
+<h1>Build Settings</h1>
+As I try to rebuild my old report settings, I'm realizing that I need to document how I did it initially, as I don't remember anymore.  Hence, this document.
+<h2>Maven</h2>
+This project is compiled with Maven 2.2.1.  You'll need to download it.  And then set a bunch of variables.
+<br>
+<ul>
+    <li>The System variable "M2_HOME" must be set to where you installed Maven; I set it to "C:\Program Files (x86)\java\Libraries\apache-maven-2.2.1"</li>
+	<li>The System variable "JAVA_HOME" must be set to where you installed the version of Java that you
+	will use for compiling.  I set it to "C:\Program Files (x86)\java\jdk1.5.0_22"</li>
+	<li>The User variable "M2" must be set to "%M2_HOME%\bin"</li>
+	<li>If you want to run reports, I recommend setting the System variable "_JAVA_OPTIONS" to "-Xmx999m", which give you a default Java heap size of 999 MB (values over 1 GB give less consistent results on some systems).</li>
+	<li>Also follow the instructions in the readme file for adding Maven to your path.  I recommend doing this via the Windows GUI, as it seems not to stick if you do it via the command line.</li>
+</ul>
+<br>
+Although the project is developed from within NetBeans, it is actually compiled for distribution from the command line.  Thus, while NetBeans uses Ant, Maven is necessary for the final distributable.  The included pom.xml files (for both the shared files and main project) are already configured to support the Maven build.
+<br>
+The recommended way to build (if on Windows) is to go to the folder <i>above</i> the editor folders, and run the editormake.bat file.  This automates both the Maven build process, and additional tasks such as copying files.  However, if you are not running Windows, you can run the equivalent commands on your system; the "mvn clean install" commands and "mvn assembly:assembly" are the necessary steps.  The final call, with the assembly plugin, creates the JAR with dependencies included.
+<br>
+Note that using a newer version of Maven is <i>not</i> recommended, as it is not 100% compatible, and you may need to change the pom.xml if you do so.
+<br>
+<h3>Additional Required Plugins</h3>
+Some plugins (particularly the NetBeans Absolute Layout one) are unavailable from the official Maven respositories.  Hunting them down on the interwebs can be a challenge.  Until this guide is more l33t, your best option is to contact Quintillus for instructions on how to set them up.  Note: Quintillus will have to check how this is set up on his dev machine.
+<br>
+The project is slowly transitioning to not using this plugin, but that is a long time off.
+<br>
+<h2>7 Zip</h2>
+This project uses 7 Zip (version 9.20) to compress the project automagically when compiled.  Although you can do this manually (and can remove it from the editormake.bat script if you so desire), this is generally handy.  You can download it from http://www.7-zip.org/download.html - choose the 7-Zip Command Line Version for Windows 32-bit.  Then put the 7za.exe file somewhere on your path; I put mine in C:\Windows\System32.
+<h2>Mercurial</h2>
+This project's source control uses Mercurial 1.5.1.  You'll need to download it (note: It appears this version is old enough it's hard to find.  Quintillus should still have it on his dev machine, but does not have access to that at the time of this writing).  And then add the place where you installed it to your system's Path; I added "C:\Program Files (x86)\Mercurial\" to my Path.
+<br>
+It probably will work to use a newer version, but this is not guaranteed.
+<br>
+<h2>NetBeans</h2>
+The project is developed within NetBeans.  Although this isn't strictly required, it has always been the case so far.  NetBeans 6.5.1 was current when development started, and should still work, but version 7.1.1 is currently used.  As minor tweaking has occasionally been required when upgrading, the lastest version is recommended.
+<br>
+Newer versions should work, and are usually upgraded to fairly often.  However, it can be a pain to go back and forth between versions, so it's recommended to coordinate this with others working on the project.
+<br>
+<h3>Dependencies</h3>
+To run the project in NetBeans, you will need <a href="http://archive.apache.org/dist/logging/log4j/1.2.16/">Log4J 1.2.16</a>.  Newer 1.2.x versions should work, but 2.x versions will not.
+</html>

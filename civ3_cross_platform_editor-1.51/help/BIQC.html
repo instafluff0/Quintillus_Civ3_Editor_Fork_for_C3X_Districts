@@ -1,0 +1,59 @@
+<html>
+	<body bgColor=#CFCCFC>
+		<h2>BIQ Comparison</h2>
+		<p>The BIQ Comparison tab lets you compare two BIQ files, and get a text file illustrating their differences.  You can also get a simple text
+		file of <i>everything</i> in one file.  The former functionality is likely the more useful.</p>
+		<p>To compare two files, you'll need to Open a second file after opening the first one.  It is highly recommended that you only use the
+		BIQC tab after doing so, and restart the editor before editing anything, as editing with multiple files open has not been tested.
+		However, if you are daring, you could still try to edit the second file that was opened.</p>
+		<p>With more than one file now opened, you'll need to check the "Compare Mode" button, and then  you can use the drop-downs for the 
+		"Current BIQ File" and "Compare To" to choose which ones you
+		wish to compare.  This way, if you have three or more files open, you can choose which to compare.  There are a couple other check boxes 
+		in this area:</p>
+		<ul>
+			<li>Save check boxes when switching files - Check this so that any check boxes on the left (explained later) will remember their values
+			for the current BIQ in the top box when the "Current BIQ file" is switched away from that BIQ, and then later back to it</li>
+			<li>Multi - To the left of this box is the "Separate with:" text box.  You can put a character here to separate values.  For example, with the default "|" (called a "pipe"), if two buildings have a cost of 50 in one BIQ and 40 in the other, it would show up as "50 | 40".
+			If you check the Multi box, you can have more than one character here, so you could have, for example, "50 ||| 40".</li>
+		</ul>
+		<p>Now you'll need to choose some check boxes from the left two columns on which to compare.  You must select at least one to export the
+		comparison.  If you select more than one, they'll be displayed in succession in the text file.  If certain sections are not relevant to
+		the BIQs selected in "Current BIQ File" and "Compare To", those check boxes will be grayed out.</p>
+		<p>At this point, you are ready to export.  In the "Output" box on the right, make sure the "File" checkbox is checked (there used to be an
+		option to export to the command line, and the check box survived its obsolescence).  Then, you can either write out the file you want to
+		export to in the text box (.txt will be automatically appended by default if it isn't present), or click the "Browse" button to choose where to export to in a traditional open/save dialog.  Now, hit "Export!".  You'll get a Cancel/OK dialog if the file already exists, but otherwise, you should be seeing "Successful Output" text to the left of the Export! button</p>
+		<p>You probably want to leave the "BIQ variables or English" to the default of English. It's easier to read that way. The "English" option will break down more variables that store multiple values, such as Unit Abilities. It is also more likely to give friendly names for referenced items (for example, requires "Temple" instead of "3" when Temple is the third building). In neither case does it create this more friendly output in all cases, but it's still generally friendlier. The BIQ Variables option is mostly there since it's occasionally useful for me when debugging the editor itself.</p>
+		<h3>Export Format</h3>
+		<p>The export looks like this:</p>
+		<font color="blue">
+		<p>
+		--> Bldg <--WWII Uncompressed.biq | WWII No Barracks.biq
+		<br>
+		<br>
+		name: Bank
+		<br>
+		ReqImprovement: 4 | 3
+		<br>
+		<br>
+		name: Cathedral
+		<br>
+		ReqImprovement: 3 | 2
+		<br>
+		<br>
+		Bldg Barracks does not exist in WWII No Barracks.biq.
+		</font>
+		<font color="black">
+		<p>Here's how to read it:</p>
+		<ul>
+			<li>--> Bldg <-- is the header for the type of item being compared.  Everything is a building until the next such header.</li>
+			<li>WWII Uncompressed.biq | WWII No Barracks.biq tells you which file is on the left in the comparisons, and which is on the right.</li>
+			<li>name: Bank tells you that the first comparison is for the Bank building.  Everything is for the bank until the next name:</li>
+			<li>ReqImprovement: 4 | 3 tells you that in WWII Uncompressed.biq, building (improvement) 4 is required to build a Bank, and building 3 is required in WWII No Barracks.biq</li>
+			<li>Bldg Barracks does not exist in WWII No Barracks.biq, or similar, appears for every item without an equivalent in the other file.</li>
+		</ul>
+		<p>There is room for future improvements, such as the editor realizing that the above items are both "Marketplace", and thus (perhaps
+		optionally) assuming that they are the same.</p>
+		</font>
+		<div id="footer"><a href="civ3editor.html">Index</a></div>
+	</body>
+</html>

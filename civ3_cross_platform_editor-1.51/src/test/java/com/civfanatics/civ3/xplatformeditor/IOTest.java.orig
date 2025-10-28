@@ -1,0 +1,288 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package com.civfanatics.civ3.xplatformeditor;
+
+import com.civfanatics.civ3.biqFile.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import java.io.File;
+import org.apache.log4j.Level;
+
+/**
+ *
+ * @author Andrew
+ */
+public class IOTest {
+
+    static IO io;
+
+    public IOTest() {
+    }
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        io = new IO();
+        io.resetLogConfig();
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        io = null;
+    }
+
+    @Test
+    public void testSaveAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddBuildingAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.buildings.add(new BLDG("Name", io.flavor.size(), io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddCivAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.civilization.add(new RACE("NewCiv", io.flavor.size(), io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddCitizenAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.citizens.add(new CTZN("NewCitizen", io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddCultAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.culture.add(new CULT("NewCulture", io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddDiffAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.difficulties.add(new DIFF("NewDifficulty", io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddGoodAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.resource.add(new GOOD("NewGood", io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddGovtAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.government.add(new GOVT("NewGovt", io.government.size(), io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddTechAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.technology.add(new TECH("NewTech", io.flavor.size(), io));
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    public void testAddUnitAndReopen(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+        io.unit.add(new PRTO("NewUnit", io, io.unit.size()));
+        io.numUnits++;
+        boolean output = io.outputBIQ(new File("Export Custom All.biq"));
+        assertTrue(output);
+        io = new IO();
+        File toReopen = new File("Export Custom All.biq");
+        boolean reopen = io.inputBIQ(toReopen);
+        assertTrue(reopen);
+        if (toReopen.exists())
+            toReopen.delete();
+    }
+
+    @Test
+    //This is somewhat of an integration test - there are many things that must
+    //be working for this to work.
+    public void testInputBIQ_None() {
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom None.biq"));
+        assertTrue(result);
+    }
+
+    @Test
+    public void testInputBIQ_RulesOnly(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom Rules Only.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testInputBIQ_MapOnly(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom Map Only.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testInputBIQ_PlayerDataOnly(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom Player Data Only.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testInputBIQ_RulesAndPlayerDataOnly(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom Rules and Plyr Data.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testInputBIQ_RulesAndMap(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom Rules and Map.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testInputBIQ_PlayerDataAndMap(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom Map and Plyr Data.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testInputBIQ_AllCustom(){
+        boolean result = io.inputBIQ(new File("src/test/java/com/civfanatics/civ3/xplatformeditor/Custom All.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testInputRhyes(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\Rhye's of Civilization Expanded v1.23.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testTheGreatWar(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\The Great War 2.1.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testMEMEuropeSmall(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\MEM Europe (Small).biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testRFRE275Hard(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\RFRE 275BC Hard.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testAOI41(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\AoI4.1-31civs-FULL.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testTwilight(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\Twillight of Byzantium.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testTCW(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\TCW1.6.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testRood(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\Rood.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testManhattan(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\Manhattan.biq"));
+        assertTrue(result);
+    }
+    @Test
+    public void testMesoamerica(){
+        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Conquests\\5 Mesoamerica.biq"));
+        assertTrue(result);
+    }
+//    @Test
+//    public void testBadInput(){
+//        boolean result = io.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\All Zeroes.biq"));
+//        //Note that this test should fail, but not error out.
+//        assertFalse(result);
+//    }
+
+}
