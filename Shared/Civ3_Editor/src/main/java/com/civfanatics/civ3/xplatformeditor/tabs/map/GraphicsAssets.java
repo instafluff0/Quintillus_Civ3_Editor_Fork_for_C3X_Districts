@@ -1,5 +1,6 @@
 package com.civfanatics.civ3.xplatformeditor.tabs.map;
 
+import com.civfanatics.civ3.xplatformeditor.districts.DistrictDefinitions;
 import java.awt.image.BufferedImage;
 
 /**
@@ -68,6 +69,81 @@ public class GraphicsAssets {
     public BufferedImage fog;
     
     public boolean largeRuinGraphics = false;
+    public DistrictSpriteSet[] districtSprites = new DistrictSpriteSet[0];
+    public WonderDistrictSpriteSet[] wonderDistrictSprites = new WonderDistrictSpriteSet[0];
+    public DistrictDefinitions districtDefinitions;
+
+    public static class DistrictSpriteSet {
+        private final BufferedImage[][][] sprites;
+
+        public DistrictSpriteSet(int variants, int eras, int columns) {
+            sprites = new BufferedImage[Math.max(1, variants)][Math.max(1, eras)][Math.max(1, columns)];
+        }
+
+        public void setSprite(int variant, int era, int column, BufferedImage image) {
+            if (variant < 0 || variant >= sprites.length) {
+                return;
+            }
+            if (era < 0 || era >= sprites[variant].length) {
+                return;
+            }
+            if (column < 0 || column >= sprites[variant][era].length) {
+                return;
+            }
+            sprites[variant][era][column] = image;
+        }
+
+        public BufferedImage getSprite(int variant, int era, int column) {
+            if (sprites.length == 0) {
+                return null;
+            }
+            int clampedVariant = clamp(variant, 0, sprites.length - 1);
+            BufferedImage[][] eraArray = sprites[clampedVariant];
+            if (eraArray.length == 0) {
+                return null;
+            }
+            int clampedEra = clamp(era, 0, eraArray.length - 1);
+            BufferedImage[] columns = eraArray[clampedEra];
+            if (columns.length == 0) {
+                return null;
+            }
+            int clampedColumn = clamp(column, 0, columns.length - 1);
+            return columns[clampedColumn];
+        }
+
+        public int getVariantCount() {
+            return sprites.length;
+        }
+
+        public int getEraCount() {
+            return sprites.length == 0 ? 0 : sprites[0].length;
+        }
+
+        public int getColumnCount() {
+            return (sprites.length == 0 || sprites[0].length == 0) ? 0 : sprites[0][0].length;
+        }
+    }
+
+    public static class WonderDistrictSpriteSet {
+        private BufferedImage completed;
+        private BufferedImage constructing;
+
+        public void setCompleted(BufferedImage completed) {
+            this.completed = completed;
+        }
+
+        public BufferedImage getCompleted() {
+            return completed;
+        }
+
+        public void setConstructing(BufferedImage constructing) {
+            this.constructing = constructing;
+        }
+
+        public BufferedImage getConstructing() {
+            return constructing;
+        }
+    }
     
     public void sendGraphics(BufferedImage[][]baseTerrainGraphics, BufferedImage[][]lmTerrainGraphics, BufferedImage[]roadGraphics,           BufferedImage[]railroadGraphics,   BufferedImage[]buildingGraphics,
                              BufferedImage[][]borderGraphics,      BufferedImage[]resourceGraphics,    BufferedImage[][][]noWallCityGraphics, BufferedImage[][]wallCityGraphics, BufferedImage[]goodyhutGraphics,
@@ -98,6 +174,11 @@ public class GraphicsAssets {
         this.unitIcons = unitIcons;
     }
     
+    public void sendDistrictGraphics(DistrictSpriteSet[] districtSprites, WonderDistrictSpriteSet[] wonderDistrictSprites) {
+        this.districtSprites = (districtSprites != null) ? districtSprites : new DistrictSpriteSet[0];
+        this.wonderDistrictSprites = (wonderDistrictSprites != null) ? wonderDistrictSprites : new WonderDistrictSpriteSet[0];
+    }
+
     public void sendHills(BufferedImage[]mountainGraphics, BufferedImage[]snowMountainGraphics, BufferedImage[]lmMountainGraphics, BufferedImage[]forestMountainGraphics, BufferedImage[]jungleMountainGraphics, 
                           BufferedImage[]hillGraphics, BufferedImage[]lmHillGraphics, BufferedImage[]forestHillGraphics, BufferedImage[]jungleHillGraphics, 
                           BufferedImage[]volcanoGraphics, BufferedImage[]forestVolcanoGraphics, BufferedImage[]jungleVolcanoGraphics) {
@@ -155,5 +236,19 @@ public class GraphicsAssets {
     public void sendFog(BufferedImage fog)
     {
         this.fog = fog;
+    }
+
+    public void setDistrictDefinitions(DistrictDefinitions definitions) {
+        this.districtDefinitions = definitions;
+    }
+
+    private static int clamp(int value, int min, int max) {
+        if (value < min) {
+            return min;
+        }
+        if (value > max) {
+            return max;
+        }
+        return value;
     }
 }

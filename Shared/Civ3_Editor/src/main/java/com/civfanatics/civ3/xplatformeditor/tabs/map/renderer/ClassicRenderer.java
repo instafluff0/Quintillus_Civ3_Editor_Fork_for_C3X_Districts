@@ -1,5 +1,6 @@
 package com.civfanatics.civ3.xplatformeditor.tabs.map.renderer;
 
+import com.civfanatics.civ3.biqFile.BLDG;
 import com.civfanatics.civ3.biqFile.CITY;
 import com.civfanatics.civ3.biqFile.CLNY;
 import com.civfanatics.civ3.biqFile.GOOD;
@@ -25,8 +26,12 @@ import static com.civfanatics.civ3.biqFile.util.MapDirection.SOUTHWEST;
 import com.civfanatics.civ3.xplatformeditor.Main;
 import static com.civfanatics.civ3.xplatformeditor.Main.settings;
 import com.civfanatics.civ3.xplatformeditor.Settings;
+import com.civfanatics.civ3.xplatformeditor.districts.DistrictDefinitions;
+import com.civfanatics.civ3.xplatformeditor.districts.DistrictDefinitions.DistrictDefinition;
 import com.civfanatics.civ3.xplatformeditor.imageSupport.Units32Supplier;
 import com.civfanatics.civ3.xplatformeditor.tabs.map.GraphicsAssets;
+import com.civfanatics.civ3.xplatformeditor.tabs.map.GraphicsAssets.DistrictSpriteSet;
+import com.civfanatics.civ3.xplatformeditor.tabs.map.GraphicsAssets.WonderDistrictSpriteSet;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -34,8 +39,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import javax.swing.JOptionPane;
@@ -58,6 +66,14 @@ public class ClassicRenderer extends Renderer {
         new Color(106, 90, 205),
         new Color(176, 196, 222)
     };
+    private static final int[][] WORK_RADIUS_OFFSETS = new int[][] {
+        {0, 0},
+        {1, -1}, {2, 0}, {1, 1}, {0, 2}, {-1, 1}, {-2, 0}, {-1, -1}, {0, -2},
+        {1, -3}, {2, -2}, {3, -1}, {3, 1}, {2, 2}, {1, 3}, {-1, 3}, {-2, 2}, {-3, 1}, {-3, -1}, {-2, -2}, {-1, -3}
+    };
+    private final Map<String, Integer> buildingNameToIndex = new HashMap<String, Integer>();
+    private final Map<Integer, int[]> districtDependentBuildingCache = new HashMap<Integer, int[]>();
+    private final Map<Integer, Integer> civEraCache = new HashMap<Integer, Integer>();
         
     private List<TILE> tiles = null;
     private WMAP wmap = null;
@@ -85,6 +101,14 @@ public class ClassicRenderer extends Renderer {
         this.resource = biq.resource;
         this.colony = biq.colony;
         this.rule = biq.rule;
+        buildingNameToIndex.clear();
+        civEraCache.clear();
+        for (int i = 0; i < biq.buildings.size(); i++) {
+            BLDG building = biq.buildings.get(i);
+            if (building != null && building.getName() != null) {
+                buildingNameToIndex.put(building.getName().trim().toLowerCase(Locale.ENGLISH), Integer.valueOf(building.getIndex()));
+            }
+        }
     }
     
     public void setViewportSize(int x, int y) {
@@ -130,6 +154,76 @@ public class ClassicRenderer extends Renderer {
         
     }
 
+    private boolean drawDistrict(TILE tile, int defaultXPosition, int defaultYPosition, Graphics canvas)
+    {
+        if (assets == null || assets.districtSprites == null || assets.districtSprites.length == 0)
+            return false;
+
+        TILE.DistrictData data = tile.getDistrictData();
+        if (data == null || data.districtType < 0)
+            return false;
+
+        int districtId = data.districtType;
+        if (districtId < 0 || districtId >= assets.districtSprites.length)
+            return false;
+
+        DistrictSpriteSet set = assets.districtSprites[districtId];
+        if (set == null)
+            return false;
+
+        boolean completed = (data.state == TILE.DISTRICT_STATE_COMPLETED);
+
+        // Wonder districts use a dedicated sprite sheet
+        if (districtId == DistrictDefinitions.WONDER_DISTRICT_ID) {
+            BufferedImage wonderSprite = resolveWonderSprite(tile, completed);
+            if (wonderSprite != null) {
+                canvas.drawImage(wonderSprite, defaultXPosition, defaultYPosition, null);
+                return true;
+            }
+        }
+
+        if (!completed && districtId != DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID)
+            return false;
+
+        DistrictDefinitions definitions = assets.districtDefinitions;
+        DistrictDefinition def = (definitions != null) ? definitions.getDistrict(districtId) : null;
+
+        int ownerId = tile.owner;
+        int variant = 0;
+        int era = 0;
+
+        int civIdForTerritory = resolveCivilizationId(tile);
+        if (def != null && civIdForTerritory >= 0 && civIdForTerritory < civ.size()) {
+            if (def.isVaryByCulture()) {
+                int cultureGroup = civ.get(civIdForTerritory).getCultureGroup();
+                variant = clamp(cultureGroup, 0, Math.max(0, set.getVariantCount() - 1));
+            }
+            if (def.isVaryByEra()) {
+                int resolvedEra = resolveEraForCivilization(civIdForTerritory);
+                era = clamp(resolvedEra, 0, Math.max(0, set.getEraCount() - 1));
+            }
+        } else if (districtId == DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID && set.getVariantCount() > 1) {
+            variant = set.getVariantCount() - 1; // abandoned art
+        }
+
+        int column = 0;
+        if (districtId == DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID) {
+            column = getNeighborhoodColumn(tile.xPos, tile.yPos, Math.max(1, set.getColumnCount()));
+        } else if (def != null && def.getDependentImprovementCount() > 0) {
+            column = countDependentBuildings(tile, ownerId, def, Math.max(1, set.getColumnCount()));
+        }
+
+        BufferedImage sprite = set.getSprite(variant, era, column);
+        if (sprite == null) {
+            sprite = fallbackSprite(set);
+        }
+        if (sprite == null)
+            return false;
+
+        canvas.drawImage(sprite, defaultXPosition, defaultYPosition, null);
+        return true;
+    }
+
     private void drawDistrictPlaceholder(TILE tile, int defaultXPosition, int defaultYPosition, Graphics canvas)
     {
         TILE.DistrictData data = tile.getDistrictData();
@@ -147,6 +241,186 @@ public class ClassicRenderer extends Renderer {
         canvas.setColor(Color.BLACK);
         canvas.drawOval(ovalX, ovalY, 16, 10);
         canvas.setColor(old);
+    }
+
+    private BufferedImage resolveWonderSprite(TILE tile, boolean completed) {
+        if (assets.wonderDistrictSprites == null || assets.wonderDistrictSprites.length == 0)
+            return null;
+        TILE.DistrictData data = tile.getDistrictData();
+        if (data == null || data.wonderInfo == null)
+            return null;
+        TILE.WonderDistrictInfo info = data.wonderInfo;
+        if (info.wonderIndex < 0 || info.wonderIndex >= assets.wonderDistrictSprites.length)
+            return null;
+        WonderDistrictSpriteSet set = assets.wonderDistrictSprites[info.wonderIndex];
+        if (set == null)
+            return null;
+        if (completed && info.state == TILE.WDS_COMPLETED) {
+            BufferedImage img = set.getCompleted();
+            if (img != null)
+                return img;
+        }
+        if (set.getConstructing() != null)
+            return set.getConstructing();
+        return set.getCompleted();
+    }
+
+    private int resolveCivilizationId(TILE tile) {
+        if (tile == null)
+            return -1;
+        if (tile.ownerType == CITY.OWNER_CIV) {
+            if (tile.owner >= 0 && tile.owner < civ.size())
+                return tile.owner;
+        } else if (tile.ownerType == CITY.OWNER_PLAYER) {
+            int playerId = tile.owner;
+            if (playerId >= 0 && playerId < player.size()) {
+                LEAD leader = player.get(playerId);
+                if (leader != null && leader.getCiv() >= 0)
+                    return leader.getCiv();
+            }
+        }
+
+        short cityId = tile.getCity();
+        if (cityId >= 0 && cityId < city.size()) {
+            CITY cityOnTile = city.get(cityId);
+            if (cityOnTile != null) {
+                int ownerType = cityOnTile.getOwnerType();
+                if (ownerType == CITY.OWNER_CIV) {
+                    int cityCiv = cityOnTile.getOwner();
+                    if (cityCiv >= 0 && cityCiv < civ.size())
+                        return cityCiv;
+                } else if (ownerType == CITY.OWNER_PLAYER) {
+                    int playerId = cityOnTile.getOwner();
+                    if (playerId >= 0 && playerId < player.size()) {
+                        LEAD leader = player.get(playerId);
+                        if (leader != null && leader.getCiv() >= 0)
+                            return leader.getCiv();
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private int resolveEraForCivilization(int civId) {
+        if (civId < 0)
+            return 0;
+        Integer cached = civEraCache.get(Integer.valueOf(civId));
+        if (cached != null)
+            return cached.intValue();
+        int era = 0;
+        for (int i = 0; i < player.size(); i++) {
+            LEAD leader = player.get(i);
+            if (leader != null && leader.getCiv() == civId) {
+                if (leader.initialEra >= 0)
+                    era = leader.initialEra;
+                break;
+            }
+        }
+        civEraCache.put(Integer.valueOf(civId), Integer.valueOf(era));
+        return era;
+    }
+
+    private int getNeighborhoodColumn(int tileX, int tileY, int columnCount) {
+        if (columnCount <= 1) {
+            return 0;
+        }
+        long v = ((long)tileX * 0x9E3779B1L) + ((long)tileY * 0x85EBCA6BL);
+        v ^= (v >> 16);
+        v *= 0x7FEB352DL;
+        v ^= (v >> 15);
+        v *= 0x846CA68BL;
+        v ^= (v >> 16);
+        long positive = v & 0x7FFFFFFFL;
+        return (int)(positive % columnCount);
+    }
+
+    private int countDependentBuildings(TILE tile, int ownerId, DistrictDefinition def, int columnCount) {
+        int[] buildingIndices = getDependentBuildingIndices(def);
+        if (buildingIndices.length == 0)
+            return 0;
+        int completed = 0;
+        for (int buildingIndex : buildingIndices) {
+            if (tileHasCityWithBuilding(tile.xPos, tile.yPos, ownerId, buildingIndex))
+                completed++;
+        }
+        return clamp(completed, 0, columnCount - 1);
+    }
+
+    private int[] getDependentBuildingIndices(DistrictDefinition def) {
+        if (def == null)
+            return new int[0];
+        int districtId = def.getId();
+        int[] cached = districtDependentBuildingCache.get(districtId);
+        if (cached != null)
+            return cached;
+        List<String> names = def.getDependentImprovementNames();
+        if (names.isEmpty()) {
+            districtDependentBuildingCache.put(districtId, new int[0]);
+            return new int[0];
+        }
+        List<Integer> indices = new ArrayList<Integer>();
+        for (String name : names) {
+            if (name == null)
+                continue;
+            Integer index = buildingNameToIndex.get(name.trim().toLowerCase(Locale.ENGLISH));
+            if (index != null && index.intValue() >= 0) {
+                indices.add(index);
+            } else {
+                logger.debug("Unable to resolve dependent improvement '" + name + "' for district " + def.getName());
+            }
+        }
+        int[] result = new int[indices.size()];
+        for (int i = 0; i < indices.size(); i++) {
+            result[i] = indices.get(i).intValue();
+        }
+        districtDependentBuildingCache.put(districtId, result);
+        return result;
+    }
+
+    private boolean tileHasCityWithBuilding(int tileX, int tileY, int ownerId, int buildingIndex) {
+        if (buildingIndex < 0 || biq == null)
+            return false;
+        for (int[] offset : WORK_RADIUS_OFFSETS) {
+            int nx = tileX + offset[0];
+            int ny = tileY + offset[1];
+            int tileIndex = biq.calculateTileIndex(nx, ny);
+            if (tileIndex < 0 || tileIndex >= tiles.size())
+                continue;
+            TILE neighbor = tiles.get(tileIndex);
+            if (neighbor == null)
+                continue;
+            short cityId = neighbor.getCity();
+            if (cityId >= 0 && cityId < city.size()) {
+                CITY targetCity = city.get(cityId);
+                if (targetCity != null && targetCity.getOwner() == ownerId && targetCity.hasBuilding(buildingIndex)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private BufferedImage fallbackSprite(DistrictSpriteSet set) {
+        for (int variant = 0; variant < set.getVariantCount(); variant++) {
+            for (int era = 0; era < set.getEraCount(); era++) {
+                for (int column = 0; column < set.getColumnCount(); column++) {
+                    BufferedImage candidate = set.getSprite(variant, era, column);
+                    if (candidate != null) {
+                        return candidate;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static int clamp(int value, int min, int max) {
+        if (value < min)
+            return min;
+        if (value > max)
+            return max;
+        return value;
     }
 
     private void drawLargeRuinGraphics(List<TILE> visibleTiles, Graphics bufferGraphics) {
@@ -513,8 +787,11 @@ public class ClassicRenderer extends Renderer {
             }
         }
 
-        if (tile.hasDistrict())
-            drawDistrictPlaceholder(tile, defaultXPosition, defaultYPosition, canvas);
+        if (tile.hasDistrict()) {
+            if (!drawDistrict(tile, defaultXPosition, defaultYPosition, canvas)) {
+                drawDistrictPlaceholder(tile, defaultXPosition, defaultYPosition, canvas);
+            }
+        }
 
         if (settings.unitsEnabled)
             drawUnits(tile, horizScrollPosition, vertScrollPosition, canvas);

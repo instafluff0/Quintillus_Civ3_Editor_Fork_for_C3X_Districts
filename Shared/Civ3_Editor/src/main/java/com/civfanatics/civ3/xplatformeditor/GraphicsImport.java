@@ -6,12 +6,20 @@
 package com.civfanatics.civ3.xplatformeditor;
 
 import com.civfanatics.civ3.biqFile.IO;
+import com.civfanatics.civ3.xplatformeditor.districts.DistrictDefinitions;
 import com.civfanatics.civ3.xplatformeditor.imageSupport.Civ3PCXFilter;
 import com.civfanatics.civ3.xplatformeditor.tabs.map.GraphicsAssets;
+import com.civfanatics.civ3.xplatformeditor.tabs.map.GraphicsAssets.DistrictSpriteSet;
+import com.civfanatics.civ3.xplatformeditor.tabs.map.GraphicsAssets.WonderDistrictSpriteSet;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import org.apache.log4j.*;
@@ -32,6 +40,10 @@ public class GraphicsImport extends Thread{
     JTabbedPane tabs;
     BufferedImage[][]unitIcons;
     static final int NUM_TNT_DUPLICATES = 3;
+    private static final int DISTRICT_TILE_WIDTH = 128;
+    private static final int DISTRICT_TILE_HEIGHT = 64;
+    private static final int MAX_ERA_VARIATIONS = 4;
+    private final Map<String, BufferedImage> districtImageCache = new HashMap<String, BufferedImage>();
     
     static int JOIN_TIMEOUT = 0;
     
@@ -787,6 +799,7 @@ public class GraphicsImport extends Thread{
         assets.sendIrrigation(irrigationGraphics, plainsIrrigationGraphics, desertIrrigationGraphics, tundraIrrigationGraphics, riverGraphics, deltaGraphics);
         assets.sendTNT(tntGrass, tntGrassShield, tntPlains, tntDesert, tntTundra, tntFloodPlains);
         assets.sendFog(fog);
+        loadDistrictGraphics(assets);
         mapPanel.setAssets(assets);
         
         mapTab.setUp(biq);
@@ -805,6 +818,186 @@ public class GraphicsImport extends Thread{
         logger.info("Graphics loaded.  Memory available: " + Runtime.getRuntime().maxMemory()/1024/1024 + " MB");
     }
     
+    private void loadDistrictGraphics(GraphicsAssets assets) {
+        if (assets == null) {
+            return;
+        }
+        DistrictDefinitions definitions = null;
+        try {
+            if (mapTab != null) {
+                definitions = mapTab.getDistrictDefinitionsForGraphics();
+            }
+        }
+        catch (Exception e) {
+            logger.warn("Unable to load district configuration for graphics", e);
+        }
+        assets.setDistrictDefinitions(definitions);
+        if (definitions == null) {
+            assets.sendDistrictGraphics(new DistrictSpriteSet[0], new WonderDistrictSpriteSet[0]);
+            return;
+        }
+
+        List<DistrictDefinitions.DistrictDefinition> districtDefs = definitions.getDistricts();
+        DistrictSpriteSet[] districtSets = new DistrictSpriteSet[districtDefs.size()];
+        for (DistrictDefinitions.DistrictDefinition def : districtDefs) {
+            if (def == null) {
+                continue;
+            }
+            DistrictSpriteSet set = buildDistrictSpriteSet(def);
+            if (set != null) {
+                int id = def.getId();
+                if (id >= 0 && id < districtSets.length) {
+                    districtSets[id] = set;
+                }
+            }
+        }
+
+        List<DistrictDefinitions.WonderDefinition> wonderDefs = definitions.getWonders();
+        WonderDistrictSpriteSet[] wonderSets = new WonderDistrictSpriteSet[wonderDefs.size()];
+        for (DistrictDefinitions.WonderDefinition def : wonderDefs) {
+            if (def == null) {
+                continue;
+            }
+            WonderDistrictSpriteSet set = buildWonderSpriteSet(def);
+            if (set != null) {
+                int index = def.getIndex();
+                if (index >= 0 && index < wonderSets.length) {
+                    wonderSets[index] = set;
+                }
+            }
+        }
+        assets.sendDistrictGraphics(districtSets, wonderSets);
+    }
+
+    private DistrictSpriteSet buildDistrictSpriteSet(DistrictDefinitions.DistrictDefinition def) {
+        List<String> imgPaths = def.getImgPaths();
+        if (imgPaths.isEmpty()) {
+            return null;
+        }
+        int variants = Math.max(1, imgPaths.size());
+        int eras = def.isVaryByEra() ? MAX_ERA_VARIATIONS : 1;
+        int columns = Math.max(1, def.getColumnCount());
+        DistrictSpriteSet set = new DistrictSpriteSet(variants, eras, columns);
+
+        for (int variant = 0; variant < variants; variant++) {
+            if (variant >= imgPaths.size()) {
+                break;
+            }
+            String relativePath = imgPaths.get(variant);
+            File artFile = resolveDistrictArtFile(relativePath);
+            if (artFile == null) {
+                logger.warn("District art not found for " + def.getName() + ": " + relativePath);
+                continue;
+            }
+            BufferedImage sheet = loadPcxAsBufferedImage(artFile);
+            if (sheet == null) {
+                logger.warn("Failed to load district art from " + artFile.getAbsolutePath());
+                continue;
+            }
+            int availableColumns = sheet.getWidth() / DISTRICT_TILE_WIDTH;
+            int availableRows = sheet.getHeight() / DISTRICT_TILE_HEIGHT;
+            int effectiveEraCount = Math.min(eras, Math.max(1, availableRows));
+            int effectiveColumnCount = Math.min(columns, Math.max(1, availableColumns));
+            for (int era = 0; era < effectiveEraCount; era++) {
+                for (int column = 0; column < effectiveColumnCount; column++) {
+                    BufferedImage sprite = extractDistrictTile(sheet, column, era);
+                    if (sprite != null) {
+                        set.setSprite(variant, era, column, sprite);
+                    }
+                }
+            }
+        }
+        return set;
+    }
+
+    private WonderDistrictSpriteSet buildWonderSpriteSet(DistrictDefinitions.WonderDefinition def) {
+        File artFile = resolveDistrictArtFile(def.getImgPath());
+        if (artFile == null) {
+            logger.warn("Wonder district art not found for " + def.getName() + ": " + def.getImgPath());
+            return null;
+        }
+        BufferedImage sheet = loadPcxAsBufferedImage(artFile);
+        if (sheet == null) {
+            logger.warn("Failed to load wonder district art from " + artFile.getAbsolutePath());
+            return null;
+        }
+        WonderDistrictSpriteSet set = new WonderDistrictSpriteSet();
+        BufferedImage completed = extractDistrictTile(sheet, def.getImgColumn(), def.getImgRow());
+        if (completed != null) {
+            set.setCompleted(completed);
+        }
+        BufferedImage constructing = extractDistrictTile(sheet, def.getConstructColumn(), def.getConstructRow());
+        if (constructing != null) {
+            set.setConstructing(constructing);
+        }
+        return set;
+    }
+
+    private BufferedImage extractDistrictTile(BufferedImage sheet, int column, int row) {
+        int x = column * DISTRICT_TILE_WIDTH;
+        int y = row * DISTRICT_TILE_HEIGHT;
+        if (x + DISTRICT_TILE_WIDTH > sheet.getWidth() || y + DISTRICT_TILE_HEIGHT > sheet.getHeight()) {
+            return null;
+        }
+        try {
+            return sheet.getSubimage(x, y, DISTRICT_TILE_WIDTH, DISTRICT_TILE_HEIGHT);
+        }
+        catch (Exception ex) {
+            logger.warn("Failed to slice district sprite at column " + column + ", row " + row, ex);
+            return null;
+        }
+    }
+
+    private File resolveDistrictArtFile(String relativePath) {
+        if (relativePath == null || relativePath.length() == 0) {
+            return null;
+        }
+        String normalized = relativePath.replace("\\", Main.fileSlash).replace("/", Main.fileSlash);
+        if (settings != null && settings.civInstallDir != null && settings.civInstallDir.length() > 0) {
+            try {
+                String conquestsFolder = utils.getConquestsFolder(settings.civInstallDir);
+                if (conquestsFolder != null && conquestsFolder.length() > 0) {
+                    File candidate = new File(conquestsFolder + "C3X" + Main.fileSlash + "Art" + Main.fileSlash + "Districts" + Main.fileSlash + "1200" + Main.fileSlash + normalized);
+                    if (candidate.isFile()) {
+                        return candidate;
+                    }
+                }
+            }
+            catch (Exception e) {
+                logger.debug("Unable to resolve district art path from civ install dir", e);
+            }
+        }
+        File fallback = new File(normalized);
+        if (fallback.isFile()) {
+            return fallback;
+        }
+        return null;
+    }
+
+    private BufferedImage loadPcxAsBufferedImage(File file) {
+        if (file == null) {
+            return null;
+        }
+        String key = file.getAbsolutePath();
+        BufferedImage cached = districtImageCache.get(key);
+        if (cached != null) {
+            return cached;
+        }
+        PCXImportThread thread = new PCXImportThread(key);
+        thread.start();
+        try {
+            thread.join(JOIN_TIMEOUT);
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        BufferedImage image = thread.getBufferedImage();
+        if (image != null) {
+            districtImageCache.put(key, image);
+        }
+        return image;
+    }
+
     private BufferedImage[] importGraphics(String fileName, int xDim, int yDim, int heightEach, int heightOffset)
     {
 

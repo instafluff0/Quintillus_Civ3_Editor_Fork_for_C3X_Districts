@@ -1222,7 +1222,7 @@ public class MapTab extends JPanel{
                     return;
                 DistrictDefinitions.DistrictDefinition def = lstDistricts.getSelectedValue();
                 if (def != null)
-                    setDistrictForSelectedTile(def.id);
+                    setDistrictForSelectedTile(def.getId());
             }
         });
 
@@ -3320,6 +3320,11 @@ public class MapTab extends JPanel{
         }
     }
 
+    public DistrictDefinitions getDistrictDefinitionsForGraphics() {
+        ensureDistrictDefinitions();
+        return districtDefinitions;
+    }
+
     private void activateDistrictMode()
     {
         ensureDistrictDefinitions();
@@ -3461,7 +3466,7 @@ public class MapTab extends JPanel{
             data.wonderInfo.wonderIndex = -1;
         } else {
             data.wonderInfo.cityId = selection.cityIndex;
-            data.wonderInfo.wonderIndex = selection.definition.index;
+            data.wonderInfo.wonderIndex = selection.definition.getIndex();
         }
         map.triggerUpdates();
         updateDistrictPanel();
@@ -3493,10 +3498,10 @@ public class MapTab extends JPanel{
                     continue;
                 CITY city = biq.city.get(cityIndex);
                 for (DistrictDefinitions.WonderDefinition wonder : districtDefinitions.getWonders()) {
-                    if (usedWonders.contains(Integer.valueOf(wonder.index)))
+                    if (usedWonders.contains(Integer.valueOf(wonder.getIndex())))
                         continue;
-                    int buildingId = findBuildingIdByName(wonder.name);
-                    String key = wonder.name + ":" + cityIndex;
+                    int buildingId = findBuildingIdByName(wonder.getName());
+                    String key = wonder.getName() + ":" + cityIndex;
                     if (buildingId >= 0 && city.hasBuilding(buildingId) && seenPairs.add(key)) {
                         options.add(new WonderOption(wonder, city, cityIndex));
                     }
@@ -3524,7 +3529,7 @@ public class MapTab extends JPanel{
             return null;
         if (wonderIndex < 0 || wonderIndex >= districtDefinitions.getWonders().size())
             return null;
-        return districtDefinitions.getWonders().get(wonderIndex).name;
+        return districtDefinitions.getWonders().get(wonderIndex).getName();
     }
 
     private BufferedImage createDistrictIcon(boolean active)
@@ -3579,7 +3584,7 @@ public class MapTab extends JPanel{
         public String toString() {
             if (isNone)
                 return "None";
-            String wonderName = (definition != null) ? definition.name : "";
+            String wonderName = (definition != null) ? definition.getName() : "";
             String cityName = (city != null && city.getName() != null) ? city.getName() : "";
             if (cityName.length() == 0)
                 return wonderName;
