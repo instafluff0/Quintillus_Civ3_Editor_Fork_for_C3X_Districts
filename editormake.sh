@@ -6,8 +6,7 @@ mvn clean install -DskipTests
 cd ../Civ3_Editor
 mvn clean install -DskipTests
 cp  ./src/main/java/com/civfanatics/civ3/xplatformeditor/langs ./target/langs
-#mvn clean install -DskipTests
-#mvn assembly:assembly
+mvn assembly:assembly -DskipTests
 cd target
 mkdir dist
 cd dist
@@ -19,5 +18,5 @@ cp ../../imgs/spectrum.pcx ./imgs/
 cp ../../help/*.html ./help/
 cp ../../bin/BIQDecompressor.jar ./bin
 cp -r ../langs .
-mv ../s.jar "Conquests Editor.jar"
+mv ../*s.jar "Conquests Editor.jar"
 cd ../../..
