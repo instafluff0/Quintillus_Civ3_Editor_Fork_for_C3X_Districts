@@ -1,6 +1,7 @@
 
 package com.civfanatics.civ3.savFile;
 
+import com.civfanatics.civ3.biqFile.BLDG;
 import com.civfanatics.civ3.biqFile.util.LittleEndianDataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class SavCITY {
     private int constructingType;   //0 = wealth, 1 = building, 2 = unit
     private int yearBuilt;  //vanilla only, otherwise in YEAR section
     private int unknown1;
-    private int culturalInfluence;
+    private int borderLevel;    //aka "culturalInfluence"
     private int militaryPolice;
     private int luxConnectedCount;
     private int luxConnectedBits;
@@ -162,7 +163,7 @@ public class SavCITY {
         this.constructingType = in.readInt();
         this.yearBuilt = in.readInt();
         this.unknown1 = in.readInt();
-        this.culturalInfluence = in.readInt();
+        this.borderLevel = in.readInt();
         this.militaryPolice = in.readInt();
         this.luxConnectedCount = in.readInt();
         this.luxConnectedBits = in.readInt();
@@ -319,5 +320,409 @@ public class SavCITY {
     
     public boolean isRealCity() {
         return dataLength == 0x88;
+    }
+
+    //TODO: Pare getters down to what makes sense.  These are auto-generated cause there were none.
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public SAV getBaselink() {
+        return baselink;
+    }
+
+    public byte[] getInputFour() {
+        return inputFour;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public int getDataLength() {
+        return dataLength;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public short getX() {
+        return x;
+    }
+
+    public short getY() {
+        return y;
+    }
+
+    public byte getOwner() {
+        return owner;
+    }
+
+    public byte[] getUnknownThreeBytes() {
+        return unknownThreeBytes;
+    }
+
+    public int getMaintenanceGPT() {
+        return maintenanceGPT;
+    }
+
+    public int getCityFlags() {
+        return cityFlags;
+    }
+
+    public int getGovernorSettings() {
+        return governorSettings;
+    }
+
+    public long getUnknownLong() {
+        return unknownLong;
+    }
+
+    public int getTotalFood() {
+        return totalFood;
+    }
+
+    public int getShieldsCollected() {
+        return shieldsCollected;
+    }
+
+    public int getPollution() {
+        return pollution;
+    }
+
+    public int getConstructing() {
+        return constructing;
+    }
+
+    public int getConstructingType() {
+        return constructingType;
+    }
+
+    public int getYearBuilt() {
+        return yearBuilt;
+    }
+
+    public int getUnknown1() {
+        return unknown1;
+    }
+
+    public int getBorderLevel() {
+        return borderLevel;
+    }
+
+    public int getMilitaryPolice() {
+        return militaryPolice;
+    }
+
+    public int getLuxConnectedCount() {
+        return luxConnectedCount;
+    }
+
+    public int getLuxConnectedBits() {
+        return luxConnectedBits;
+    }
+
+    public int getUnknown2() {
+        return unknown2;
+    }
+
+    public int getDraftTurnsLeft() {
+        return draftTurnsLeft;
+    }
+
+    public byte[] getUnknown52Bytes() {
+        return unknown52Bytes;
+    }
+
+    public String getCityHeaderTwo() {
+        return cityHeaderTwo;
+    }
+
+    public int getDataLength2() {
+        return dataLength2;
+    }
+
+    public byte getUnhappyNoReasonPercent() {
+        return unhappyNoReasonPercent;
+    }
+
+    public byte getUnhappyCrowdedPercent() {
+        return unhappyCrowdedPercent;
+    }
+
+    public byte getUnhappyWarWearinessPercent() {
+        return unhappyWarWearinessPercent;
+    }
+
+    public byte getUnhappyAggressionPercent() {
+        return unhappyAggressionPercent;
+    }
+
+    public byte getUnhappyPropagandaPercent() {
+        return unhappyPropagandaPercent;
+    }
+
+    public byte getUnhappyDraftPercent() {
+        return unhappyDraftPercent;
+    }
+
+    public byte getUnhappyOppressionPercent() {
+        return unhappyOppressionPercent;
+    }
+
+    public byte getUnhappyThisCityImprovementsPercent() {
+        return unhappyThisCityImprovementsPercent;
+    }
+
+    public byte getUnhappyOtherCityImprovementsPercent() {
+        return unhappyOtherCityImprovementsPercent;
+    }
+
+    public byte[] getSevenBytes() {
+        return sevenBytes;
+    }
+
+    public String getCityHeaderThree() {
+        return cityHeaderThree;
+    }
+
+    public int getDataLength3() {
+        return dataLength3;
+    }
+
+    public byte[] getThirtySixBytes() {
+        return thirtySixBytes;
+    }
+
+    public String getCityHeaderFour() {
+        return cityHeaderFour;
+    }
+
+    public int getDataLength4() {
+        return dataLength4;
+    }
+
+    public int getCulturePerTurn() {
+        return culturePerTurn;
+    }
+
+    public int[] getCulturePerLEAD() {
+        return culturePerLEAD;
+    }
+
+    public long getUnknownLongInSection4() {
+        return unknownLongInSection4;
+    }
+
+    public int getFoodPerTurn() {
+        return foodPerTurn;
+    }
+
+    public int getShieldsPerTurn() {
+        return shieldsPerTurn;
+    }
+
+    public int getCommercePerTurn() {
+        return commercePerTurn;
+    }
+
+    public byte[] getTwelveBytes() {
+        return twelveBytes;
+    }
+
+    public String getCityHeaderFive() {
+        return cityHeaderFive;
+    }
+
+    public int getDataLength5() {
+        return dataLength5;
+    }
+
+    public byte[] getNameBuffer() {
+        return nameBuffer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getQueueSlotsUsed() {
+        return queueSlotsUsed;
+    }
+
+    public QueueConstructing[] getQueueConstructing() {
+        return queueConstructing;
+    }
+
+    public int getFoodPerTurnForPopulation() {
+        return foodPerTurnForPopulation;
+    }
+
+    public int getCorruptShieldsPerTurn() {
+        return corruptShieldsPerTurn;
+    }
+
+    public int getCorruptGoldPerTurn() {
+        return corruptGoldPerTurn;
+    }
+
+    public int getExcessFoodPerTurn() {
+        return excessFoodPerTurn;
+    }
+
+    public int getUnwastedFoodPerTurn() {
+        return unwastedFoodPerTurn;
+    }
+
+    public int getUncorruptGoldPerTurn() {
+        return uncorruptGoldPerTurn;
+    }
+
+    public int getLuxGoldPerTurn() {
+        return luxGoldPerTurn;
+    }
+
+    public int getScienceGoldPerTurn() {
+        return scienceGoldPerTurn;
+    }
+
+    public int getTreasuryGoldPerTurn() {
+        return treasuryGoldPerTurn;
+    }
+
+    public int getEntertainerCount() {
+        return entertainerCount;
+    }
+
+    public int getScientistCount() {
+        return scientistCount;
+    }
+
+    public int getTaxManCount() {
+        return taxManCount;
+    }
+
+    public String getPopdHeader() {
+        return popdHeader;
+    }
+
+    public int getPopdDataLength() {
+        return popdDataLength;
+    }
+
+    public int getSpecialistCount() {
+        return specialistCount;
+    }
+
+    public int getCitizenCount() {
+        return citizenCount;
+    }
+
+    public List<POPD> getCitizens() {
+        return citizens;
+    }
+
+    public String getBinfHeader() {
+        return binfHeader;
+    }
+
+    public int getBinfLength() {
+        return binfLength;
+    }
+
+    public int getBuildingCount() {
+        return buildingCount;
+    }
+
+    public List<BINF> getBuildingInfo() {
+        return buildingInfo;
+    }
+
+    public String getBitmHeader() {
+        return bitmHeader;
+    }
+
+    public int getDataLengthBitm() {
+        return dataLengthBitm;
+    }
+
+    public byte[] getUsableBuildingBits() {
+        return usableBuildingBits;
+    }
+
+    public int getBuildingCountBitm() {
+        return buildingCountBitm;
+    }
+
+    public int getBuildingBytes() {
+        return buildingBytes;
+    }
+
+    public String getDateHeader() {
+        return dateHeader;
+    }
+
+    public int getDateDataLength() {
+        return dateDataLength;
+    }
+
+    public byte[] getYearTextBytes() {
+        return yearTextBytes;
+    }
+
+    public String getYearText() {
+        return yearText;
+    }
+
+    public int getBaseUnit() {
+        return baseUnit;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public int getWeek() {
+        return week;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public byte[] getExtraDATEBytes() {
+        return extraDATEBytes;
+    }
+
+    public byte[] getDummyCityData() {
+        return dummyCityData;
+    }
+    
+    public List<Integer> getBuildingsPresent() {
+        int buildingIndex = 0;
+        List<Integer> buildings = new ArrayList<Integer>();
+        for (int i = 0; i < usableBuildingBits.length; i++) {
+            byte currentByte = usableBuildingBits[i];
+            for (int bit = 1; bit < 255; bit = bit << 1) {
+                if ((currentByte & bit) == bit) {
+                    buildings.add(buildingIndex);
+                }
+                buildingIndex++;
+            }
+        }
+        return buildings;
+    }
+    
+    //TODO: This doesn't take into account owner; it simply takes the max.  This
+    //should be improved, but is lower priority than other issues.
+    public int getCulturePoints() {
+        int max = -1;
+        for (int i = 0; i < this.culturePerLEAD.length; i++) {
+            if (culturePerLEAD[i] > max) {
+                max = culturePerLEAD[i];
+            }
+        }
+        return max;
     }
 }

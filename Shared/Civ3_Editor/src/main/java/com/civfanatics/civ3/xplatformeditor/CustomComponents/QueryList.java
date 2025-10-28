@@ -163,6 +163,16 @@ public final class QueryList <E> extends TransformationList<E, E>{
         return filtered[index];
     }
 
+    @Override
+    public int getViewIndex(int sourceIndex) {
+        for (int i = 0; i < size; i++) {
+            if (filtered[i] == sourceIndex) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private SortHelper getSortHelper() {
         if (helper == null) {
             helper = new SortHelper();

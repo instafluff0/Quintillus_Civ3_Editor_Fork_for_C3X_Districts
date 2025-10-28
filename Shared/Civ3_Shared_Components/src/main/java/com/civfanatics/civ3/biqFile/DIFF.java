@@ -24,7 +24,7 @@ public class DIFF extends BIQSection{
     private int percentOptimal;
     private int AIAITrade = 100;
     private int corruptionPercent;
-    private int militaryLaw;
+    private int militaryLaw = 1;    //citizens quelled per military unit
     public DIFF(IO baselink)
     {
         super(baselink);

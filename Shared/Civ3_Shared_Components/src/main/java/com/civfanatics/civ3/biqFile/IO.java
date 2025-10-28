@@ -9,9 +9,8 @@ package com.civfanatics.civ3.biqFile;
  * @author Quintillus
  */
 
+import com.civfanatics.civ3.biqFile.util.DefaultRulesLoader;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.*;
 import javax.swing.JOptionPane;
 import org.apache.log4j.*;
@@ -19,7 +18,9 @@ import com.civfanatics.civ3.biqFile.util.LittleEndianDataInputStream;
 import com.civfanatics.civ3.biqFile.util.LittleEndianDataOutputStream;
 import com.civfanatics.civ3.pediaIcons.PediaIconsFile;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.util.Map.Entry;
+import scriptFile.ScriptFile;
 
 public class IO
 {
@@ -152,8 +153,6 @@ public class IO
     public int numCivilizations;
     public List<RACE> civilization = new ArrayList<RACE>();
     public int dataInputted;
-
-    private static final byte[] C3X_SEGMENT_BOOKEND = new byte[] {0x22, 0x43, 0x33, 0x58};
     
     //conversion variables
     public int convertToConquests = 0;
@@ -176,6 +175,11 @@ public class IO
      * your program may import and attach it as well.
      */
     PediaIconsFile pediaIcons = new PediaIconsFile();
+    
+    /**
+     * The "script.txt" file from the Text folder.
+     **/
+    ScriptFile scriptFile = new ScriptFile();
     
     //static initializer
     static {
@@ -375,19 +379,19 @@ public class IO
                 if (logger.isInfoEnabled())
                     logger.info("About to go into the various input processors; has been " + upToNow/1000000 + " milliseconds.");
                 inputBLDG(ins[0]);
-                logger.info("BLDG Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("BLDG Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputCTZN(ins[0]);
-                logger.info("CTZN Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("CTZN Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputCULT(ins[0]);
-                logger.info("CULT Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("CULT Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputDIFF(ins[0]);
-                logger.info("DIFF Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("DIFF Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputERAS(ins[0]);
-                logger.info("ERAS Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("ERAS Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputESPN(ins[0]);
-                logger.info("ESPN Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("ESPN Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputEXPR(ins[0]);
-                logger.info("EXPR Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("EXPR Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 if (fromSAV) {
                     //FLAV does not ALWAYS follow EXPR when embedded
                     ins[0].mark(4);
@@ -403,19 +407,19 @@ public class IO
                     }
                 }
                 inputGOOD(ins[0]);
-                logger.info("GOOD Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("GOOD Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputGOVT(ins[0]);
-                logger.info("GOVT Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("GOVT Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputRULE(ins[0]);
-                logger.info("RULE Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("RULE Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputPRTO(ins[0]);
-                logger.info("PRTO Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("PRTO Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputRACE(ins[0]);
-                logger.info("RACE Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("RACE Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputTECH(ins[0]);
-                logger.info("TECH Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("TECH Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputTFRM(ins[0]);
-                logger.info("TFRM Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("TFRM Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 if (convertToConquests == 1)
                 {
                     TRFM airfield = new TRFM(this);
@@ -476,9 +480,9 @@ public class IO
                     }
                 }
                 inputTERR(ins[0]);
-                logger.info("TERR Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("TERR Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 inputWSIZ(ins[0]);
-                logger.info("WSIZ Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
+                logger.debug("WSIZ Bytes read: " + dataInputted + "; input bytes read = " + ins[0].numBytesRead);
                 if (version == civ3Version.CONQUESTS && !fromSAV)
                 {
                     inputFLAV(ins[0]);
@@ -503,60 +507,7 @@ public class IO
                 //Extract Englishes and post-processing.
                 try
                 {
-                    for (BLDG building : buildings) {
-                        //logger.info("numFlavors: " + numFlavors);
-                        building.extractEnglish(numFlavors);
-                        //The below lines set up TECH links based on int links (not done initially b/c techs not imported yet)
-                        building.setReqAdvance(building.getReqAdvance());
-                        building.setObsoleteBy(building.getObsoleteBy());
-                        building.setUnitProduced(building.getUnitProduced());
-                    }
-                    for (CTZN citizen : citizens) {
-                        citizen.setPrerequisite(citizen.getPrerequisite());
-                    }
-                    for (int i = 0; i < numTechnologies; i++)
-                    {
-                        technology.get(i).extractEnglish(numFlavors);
-                        technology.get(i).refreshPrerequisites();
-                    }
-                    for (RACE civ : civilization) {
-                        civ.extractEnglish(numFlavors);
-                        civ.refreshFreeTechs();
-                        civ.setKingUnit(civ.getKingUnit());
-                    }
-                    for (GOVT government : government) {
-                        government.setPrerequisiteTechnology(government.getPrerequisiteTechnology());
-                    }
-                    for (int i = 0; i < resource.size(); i++) {
-                        resource.get(i).setPrerequisite(resource.get(i).getPrerequisite());
-                    }
-                    for (int i = 0; i < numTerrains; i++)
-                    {
-                        terrain.get(i).simplifyGoods();
-                    }
-                    for (RULE ruleSet : rule) {
-                        ruleSet.setAdvancedBarbarian(ruleSet.getAdvancedBarbarian());
-                        ruleSet.setBasicBarbarian(ruleSet.getBasicBarbarian());
-                        ruleSet.setBarbarianSeaUnit(ruleSet.getBarbarianSeaUnit());
-                        ruleSet.setBattleCreatedUnit(ruleSet.getBattleCreatedUnit());
-                        ruleSet.setBuildArmyUnit(ruleSet.getBuildArmyUnit());
-                        ruleSet.setScout(ruleSet.getScout());
-                        ruleSet.setSlave(ruleSet.getSlave());
-                        ruleSet.setStartUnit1(ruleSet.getStartUnit1());
-                        ruleSet.setStartUnit2(ruleSet.getStartUnit2());
-                        ruleSet.setFlagUnit(ruleSet.getFlagUnit());
-                    }
-                    for (TRFM terraform : workerJob) {
-                        terraform.setRequiredAdvance(terraform.getRequiredAdvance());
-                    }
-                    for (PRTO prto : unit) {
-                        prto.setRequiredTech(prto.getRequiredTech());
-                        prto.setStealthTargetPRTOLinks();
-                        prto.setLegalUnitTelepadsPRTOLinks();
-                        prto.setEnslaveResultsIn(prto.getEnslaveResultsIn());
-                        prto.setUpgradeTo(prto.getUpgradeTo());
-                    }
-                    //Note map/lead extracts MUST be after they are imported
+                    performRulePostProcessingFromBIQ();
                 }
                 catch (Exception e)
                 {
@@ -578,6 +529,25 @@ public class IO
             else
             {
                 hasCustomRules = false;
+                IO defaultRules = DefaultRulesLoader.getDefaultRules();
+                this.buildings = defaultRules.buildings;
+                this.citizens = defaultRules.citizens;
+                this.culture = defaultRules.culture;
+                this.difficulties = defaultRules.difficulties;
+                this.eras = defaultRules.eras;
+                this.espionage = defaultRules.espionage;
+                this.experience = defaultRules.experience;
+                this.resource = defaultRules.resource;
+                this.government = defaultRules.government;
+                this.rule = defaultRules.rule;
+                this.unit = defaultRules.unit;
+                this.numUnits = defaultRules.numUnits;
+                this.civilization = defaultRules.civilization;
+                this.technology = defaultRules.technology;
+                this.workerJob = defaultRules.workerJob;
+                this.terrain = defaultRules.terrain;
+                this.worldSize = defaultRules.worldSize;
+                this.flavor = defaultRules.flavor;
             }
             if (temp.equals("WCHR"))   //go ahead and do world map
             {   //else, game data comes next anyways
@@ -653,7 +623,10 @@ public class IO
                 //but it wasn't, so input "GAME"
                 ins[0].read(inputFour, 0, 4);
                 dataInputted += 4;
-                temp = new String(inputFour, currentCharset);                
+                temp = new String(inputFour, currentCharset);
+                
+                //TODO: Some of the above should be moved into post-processing
+                performMapPostProcessing();
             }   //inherent else
             //if there was no map, the inherent else is taken and you end up here
             //if there was a map, that's done now, and you have to import stuff here too
@@ -671,20 +644,7 @@ public class IO
             }
             else {
                 if (convertToConquests == 1) {
-                    //Initialize scenario properties
-                    scenarioProperty = new ArrayList<GAME>();
-                    GAME properties = new GAME(this);
-                    for (int i = 0; i < 5; i++) {
-                        properties.warWith0.add(0);
-                        properties.warWith1.add(0);
-                        properties.warWith2.add(0);
-                        properties.warWith3.add(0);
-                        properties.warWith4.add(0);
-                    }
-                    for (int i = 1; i < civilization.size(); i++) {
-                        properties.civPartOfWhichAlliance.add(0);
-                    }
-                    scenarioProperty.add(properties);
+                    initializeGAMESection();
                 }
             }
             
@@ -698,36 +658,43 @@ public class IO
                 logger.info("data inputted: " + dataInputted);
             }
 
-            boolean needLeadSection = false;
-            if (fileLength > dataInputted) {
-                if (fromSAV) {
-                    ins[0].mark(4);
-                    ins[0].read(inputFour, 0, 4);
-                    String nextChunk = new String(inputFour, currentCharset);
-                    ins[0].reset();
-                    if ("LEAD".equals(nextChunk)) {
-                        needLeadSection = true;
-                    }
-                } else {
-                    needLeadSection = true;
-                }
-            }
-
-            if (needLeadSection) {
+            boolean isDone = false;
+            if (fromSAV) {
+                //detect if LEAD
+                ins[0].mark(4);
                 ins[0].read(inputFour, 0, 4);
-                String tempLEAD = new String(inputFour, currentCharset);
-                if (!(tempLEAD.equals("LEAD")))
-                {
-                    logger.error("Could not input file - failed at LEAD header.  Header is " + temp + "; bytes inputted: " + dataInputted);
-                    return false;
-                }
                 dataInputted += 4;
-                inputLEAD(ins[0]);
-                if (logger.isDebugEnabled())
-                    logger.debug("finished custom player data");
+                temp = new String(inputFour, currentCharset);
+                if (!temp.equals("LEAD")) {
+                    isDone = true;
+                }
+                ins[0].reset();
             }
+            
+            //TODO: Make clearer when I'm less tired
+            if ((fileLength <= dataInputted && !fromSAV) || isDone)
+            {
+                long end = System.nanoTime();
+                long duration = end - start;
+                if (logger.isInfoEnabled())
+                    logger.info("Time to input BIQ: " + duration/1000000 + " milliseconds");
+                if (convertToConquests > 0)
+                    version = civ3Version.CONQUESTS;
+                return true;
+            }   //inherent else - if otherwise, input custom player data
 
-            consumeC3XModData(ins[0], fileLength);
+            //LEAD Section - MAY NOT EXIST!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ins[0].read(inputFour, 0, 4);
+            String tempLEAD = new String(inputFour, currentCharset);
+            dataInputted += 4;
+            if (!(tempLEAD.equals("LEAD")))
+            {
+                logger.error("Could not input file - failed at LEAD header.  Header is " + temp + "; bytes inputted: " + dataInputted);
+                return false;
+            }
+            inputLEAD(ins[0]);
+            if (logger.isDebugEnabled())
+                logger.debug("finished custom player data");
 
             if (logger.isInfoEnabled())
                 logger.info("final input:  " + dataInputted);
@@ -780,6 +747,88 @@ public class IO
         return false;
     }
 
+    private void initializeGAMESection() {
+        //Initialize scenario properties
+        scenarioProperty = new ArrayList<GAME>();
+        GAME properties = new GAME(this);
+        for (int i = 0; i < 5; i++) {
+            properties.warWith0.add(0);
+            properties.warWith1.add(0);
+            properties.warWith2.add(0);
+            properties.warWith3.add(0);
+            properties.warWith4.add(0);
+        }
+        properties.dataLength = 7453 - 128;
+        properties.numberOfPlayableCivs = 31;
+        for (int i = 1; i < civilization.size(); i++) {
+            properties.civPartOfWhichAlliance.add(0);
+            properties.idOfPlayableCivs.add(i);
+        }
+        properties.dataLength = properties.dataLength + civilization.size() * 8;
+        scenarioProperty.add(properties);
+    }
+
+    //TODO: This should likely be combined with the rule post processing from a scenario.
+    //There may be a little bit of extra post-processing there but I expect a majority to be shared.
+    private void performRulePostProcessingFromBIQ() {
+        for (BLDG building : buildings) {
+            //logger.info("numFlavors: " + numFlavors);
+            building.extractEnglish(numFlavors);
+            //The below lines set up TECH links based on int links (not done initially b/c techs not imported yet)
+            building.setReqAdvance(building.getReqAdvance());
+            building.setObsoleteBy(building.getObsoleteBy());
+            building.setUnitProduced(building.getUnitProduced());
+            building.setReqResource1(building.getReqResource1());
+            building.setReqResource2(building.getReqResource2());
+        }
+        for (CTZN citizen : citizens) {
+            citizen.setPrerequisite(citizen.getPrerequisite());
+        }
+        for (int i = 0; i < numTechnologies; i++)
+        {
+            technology.get(i).extractEnglish(numFlavors);
+            technology.get(i).refreshPrerequisites();
+        }
+        for (RACE civ : civilization) {
+            civ.extractEnglish(numFlavors);
+            civ.refreshFreeTechs();
+            civ.setKingUnit(civ.getKingUnit());
+        }
+        for (GOVT government : government) {
+            government.setPrerequisiteTechnology(government.getPrerequisiteTechnology());
+        }
+        for (int i = 0; i < resource.size(); i++) {
+            resource.get(i).setPrerequisite(resource.get(i).getPrerequisite());
+        }
+        for (int i = 0; i < numTerrains; i++)
+        {
+            terrain.get(i).simplifyGoods();
+        }
+        for (RULE ruleSet : rule) {
+            ruleSet.setAdvancedBarbarian(ruleSet.getAdvancedBarbarian());
+            ruleSet.setBasicBarbarian(ruleSet.getBasicBarbarian());
+            ruleSet.setBarbarianSeaUnit(ruleSet.getBarbarianSeaUnit());
+            ruleSet.setBattleCreatedUnit(ruleSet.getBattleCreatedUnit());
+            ruleSet.setBuildArmyUnit(ruleSet.getBuildArmyUnit());
+            ruleSet.setScout(ruleSet.getScout());
+            ruleSet.setSlave(ruleSet.getSlave());
+            ruleSet.setStartUnit1(ruleSet.getStartUnit1());
+            ruleSet.setStartUnit2(ruleSet.getStartUnit2());
+            ruleSet.setFlagUnit(ruleSet.getFlagUnit());
+        }
+        for (TRFM terraform : workerJob) {
+            terraform.setRequiredAdvance(terraform.getRequiredAdvance());
+        }
+        for (PRTO prto : unit) {
+            prto.setRequiredTech(prto.getRequiredTech());
+            prto.setStealthTargetPRTOLinks();
+            prto.setLegalUnitTelepadsPRTOLinks();
+            prto.setEnslaveResultsIn(prto.getEnslaveResultsIn());
+            prto.setUpgradeTo(prto.getUpgradeTo());
+        }
+        //Note map/lead extracts MUST be after they are imported
+    }
+
     private boolean inputBLDG(LittleEndianDataInputStream in)
     {
         try
@@ -796,6 +845,8 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 //Should always be the same data length
+                //But keep a copy here for reading ancient BIC files
+                int fileDataLength = integer;
                 //buildings.get(i).setDataLength(integer);
                 in.read(inputSixtyFour, 0, 64);
                 dataInputted += 64;
@@ -897,9 +948,11 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 buildings.get(i).setWonderCharacteristics(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                buildings.get(i).setArmiesRequired(integer);
+                if (fileDataLength > 248) {
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    buildings.get(i).setArmiesRequired(integer);
+                }
                 if (version == civ3Version.CONQUESTS)
                 {
                     integer = in.readInt();
@@ -1035,6 +1088,17 @@ public class IO
             dataInputted += 4;
             //logger.info(integer);
             numCulturalOpinions = integer;
+            
+            //Early versions of Vanilla have two extra bytes, with values 33
+            //and 5 (decimal) to start this section.  By BIC 4.01 (1.27f),
+            //these are not present; they are through at least BIC 2.10 (1.16f).
+            //Mercator did note this in the BIC format thread at Apolyton, so
+            //it is expected.
+            if (version == civ3Version.VANILLA && numCulturalOpinions == 33) {
+                in.readInt();   //5 decimal
+                numCulturalOpinions = in.readInt();
+                dataInputted += 8;
+            }
 
             for (int i = 0; i < numCulturalOpinions; i++)
             {
@@ -1103,6 +1167,7 @@ public class IO
             {
                 difficulties.add(new DIFF(this));
                 integer = in.readInt();
+                int diffLength = integer;
                 dataInputted += 4;
                 //should always be the same
                 //difficulties.get(i).setDataLength(integer);
@@ -1112,42 +1177,51 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 difficulties.get(i).setContentCitizens(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setMaxGovtTransition(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setAIDefenceStart(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setAIOffenceStart(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setExtraStart1(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setExtraStart2(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setAdditionalFreeSupport(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setBonusPerCity(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setAttackBarbariansBonus(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setCostFactor(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setPercentOptimal(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setAIAITrade(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                difficulties.get(i).setCorruptionPercent(integer);
+                //In very early versions of Vanilla (BIC 2.05, initial release),
+                //the only difficulty level option was content citizens.
+                if (diffLength > 68) {
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setMaxGovtTransition(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setAIDefenceStart(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setAIOffenceStart(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setExtraStart1(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setExtraStart2(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setAdditionalFreeSupport(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setBonusPerCity(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setAttackBarbariansBonus(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setCostFactor(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    difficulties.get(i).setPercentOptimal(integer);
+                    //AI-AI Trade and corruption percent were a later addition
+                    //to Vanilla.
+                    //By BIC 4.01 (Vanilla 1.29f) these were present
+                    if (diffLength > 108) {
+                        integer = in.readInt();
+                        dataInputted += 4;
+                        difficulties.get(i).setAIAITrade(integer);
+                        integer = in.readInt();
+                        dataInputted += 4;
+                        difficulties.get(i).setCorruptionPercent(integer);
+                    }
+                }
                 if (version.ordinal() >= civ3Version.PTW.ordinal()) {
                     integer = in.readInt();
                     dataInputted += 4;
@@ -1265,7 +1339,7 @@ public class IO
             for (int i = 0; i < numEspionage; i++)
             {
                 espionage.add(new ESPN(this));
-                integer = in.readInt();
+                int espnLength = in.readInt();
                 dataInputted += 4;
                 //should always be the same
                 //espionage.get(i).setDataLength(integer);
@@ -1282,11 +1356,14 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 espionage.get(i).setMissionPerformedBy(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                espionage.get(i).setBaseCost(integer);
-                //logger.info(espionage.get(i).toString());
-                //logger.info();
+                //Base cost was not present in early versions of Vanilla
+                if (espnLength > 228) {
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    espionage.get(i).setBaseCost(integer);
+                    //logger.info(espionage.get(i).toString());
+                    //logger.info();
+                }
                 espionage.get(i).trim();
             }
         }
@@ -1321,7 +1398,7 @@ public class IO
             for (int i = 0; i < numExprLevel; i++)
             {
                 experience.add(new EXPR(this));
-                integer = in.readInt();
+                int exprLength = in.readInt();
                 dataInputted += 4;
                 //Should always be the same
                 //experience.get(i).setDataLength(integer);
@@ -1331,9 +1408,14 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 experience.get(i).setBaseHitPoints(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                experience.get(i).setRetreatBonus(integer);
+                //Early versions of Vanilla did not have Retreat Bonus in EXPR
+                //This was added in BIC 3.08/Vanilla 1.21f, according to the
+                //official release notes.
+                if (majorVersionNumber > 3 || (majorVersionNumber == 3 && minorVersionNumber >= 8)) {
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    experience.get(i).setRetreatBonus(integer);
+                }
                 //logger.info(experience.get(i).toString());
                 experience.get(i).trim();
             }
@@ -1369,6 +1451,7 @@ public class IO
             for (int i = 0; i < numGoods; i++)
             {
                 resource.add(new GOOD(this));
+                resource.get(i).setIndex(i);
                 integer = in.readInt();
                 dataInputted += 4;
                 //Should always be the same
@@ -1621,16 +1704,23 @@ public class IO
             dataInputted += 4;
             //logger.info(integer);
             numRules = integer;
-
+            
             for (int i = 0; i < numRules; i++)
             {
                 rule.add(new RULE(this));
-                integer = in.readInt();
+                //Standard length:
+                // 64 * 6 culture levels  = 384
+                // 4 * 10 spaceship parts =  40
+                // 296 other bytes        = 296
+                // 720 total              = 720
+                //N.B. This doesn't include the 4 bytes for dataLength
+                int adjustmentFromStandardLength = 0;
+                int ruleLength = in.readInt();
                 dataInputted += 4;
                 //Begin fix for 1.00 issue
                 int ruleStartInputted = dataInputted;
                 boolean convertedRules = false;
-                rule.get(i).setDataLength(integer);
+                rule.get(i).setDataLength(ruleLength);
                 in.read(inputThirtyTwo, 0, 32);
                 dataInputted += 32;
                 rule.get(i).setTownName(new String(inputThirtyTwo, currentCharset));
@@ -1642,6 +1732,7 @@ public class IO
                 rule.get(i).setMetropolisName(new String(inputThirtyTwo, currentCharset));
                 int numSpaceshipParts = in.readInt();
                 dataInputted += 4;
+                adjustmentFromStandardLength += (numSpaceshipParts - 10) * 4;
                 //Obsolete - now calculated automatically
                 //rule.get(i).setNumSpaceshipParts(integer);
                 //input number of each part required
@@ -1776,6 +1867,7 @@ public class IO
                 //Obsolete - now calculated automatically
                 //rule.get(i).setNumCulturalLevels(integer);
                 //input name of each cultural level
+                adjustmentFromStandardLength += (numCultureLevelNames - 6) * 64;
                 for (int j = 0; j < numCultureLevelNames; j++)
                 {
                     in.read(inputSixtyFour, 0, 64);
@@ -1789,21 +1881,28 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 rule.get(i).setBorderExpansionMultiplier(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                rule.get(i).setBorderFactor(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                rule.get(i).setFutureTechCost(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                rule.get(i).setGoldenAgeDuration(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                rule.get(i).setMaximumResearchTime(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                rule.get(i).setMinimumResearchTime(integer);
+                //Early versions of Vanilla did not have the last 5 fields
+                //in RULE.
+                //Combined with PTW/Conquests additions, these add up to 28
+                //bytes fewer than the 720 standard, which then must be adjusted
+                //if spaceship parts/culture level name lengths are non-standard
+                if (ruleLength > (692 + adjustmentFromStandardLength)) {
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    rule.get(i).setBorderFactor(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    rule.get(i).setFutureTechCost(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    rule.get(i).setGoldenAgeDuration(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    rule.get(i).setMaximumResearchTime(integer);
+                    integer = in.readInt();
+                    dataInputted += 4;
+                    rule.get(i).setMinimumResearchTime(integer);
+                }
                 if (version.ordinal() >= civ3Version.PTW.ordinal()) {
                     integer = in.readInt();
                     dataInputted += 4;
@@ -1821,8 +1920,16 @@ public class IO
                     }
                 }
                 else if (convertToConquests > 0) {
+                    //712 is the "standard" length of latest-version Vanilla BICs
+                    //The last 8 will be added by the two conversion calls
+                    if (ruleLength < (712 + adjustmentFromStandardLength)) {
+                        //Add data length for the fields added in later versions
+                        //of Vanilla.
+                        rule.get(i).setDataLength(712 + adjustmentFromStandardLength);
+                    }
                     rule.get(i).convertToPTWFromVanilla();
-                    rule.get(i).convertToConquestsFromPTW();                    
+                    rule.get(i).convertToConquestsFromPTW();
+                    convertedRules = true;                    
                 }
                 
                 //Fix for bug in editor version 1.00
@@ -1872,7 +1979,7 @@ public class IO
             {
                 int startData = dataInputted;
                 PRTO newPRTO = new PRTO(this, i);
-                integer = in.readInt();
+                int prtoLength = in.readInt();
                 dataInputted += 4;
                 //Auto-calculated
                 //newPRTO.setDataLength(integer);
@@ -1953,109 +2060,113 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 newPRTO.setUnitClass(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                newPRTO.setOtherStrategy(integer);
-                integer = in.readInt();
-                dataInputted += 4;
-                newPRTO.setHitPointBonus(integer);
-                if (version.ordinal() >= version.PTW.ordinal()) {
+                //Other strategy and HP bonus were not present in early Vanilla.
+                //They were added in BIC 3.08/Vanilla 1.21f
+                if (prtoLength > 156) {
                     integer = in.readInt();
                     dataInputted += 4;
-                    newPRTO.setPTWStandardOrders(integer);
+                    newPRTO.setOtherStrategy(integer);
                     integer = in.readInt();
                     dataInputted += 4;
-                    newPRTO.setPTWSpecialActions(integer);
-                    integer = in.readInt();
-                    dataInputted += 4;
-                    newPRTO.setPTWWorkerActions(integer);
-                    integer = in.readInt();
-                    dataInputted += 4;
-                    newPRTO.setPTWAirMissions(integer);
-                    integer = in.readInt();
-                    dataInputted += 4;
-                    integer = integer - 65536; //only want first two bytes
-                    newPRTO.setPTWActionsMix(integer);
-                    integer = in.readInt();
-                    dataInputted += 4;
-                    newPRTO.setBombardEffects(integer);
-                    //terrain ignore movements
-                    int maxTerr = version == civ3Version.CONQUESTS ? 14 : 12;
-                    for (int j = 0; j < maxTerr; j++)
-                    {
-                        inputByte = in.readByte();
-                        dataInputted++;
-                        newPRTO.setIgnoredMovementCost(j,inputByte);
-                    }
-                    integer = in.readInt();
-                    dataInputted += 4;
-                    newPRTO.setRequiresSupport(integer);
-                    if (version == civ3Version.CONQUESTS)
-                    {
+                    newPRTO.setHitPointBonus(integer);
+                    if (version.ordinal() >= version.PTW.ordinal()) {
                         integer = in.readInt();
                         dataInputted += 4;
-                        newPRTO.setUseExactCost(integer);
+                        newPRTO.setPTWStandardOrders(integer);
                         integer = in.readInt();
                         dataInputted += 4;
-                        newPRTO.setTelepadRange(integer);
+                        newPRTO.setPTWSpecialActions(integer);
                         integer = in.readInt();
                         dataInputted += 4;
-                        newPRTO.setQuestionMark3(integer);
-                        int numUnitTelepads = in.readInt();
+                        newPRTO.setPTWWorkerActions(integer);
+                        integer = in.readInt();
                         dataInputted += 4;
-                        //Now calculate this outselves
-                        //newPRTO.setNumLegalUnitTelepads(integer);
-                        if (logger.isDebugEnabled())
-                            logger.debug(dataInputted + " and num unit telepads = " + integer);
-                        for (int j = 0; j < numUnitTelepads; j++)
+                        newPRTO.setPTWAirMissions(integer);
+                        integer = in.readInt();
+                        dataInputted += 4;
+                        integer = integer - 65536; //only want first two bytes
+                        newPRTO.setPTWActionsMix(integer);
+                        integer = in.readInt();
+                        dataInputted += 4;
+                        newPRTO.setBombardEffects(integer);
+                        //terrain ignore movements
+                        int maxTerr = version == civ3Version.CONQUESTS ? 14 : 12;
+                        for (int j = 0; j < maxTerr; j++)
                         {
-                            integer = in.readInt();
-                            dataInputted += 4;
-                            newPRTO.addUnitTelepad(integer);
+                            inputByte = in.readByte();
+                            dataInputted++;
+                            newPRTO.setIgnoredMovementCost(j,inputByte);
                         }
                         integer = in.readInt();
                         dataInputted += 4;
-                        newPRTO.setEnslaveResultsIn(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        newPRTO.setQuestionMark5(integer);
-                        int numStealthTargets = in.readInt();
-                        dataInputted += 4;
-                        //newPRTO.setNumStealthTargets(integer);
-                        for (int j = 0; j < numStealthTargets; j++)
+                        newPRTO.setRequiresSupport(integer);
+                        if (version == civ3Version.CONQUESTS)
                         {
                             integer = in.readInt();
                             dataInputted += 4;
-                            newPRTO.addStealthAttackTarget(integer);
-                        }
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        newPRTO.setQuestionMark6(integer);
-                        int numLegalBuildingTelepads = in.readInt();
-                        dataInputted += 4;
-                        //newPRTO.setNumLegalBuildingTelepads(integer);
-                        if (logger.isDebugEnabled())
-                            logger.debug(dataInputted + " and num bldg telepads = " + integer);
-                        for (int j = 0; j < numLegalBuildingTelepads; j++)
-                        {
+                            newPRTO.setUseExactCost(integer);
                             integer = in.readInt();
                             dataInputted += 4;
-                            newPRTO.addBuildingTelepad(integer);
+                            newPRTO.setTelepadRange(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            newPRTO.setQuestionMark3(integer);
+                            int numUnitTelepads = in.readInt();
+                            dataInputted += 4;
+                            //Now calculate this outselves
+                            //newPRTO.setNumLegalUnitTelepads(integer);
+                            if (logger.isDebugEnabled())
+                                logger.debug(dataInputted + " and num unit telepads = " + integer);
+                            for (int j = 0; j < numUnitTelepads; j++)
+                            {
+                                integer = in.readInt();
+                                dataInputted += 4;
+                                newPRTO.addUnitTelepad(integer);
+                            }
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            newPRTO.setEnslaveResultsIn(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            newPRTO.setQuestionMark5(integer);
+                            int numStealthTargets = in.readInt();
+                            dataInputted += 4;
+                            //newPRTO.setNumStealthTargets(integer);
+                            for (int j = 0; j < numStealthTargets; j++)
+                            {
+                                integer = in.readInt();
+                                dataInputted += 4;
+                                newPRTO.addStealthAttackTarget(integer);
+                            }
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            newPRTO.setQuestionMark6(integer);
+                            int numLegalBuildingTelepads = in.readInt();
+                            dataInputted += 4;
+                            //newPRTO.setNumLegalBuildingTelepads(integer);
+                            if (logger.isDebugEnabled())
+                                logger.debug(dataInputted + " and num bldg telepads = " + integer);
+                            for (int j = 0; j < numLegalBuildingTelepads; j++)
+                            {
+                                integer = in.readInt();
+                                dataInputted += 4;
+                                newPRTO.addBuildingTelepad(integer);
+                            }
+                            inputByte = in.readByte();
+                            dataInputted++;
+                            newPRTO.setCreatesCraters(inputByte);
+                            float floatingPoint = in.readFloat();
+                            //integer = in.readInt();
+                            dataInputted += 4;
+                            newPRTO.setWorkerStrengthFloat(floatingPoint);
+                            //need to find out if there are more bytes
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            newPRTO.setQuestionMark8(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            newPRTO.setAirDefence(integer);
                         }
-                        inputByte = in.readByte();
-                        dataInputted++;
-                        newPRTO.setCreatesCraters(inputByte);
-                        float floatingPoint = in.readFloat();
-                        //integer = in.readInt();
-                        dataInputted += 4;
-                        newPRTO.setWorkerStrengthFloat(floatingPoint);
-                        //need to find out if there are more bytes
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        newPRTO.setQuestionMark8(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        newPRTO.setAirDefence(integer);
                     }
                 }
                 //logger.info(newPRTO.toString());
@@ -2455,7 +2566,7 @@ public class IO
                 dataInputted += 4;
                 terrain.get(i).setNumTotalResources(integer);
                 int bytesOfAllowedResourceDataToInput = (integer + 7) / 8;
-                //logger.info("Inputting " + bytesOfAllowedResourceDataToInput + " bytes of data on allowed resources.");
+                logger.trace("Inputting " + bytesOfAllowedResourceDataToInput + " bytes of data on allowed resources.");
                 for (int j = 0; j < bytesOfAllowedResourceDataToInput; j++)
                 {
                     inputByte = in.readByte();
@@ -2498,89 +2609,94 @@ public class IO
                 integer = in.readInt();
                 dataInputted += 4;
                 terrain.get(i).setPollutionEffect(integer);
-                inputByte = in.readByte();
-                dataInputted++;
-                terrain.get(i).setAllowCities(inputByte);
-                inputByte = in.readByte();
-                dataInputted++;
-                terrain.get(i).setAllowColonies(inputByte);
-                if (version.ordinal() >= civ3Version.PTW.ordinal()) {
+                if (majorVersionNumber > 4 || majorVersionNumber == 4 && minorVersionNumber >= 1) {
                     inputByte = in.readByte();
                     dataInputted++;
-                    terrain.get(i).setImpassable(inputByte);
+                    terrain.get(i).setAllowCities(inputByte);
                     inputByte = in.readByte();
                     dataInputted++;
-                    terrain.get(i).setImpassableByWheeled(inputByte);
-                    inputByte = in.readByte();
-                    dataInputted++;
-                    terrain.get(i).setAllowAirfields(inputByte);
-                    inputByte = in.readByte();
-                    dataInputted++;
-                    terrain.get(i).setAllowForts(inputByte);
-                    inputByte = in.readByte();
-                    dataInputted++;
-                    terrain.get(i).setAllowOutposts(inputByte);
-                    inputByte = in.readByte();
-                    dataInputted++;
-                    terrain.get(i).setAllowRadarTowers(inputByte);
-                    if (version == civ3Version.CONQUESTS)
-                    {
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setQuestionMark(integer);
+                    terrain.get(i).setAllowColonies(inputByte);
+                    if (version.ordinal() >= civ3Version.PTW.ordinal()) {
                         inputByte = in.readByte();
                         dataInputted++;
-                        terrain.get(i).setLandmarkEnabled(inputByte);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkFood(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkShields(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkCommerce(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkFoodBonus(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkShieldsBonus(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkCommerceBonus(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkMovementCost(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setLandmarkDefenceBonus(integer);
-                        in.read(inputThirtyTwo, 0, 32);
-                        dataInputted += 32;
-                        terrain.get(i).setLandmarkName(new String(inputThirtyTwo, currentCharset));
-                        in.read(inputThirtyTwo, 0, 32);
-                        dataInputted += 32;
-                        terrain.get(i).setLandmarkCivilopediaEntry(new String(inputThirtyTwo, currentCharset));
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setQuestionMark2(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setTerrainFlags(integer);
-                        integer = in.readInt();
-                        dataInputted += 4;
-                        terrain.get(i).setDiseaseStrength(integer);
+                        terrain.get(i).setImpassable(inputByte);
+                        inputByte = in.readByte();
+                        dataInputted++;
+                        terrain.get(i).setImpassableByWheeled(inputByte);
+                        inputByte = in.readByte();
+                        dataInputted++;
+                        terrain.get(i).setAllowAirfields(inputByte);
+                        inputByte = in.readByte();
+                        dataInputted++;
+                        terrain.get(i).setAllowForts(inputByte);
+                        inputByte = in.readByte();
+                        dataInputted++;
+                        terrain.get(i).setAllowOutposts(inputByte);
+                        inputByte = in.readByte();
+                        dataInputted++;
+                        terrain.get(i).setAllowRadarTowers(inputByte);
+                        if (version == civ3Version.CONQUESTS)
+                        {
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setQuestionMark(integer);
+                            inputByte = in.readByte();
+                            dataInputted++;
+                            terrain.get(i).setLandmarkEnabled(inputByte);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkFood(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkShields(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkCommerce(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkFoodBonus(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkShieldsBonus(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkCommerceBonus(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkMovementCost(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setLandmarkDefenceBonus(integer);
+                            in.read(inputThirtyTwo, 0, 32);
+                            dataInputted += 32;
+                            terrain.get(i).setLandmarkName(new String(inputThirtyTwo, currentCharset));
+                            in.read(inputThirtyTwo, 0, 32);
+                            dataInputted += 32;
+                            terrain.get(i).setLandmarkCivilopediaEntry(new String(inputThirtyTwo, currentCharset));
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setQuestionMark2(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setTerrainFlags(integer);
+                            integer = in.readInt();
+                            dataInputted += 4;
+                            terrain.get(i).setDiseaseStrength(integer);
+                        }
+                        else {
+                            if (convertToConquests > 0) {
+                                terrain.get(i).dataLength+=113;
+                            }
+                        }
                     }
                     else {
                         if (convertToConquests > 0) {
-                            terrain.get(i).dataLength+=113;
+                            terrain.get(i).dataLength+=120; //7 for PTW; 113 for Conquests
                         }
-                    }
+                    }   
                 }
-                else {
-                    if (convertToConquests > 0) {
-                        terrain.get(i).dataLength+=120; //7 for PTW; 113 for Conquests
-                    }
+                else if (convertToConquests > 0) {
+                    terrain.get(i).dataLength+=122; //2 for Vanilla 1.29f, 7 for PTW, 113 for Conquests
                 }
                 //logger.info(terrain.get(i).toString());
                 //logger.info();
@@ -3050,15 +3166,12 @@ public class IO
                 dataInputted += 4;
                 //We now (June 2014) just rely on the size of our array rather than keeping a separate int
                 //city.get(i).setNumBuildings(integer);
-                for (int j = 0; j < numBuildings; j++)
-                {
+                for (int j = 0; j < numBuildings; j++) {
                     integer = in.readInt();
                     dataInputted += 4;
                     city.get(i).addBuilding(integer);
-                    //whether it has a building that acts like Walls in regular Civ3
-                    if (buildings.get(integer).getBombardDefence() > 0)
-                        city.get(i).setWallStyleBuilding(true);
                 }
+                city.get(i).updateWallStyleBuildingStatus();
                 integer = in.readInt();
                 dataInputted += 4;
                 city.get(i).setCulture(integer);
@@ -3104,7 +3217,7 @@ public class IO
             String temp = new String(inputFour, currentCharset);
             if (!(temp.equals("UNIT")))
             {
-                logger.error("Could not input file - failed at UNIT header.  Header is " + temp + "; bytes inputted: " + dataInputted + ".  Data inputted: " + dataInputted);
+                logger.error("Could not input file - failed at UNIT header.  This often means a city name is too long.  Header is " + temp + "; bytes inputted: " + dataInputted + ".  Data inputted: " + dataInputted);
                 return false;
             }
             //logger.info(temp);
@@ -3844,6 +3957,10 @@ public class IO
     {
         return hasCustomPlayerData;
     }
+    
+    public void setCustomPlayerData(boolean customPlayerData) {
+        this.hasCustomPlayerData = customPlayerData;
+    }
 
     public int findInstance(Section section, String name)
     {
@@ -3996,7 +4113,6 @@ public class IO
                 if (logger.isDebugEnabled())
                     logger.debug("Finished exporting LEAD section");
             }
-            appendC3XModData(out);
             //end of file
         }
         catch (Exception e)
@@ -4005,307 +4121,6 @@ public class IO
             return false;
         }
         return true;
-    }
-
-    private void consumeC3XModData(LittleEndianDataInputStream in, long fileLength)
-    {
-        long remaining = fileLength - dataInputted;
-        if (remaining <= 0) {
-            return;
-        }
-
-        if (remaining > Integer.MAX_VALUE) {
-            logger.warn("C3X mod data segment larger than supported; skipping.");
-            try {
-                long skipped = 0;
-                while (skipped < remaining) {
-                    long skip = in.skip(remaining - skipped);
-                    if (skip <= 0) {
-                        break;
-                    }
-                    skipped += skip;
-                }
-            }
-            catch (IOException e) {
-                logger.warn("Failed to skip oversized C3X mod data segment", e);
-            }
-            dataInputted = (int)Math.min(fileLength, Integer.MAX_VALUE);
-            return;
-        }
-
-        int bytesToRead = (int)remaining;
-        byte[] segment = new byte[bytesToRead];
-        try {
-            in.readFully(segment);
-        }
-        catch (IOException e) {
-            logger.error("Failed reading C3X mod data segment", e);
-            return;
-        }
-        dataInputted += bytesToRead;
-
-        int minLength = (C3X_SEGMENT_BOOKEND.length * 2) + 4;
-        if (bytesToRead < minLength) {
-            return;
-        }
-        if (!matchesBookend(segment, 0) || !matchesBookend(segment, bytesToRead - C3X_SEGMENT_BOOKEND.length)) {
-            return;
-        }
-        int lengthOffset = bytesToRead - C3X_SEGMENT_BOOKEND.length - 4;
-        int segSize = getLittleEndianInt(segment, lengthOffset);
-        if (segSize <= 0 || segSize > bytesToRead - minLength) {
-            return;
-        }
-        int dataOffset = C3X_SEGMENT_BOOKEND.length;
-        byte[] modData = Arrays.copyOfRange(segment, dataOffset, dataOffset + segSize);
-        parseC3XModData(modData);
-    }
-
-    private boolean matchesBookend(byte[] data, int offset)
-    {
-        if (offset < 0 || offset + C3X_SEGMENT_BOOKEND.length > data.length)
-            return false;
-        for (int i = 0; i < C3X_SEGMENT_BOOKEND.length; i++) {
-            if (data[offset + i] != C3X_SEGMENT_BOOKEND[i])
-                return false;
-        }
-        return true;
-    }
-
-    private int getLittleEndianInt(byte[] data, int offset)
-    {
-        if (offset < 0 || offset + 4 > data.length)
-            return 0;
-        return (data[offset] & 0xFF) |
-               ((data[offset + 1] & 0xFF) << 8) |
-               ((data[offset + 2] & 0xFF) << 16) |
-               ((data[offset + 3] & 0xFF) << 24);
-    }
-
-    private void parseC3XModData(byte[] modDataBytes)
-    {
-        if (modDataBytes == null || modDataBytes.length == 0)
-            return;
-
-        for (TILE t : tile) {
-            t.clearDistrict();
-        }
-
-        ByteBuffer buffer = ByteBuffer.wrap(modDataBytes).order(ByteOrder.LITTLE_ENDIAN);
-        while (buffer.hasRemaining()) {
-            String chunkName = readAlignedString(buffer);
-            if (chunkName == null || chunkName.length() == 0)
-                break;
-
-            if ("district_tile_map".equals(chunkName)) {
-                if (buffer.remaining() < Integer.BYTES)
-                    break;
-                int entryCount = buffer.getInt();
-                for (int i = 0; i < entryCount; i++) {
-                    if (buffer.remaining() < 7 * Integer.BYTES) {
-                        buffer.position(buffer.limit());
-                        break;
-                    }
-                    int x = buffer.getInt();
-                    int y = buffer.getInt();
-                    int districtId = buffer.getInt();
-                    int state = buffer.getInt();
-                    int wonderState = buffer.getInt();
-                    int wonderCityId = buffer.getInt();
-                    int wonderIndex = buffer.getInt();
-                    int tileIndex = calculateTileIndex(x, y);
-                    if (tileIndex >= 0 && tileIndex < tile.size()) {
-                        TILE targetTile = tile.get(tileIndex);
-                        TILE.DistrictData data = new TILE.DistrictData();
-                        data.districtType = districtId;
-                        data.state = state;
-                        TILE.WonderDistrictInfo info = new TILE.WonderDistrictInfo();
-                        info.state = wonderState;
-                        info.cityId = wonderCityId;
-                        info.wonderIndex = wonderIndex;
-                        data.wonderInfo = info;
-                        targetTile.setDistrictData(data);
-                    }
-                }
-            }
-            else if ("district_pending_requests".equals(chunkName)) {
-                if (buffer.remaining() < Integer.BYTES)
-                    break;
-                int entryCount = buffer.getInt();
-                skipInts(buffer, entryCount * 5);
-            }
-            else if ("building_pending_orders".equals(chunkName)) {
-                if (buffer.remaining() < Integer.BYTES)
-                    break;
-                int entryCount = buffer.getInt();
-                skipInts(buffer, entryCount * 2);
-            }
-            else if ("distribution_hub_records".equals(chunkName)) {
-                if (buffer.remaining() < Integer.BYTES)
-                    break;
-                int entryCount = buffer.getInt();
-                skipInts(buffer, entryCount * 4);
-            }
-            else {
-                break;
-            }
-        }
-    }
-
-    private String readAlignedString(ByteBuffer buffer)
-    {
-        if (!buffer.hasRemaining())
-            return null;
-
-        int startPos = buffer.position();
-        int storedLen = 0;
-        boolean foundTerminator = false;
-
-        while (buffer.hasRemaining()) {
-            byte b = buffer.get();
-            storedLen++;
-            if (b == 0) {
-                foundTerminator = true;
-                break;
-            }
-        }
-
-        if (!foundTerminator) {
-            return null;
-        }
-
-        int totalLen = storedLen;
-        byte[] raw = new byte[totalLen];
-        buffer.position(startPos);
-        buffer.get(raw);
-
-        int paddedLen = (totalLen + 3) & ~3;
-        int skip = paddedLen - totalLen;
-        if (skip > 0) {
-            if (buffer.remaining() >= skip)
-                buffer.position(buffer.position() + skip);
-            else
-                buffer.position(buffer.limit());
-        }
-
-        int strLen = Math.max(totalLen - 1, 0);
-        try {
-            return new String(raw, 0, strLen, currentCharset);
-        }
-        catch (UnsupportedEncodingException e) {
-            return new String(raw, 0, strLen);
-        }
-    }
-
-    private void skipInts(ByteBuffer buffer, int count)
-    {
-        if (count <= 0) {
-            return;
-        }
-        int bytes = count * Integer.BYTES;
-        if (bytes <= 0) {
-            return;
-        }
-        if (buffer.remaining() < bytes) {
-            buffer.position(buffer.limit());
-        }
-        else {
-            buffer.position(buffer.position() + bytes);
-        }
-    }
-
-    private void appendC3XModData(LittleEndianDataOutputStream out)
-    {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        LittleEndianDataOutputStream modOut = new LittleEndianDataOutputStream(buffer);
-
-        boolean wroteChunk = false;
-        try {
-            wroteChunk = writeDistrictTileMapChunk(modOut);
-            modOut.flush();
-        }
-        catch (IOException e) {
-            logger.error("Failed to prepare C3X district data chunk", e);
-        }
-        byte[] modBytes = buffer.toByteArray();
-
-        if (!wroteChunk || modBytes.length == 0) {
-            try {
-                modOut.close();
-            }
-            catch (IOException ignored) {
-            }
-            return;
-        }
-
-        try {
-            out.write(C3X_SEGMENT_BOOKEND);
-            out.write(modBytes);
-            writeInt(modBytes.length, out);
-            out.write(C3X_SEGMENT_BOOKEND);
-        }
-        catch (IOException e) {
-            logger.error("Failed to write C3X district data chunk", e);
-        }
-        finally {
-            try {
-                modOut.close();
-            }
-            catch (IOException ignored) {
-            }
-        }
-    }
-
-    private boolean writeDistrictTileMapChunk(LittleEndianDataOutputStream modOut) throws IOException
-    {
-        int entryCount = 0;
-        for (TILE t : tile) {
-            TILE.DistrictData data = t.getDistrictData();
-            if (data != null && data.districtType >= 0) {
-                entryCount++;
-            }
-        }
-
-        if (entryCount == 0) {
-            return false;
-        }
-
-        writeAlignedString(modOut, "district_tile_map");
-        writeInt(entryCount, modOut);
-
-        for (TILE t : tile) {
-            TILE.DistrictData data = t.getDistrictData();
-            if (data == null || data.districtType < 0)
-                continue;
-            writeInt(t.xPos, modOut);
-            writeInt(t.yPos, modOut);
-            writeInt(data.districtType, modOut);
-            writeInt(data.state, modOut);
-            TILE.WonderDistrictInfo info = data.wonderInfo != null ? data.wonderInfo : new TILE.WonderDistrictInfo();
-            writeInt(info.state, modOut);
-            writeInt(info.cityId, modOut);
-            writeInt(info.wonderIndex, modOut);
-        }
-        return true;
-    }
-
-    private void writeAlignedString(LittleEndianDataOutputStream out, String text) throws IOException
-    {
-        if (text == null)
-            text = "";
-        byte[] bytes;
-        try {
-            bytes = text.getBytes(currentCharset);
-        }
-        catch (UnsupportedEncodingException e) {
-            bytes = text.getBytes();
-        }
-        int lenWithNull = bytes.length + 1;
-        int paddedLen = (lenWithNull + 3) & ~3;
-        byte[] data = new byte[paddedLen];
-        System.arraycopy(bytes, 0, data, 0, bytes.length);
-        data[bytes.length] = 0;
-        out.write(data);
     }
 
     public void writeInt(int number, LittleEndianDataOutputStream out)
@@ -4343,7 +4158,8 @@ public class IO
         int numExtraBytes = length - len;
         try
         {
-            out.writeBytes(string);
+            byte[] strBuff = string.getBytes(currentCharset);
+            out.write(strBuff);
             for (int i = 0; i < numExtraBytes; i++)
             {
                 out.writeByte(0);
@@ -4564,33 +4380,7 @@ public class IO
                 inputTERR(in);
                 inputWSIZ(in);
 
-
-                //Extract Englishes
-                try
-                {
-                    for (int i = 0; i < numBuildings; i++)
-                    {
-                        if (logger.isTraceEnabled())
-                            logger.trace("numFlavors: " + numFlavors);
-                        buildings.get(i).extractEnglish(numFlavors);
-                    }
-                    for (int i = 0; i < numTechnologies; i++)
-                    {
-                        technology.get(i).extractEnglish(numFlavors);
-                    }
-                    for (int i = 0; i < numCivilizations; i++)
-                    {
-                        civilization.get(i).extractEnglish(numFlavors);
-                    }
-                    for (int i = 0; i < numTerrains; i++)
-                    {
-                        terrain.get(i).simplifyGoods();
-                    }
-                }
-                catch (Exception e)
-                {
-                    JOptionPane.showMessageDialog(null, "Could not input file - error extracting binary data on building/technology/civilization headers.", "File input failed.", JOptionPane.ERROR_MESSAGE);
-                    logger.error("Error on extract Englishes", e);
+                if (!this.performRulePostProcessingFromScenario()) {
                     return false;
                 }
 
@@ -4633,6 +4423,8 @@ public class IO
                 in.read(inputFour, 0, 4);
                 dataInputted += 4;
                 temp = new String(inputFour, currentCharset);
+                
+                performMapPostProcessing();
             }   //inherent else
             //if there was no map, the inherent else is taken and you end up here
             //if there was a map, that's done now, and you have to import stuff here too
@@ -4696,6 +4488,62 @@ public class IO
             return false;
         }
         //false case
+    }
+
+    private boolean performRulePostProcessingFromScenario() throws HeadlessException {
+        //Extract Englishes
+        try {
+            for (int i = 0; i < numBuildings; i++)
+            {
+                if (logger.isTraceEnabled())
+                    logger.trace("numFlavors: " + numFlavors);
+                buildings.get(i).extractEnglish(numFlavors);
+            }
+            for (int i = 0; i < numTechnologies; i++)
+            {
+                technology.get(i).extractEnglish(numFlavors);
+            }
+            for (int i = 0; i < numCivilizations; i++)
+            {
+                civilization.get(i).extractEnglish(numFlavors);
+            }
+            for (int i = 0; i < numTerrains; i++)
+            {
+                terrain.get(i).simplifyGoods();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Could not input file - error extracting binary data on building/technology/civilization headers.", "File input failed.", JOptionPane.ERROR_MESSAGE);
+            logger.error("Error on extract Englishes", e);
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Does any post-processing/cleanup tasks on the map.
+     */
+    private void performMapPostProcessing() {
+        //Repair SLOCs that are in the SLOC collection, but not on tiles
+        for (SLOC sloc : this.startingLocation) {
+            int tileIndex = this.calculateTileIndex(sloc.getX(), sloc.getY());
+            TILE correspondingTile = tile.get(tileIndex);
+            if (!correspondingTile.isStartLocation()) {
+                logger.info("Repairing starting location at " + sloc.getX() + ", " + sloc.getY() + ".  Save the BIQ to make this repair permanent.");
+                correspondingTile.setStartingLocation(true);
+            }
+        }
+        //Add SLOCs for ancient BIC files that predate SLOC
+        if (version == civ3Version.VANILLA && (majorVersionNumber < 4 || (majorVersionNumber == 4 && minorVersionNumber < 1))) {
+            for (TILE mapTile : this.tile) {
+                if (mapTile.isStartLocation()) {
+                    SLOC newSLOC = new SLOC(this);
+                    newSLOC.setX(mapTile.getXPos());
+                    newSLOC.setY(mapTile.getYPos());
+                    newSLOC.setOwnerType(CITY.OWNER_NONE);
+                    this.startingLocation.add(newSLOC);
+                }
+            }
+        }
     }
 
     private void outputBLDG(LittleEndianDataOutputStream out)
@@ -6807,6 +6655,21 @@ public class IO
     }
     
     /**
+     * Convenience method that returns the tile at a given index.  Wraps around
+     * the world if need be.
+     * @param xPos The xlocation
+     * @param yPos The ylocation
+     * @return The tile at that location, or null if the location is not valid
+     */
+    public TILE getTileAt(int xPos, int yPos) {
+        int tileIndex = calculateTileIndex(xPos, yPos);
+        if (tileIndex == -1) {
+            return null;
+        }
+        return tile.get(tileIndex);
+    }
+    
+    /**
      * Returns the 8 surrounding tiles.
      * If some of them are off the map, it returns fewer.
      * May be expanded to the 21 tiles cross at one point.
@@ -6965,5 +6828,34 @@ public class IO
     
     public void setPediaIcons(PediaIconsFile file) {
         this.pediaIcons = file;
+    }
+
+    public ScriptFile getScriptFile() {
+        return scriptFile;
+    }
+
+    public void setScriptFile(ScriptFile scriptFile) {
+        this.scriptFile = scriptFile;
+    }
+    
+    /**
+     * Performs all actions necessary to add a starting location.
+     * All code paths to do so should call this method.
+     */
+    public void addStartingLocation(TILE tile) {
+        SLOC newSLOC = new SLOC(this);
+        newSLOC.setX(tile.xPos);
+        newSLOC.setY(tile.yPos);
+        //Who should own it???
+        if (tile.owner != -1) {
+            newSLOC.setOwner(tile.owner);
+            newSLOC.setOwnerType(tile.ownerType);
+        }
+        else {    //default fallback option
+            newSLOC.setOwnerType(CITY.OWNER_CIV);
+            newSLOC.setOwner(1);    //first one after barbs
+        }
+        this.startingLocation.add(newSLOC);
+        tile.setStartingLocation(true);
     }
 }

@@ -23,8 +23,8 @@ public class PediaIconsFile {
     List<PediaFileSection> fileSections = new ArrayList<PediaFileSection>();
     
     //Easy-access maps
-    Map<String, String> smallTechIcons = new HashMap();
-    Map<String, String> largeTechIcons = new HashMap();
+    Map<String, String> smallIcons = new HashMap();
+    Map<String, String> largeIcons = new HashMap();
     
     enum NextLineMode {
       REGULAR, TECH  
@@ -35,12 +35,31 @@ public class PediaIconsFile {
         while (s.hasNextLine()) {
             String nextLine = s.nextLine();
             if (nextLine.startsWith("#TECH")) {
-                String techEntry  = s.nextLine();
+                String techIconPath  = s.nextLine();
+                techIconPath = techIconPath.replaceAll("\\\\", "/");
                 if (nextLine.endsWith("_LARGE")) {
-                    largeTechIcons.put(nextLine.substring(1), techEntry);
+                    largeIcons.put(nextLine.substring(1, nextLine.length() - 6), techIconPath);
                 }
                 else {
-                    smallTechIcons.put(nextLine.substring(1), techEntry);
+                    smallIcons.put(nextLine.substring(1), techIconPath);
+                }
+            }
+            else if (nextLine.startsWith("#start resources")) {
+                for (;;) {
+                    String key = s.nextLine();
+                    while (key.isEmpty()) {
+                        key = s.nextLine();
+                    }
+                    if (key.equals("#End Resources")) {
+                        break;
+                    }
+                    String largeLine = s.nextLine();
+                    String smallLine = s.nextLine();
+                    largeLine = largeLine.replaceAll("\\\\", "/");
+                    smallLine = smallLine.replaceAll("\\\\", "/");
+                    
+                    largeIcons.put(key.substring(6), largeLine);
+                    smallIcons.put(key.substring(6), smallLine);
                 }
             }
         }
@@ -53,12 +72,12 @@ public class PediaIconsFile {
      * @param large True if the large icon; false if the small icon
      * @return The file name of the icon, or null if there is none.
      */
-    public String getTechIcon(String entryName, boolean large) {
+    public String getIconFileName(String entryName, boolean large) {
         if (large) {
-            return largeTechIcons.get(entryName);
+            return largeIcons.get(entryName);
         }
         else {
-            return smallTechIcons.get(entryName);
+            return smallIcons.get(entryName);
         }
     }
 }

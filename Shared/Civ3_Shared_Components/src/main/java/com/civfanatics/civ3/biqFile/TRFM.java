@@ -15,8 +15,10 @@ public class TRFM extends BIQSection{
     private int turnsToComplete;
     private int requiredAdvanceInt;
     private TECH requiredAdvance;
-    private int requiredResource1;
-    private int requiredResource2;
+    private int requiredResourceInt;
+    private int requiredResource2Int;
+    private GOOD requiredResource1;
+    private GOOD requiredResource2;
     private String order = "";
     public TRFM(IO baselink)
     {
@@ -55,12 +57,12 @@ public class TRFM extends BIQSection{
 
     public int getRequiredResource1()
     {
-        return requiredResource1;
+        return requiredResourceInt;
     }
 
     public int getRequiredResource2()
     {
-        return requiredResource2;
+        return requiredResource2Int;
     }
 
     public String getOrder()
@@ -101,15 +103,30 @@ public class TRFM extends BIQSection{
             this.requiredAdvanceInt = requiredAdvance.getIndex();
         }
     }
+    
+    public void handleSwappedGood() {
+        if (requiredResourceInt != -1) {
+            this.requiredResourceInt = requiredResource1.getIndex();
+        }
+        if (requiredResource2Int != -1) {
+            this.requiredResource2Int = requiredResource2.getIndex();
+        }
+    }
 
     public void setRequiredResource1(int requiredResource1)
     {
-        this.requiredResource1 = requiredResource1;
+        this.requiredResourceInt = requiredResource1;
+        if (baseLink.resource != null && requiredResourceInt != -1 && baseLink.resource.size() > requiredResource1) {
+            this.requiredResource1 = baseLink.resource.get(requiredResourceInt);
+        }
     }
 
     public void setRequiredResource2(int requiredResource2)
     {
-        this.requiredResource2 = requiredResource2;
+        this.requiredResource2Int = requiredResource2;
+        if (baseLink.resource != null && requiredResource2Int != -1 && baseLink.resource.size() > requiredResource2) {
+            this.requiredResource2 = baseLink.resource.get(requiredResource2Int);
+        }
     }
 
     public void setOrder(String order)
@@ -137,14 +154,14 @@ public class TRFM extends BIQSection{
      */
     public void handleDeletedGood(int goodID)
     {
-        if (this.requiredResource1 == goodID)
-            this.requiredResource1 = -1;
-        else if (this.requiredResource1 > goodID)
-            this.requiredResource1--;
-        if (this.requiredResource2 == goodID)
-            this.requiredResource1 = -1;
-        else if (this.requiredResource2 > goodID)
-            this.requiredResource2--;
+        if (this.requiredResourceInt == goodID)
+            this.requiredResourceInt = -1;
+        else if (this.requiredResourceInt > goodID)
+            this.requiredResourceInt--;
+        if (this.requiredResource2Int == goodID)
+            this.requiredResourceInt = -1;
+        else if (this.requiredResource2Int > goodID)
+            this.requiredResource2Int--;
     }
 
     public String toEnglish(){
@@ -159,8 +176,8 @@ public class TRFM extends BIQSection{
         toReturn = toReturn + "dataLength: " + dataLength + lineReturn;
         toReturn = toReturn + "turnsToComplete: " + turnsToComplete + lineReturn;
         toReturn = toReturn + "requiredAdvance: " + requiredAdvanceInt + lineReturn;
-        toReturn = toReturn + "requiredResource1: " + requiredResource1 + lineReturn;
-        toReturn = toReturn + "requiredResource2: " + requiredResource2 + lineReturn;
+        toReturn = toReturn + "requiredResource1: " + requiredResourceInt + lineReturn;
+        toReturn = toReturn + "requiredResource2: " + requiredResource2Int + lineReturn;
         toReturn = toReturn + "order: " + order + lineReturn;
         toReturn = toReturn + lineReturn;
         return toReturn;
@@ -190,13 +207,13 @@ public class TRFM extends BIQSection{
         {
                 toReturn = toReturn + "RequiredAdvance: " + requiredAdvanceInt + separator + two.getRequiredAdvance() + lineReturn;
         }
-        if (!(requiredResource1 == two.getRequiredResource1()))
+        if (!(requiredResourceInt == two.getRequiredResource1()))
         {
-                toReturn = toReturn + "RequiredResource1: " + requiredResource1 + separator + two.getRequiredResource1() + lineReturn;
+                toReturn = toReturn + "RequiredResource1: " + requiredResourceInt + separator + two.getRequiredResource1() + lineReturn;
         }
-        if (!(requiredResource2 == two.getRequiredResource2()))
+        if (!(requiredResource2Int == two.getRequiredResource2()))
         {
-                toReturn = toReturn + "RequiredResource2: " + requiredResource2 + separator + two.getRequiredResource2() + lineReturn;
+                toReturn = toReturn + "RequiredResource2: " + requiredResource2Int + separator + two.getRequiredResource2() + lineReturn;
         }
         if (order.compareTo(two.getOrder()) != 0)
         {

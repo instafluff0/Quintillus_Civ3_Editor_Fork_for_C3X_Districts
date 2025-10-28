@@ -1,6 +1,8 @@
 
 package com.civfanatics.civ3.savFile;
 
+import com.civfanatics.civ3.biqFile.CITY;
+import com.civfanatics.civ3.biqFile.IO;
 import com.civfanatics.civ3.biqFile.util.LittleEndianDataInputStream;
 import com.civfanatics.civ3.biqFile.util.LittleEndianDataOutputStream;
 import java.io.BufferedInputStream;
@@ -13,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 
@@ -47,7 +50,7 @@ public class SAV {
     GameTILE[]tiles;
     CONT[]continents;
     private int[]goodCounts; //count of each GOOD on this CONT
-    SavLEAD[]players;
+    public SavLEAD[]players;
     SavUNIT[]savUnits;
     /**
      * There are a <b>lot</b> of "dummy" cities, usually of 12-16 bytes, in the
@@ -85,6 +88,8 @@ public class SAV {
     public byte[] inputFiftyTwoHundred;
     
     Logger logger = Logger.getLogger(this.getClass());
+    
+    int NUM_PALV_PLAYERS = 32;  //always 32, even if there are actually fewer players
     
     //If > 1, uses multithreading for inputting the file.
     static int numProcs = 1;
@@ -210,6 +215,7 @@ public class SAV {
                 }
                 catch(IOException ex) {
                     logger.error("IOException during DATE", ex);
+                    logger.error("Bytes read: " + ins[0].numBytesRead);
                 }
             }
             else {
@@ -421,8 +427,10 @@ public class SAV {
                     for (; i < numUnits; i++) {
                         savUnits[i] = new SavUNIT(this);
                         savUnits[i].readDataSection(ins[0]);
-                        logger.info("New unit: " + savUnits[i]);
-                        logger.info("Bytes read: " + ins[0].numBytesRead);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("New unit: " + savUnits[i]);
+                            logger.debug("Bytes read: " + ins[0].numBytesRead);
+                        }
                     }
                 }
                 catch(IOException ex) {
@@ -452,7 +460,7 @@ public class SAV {
                     }
                 }
                 catch (EndOfCITYException ex) {
-                    logger.info("Reached end of SAV CITY section successfully; have " + firaxisCities.size() + " Firaxis cities");
+                    logger.info("Reached end of SAV CITY section successfully; have " + firaxisCities.size() + " Firaxis cities and " + realCities.size() + " real cities");
                 }
                 catch (HeaderException ex) {
                     logger.error("Header exception during CITY; i = " + i + ".  # of real cities = " + realCities.size(), ex);
@@ -464,6 +472,19 @@ public class SAV {
             else {
                 logger.error("CITY header is missing; instead read " + sectionHeader);
                 return false;
+            }
+            
+            ins[0].mark(5);
+            ins[0].read(inputFour, 0, 4);
+            ins[0].reset();
+            sectionHeader = new String(inputFour, currentCharset);
+            logger.info("Bytes read: " + ins[0].numBytesRead);
+            
+            if ("CLNY".equals(sectionHeader)) {
+                for (int i = 0; i < gameData.getNumberOfColonies(); i++) {
+                    SavCLNY colony = new SavCLNY();
+                    colony.readDataSection(ins[0]);
+                }
             }
             
             ins[0].read(zerosBeforePALV, 0, 256);
@@ -484,13 +505,9 @@ public class SAV {
             logger.info("Bytes read: " + ins[0].numBytesRead);
             
             if ("PALV".equals(sectionHeader)) {
-                int numPlayers = embeddedRules.embeddedRules.player.size();
-                if (numPlayers == 0) {  //TODO: Hack until default LEADs are loaded?
-                    numPlayers = 32;
-                }
                 int i = 0;  //stored outside try/catch so I can log it if something goes wrong
                 try {
-                    for (; i < numPlayers; i++) {
+                    for (; i < NUM_PALV_PLAYERS; i++) {
                         PALV newPALV = new PALV(this);
                         newPALV.readDataSection(ins[0]);
                         palaceViews.add(newPALV);
@@ -682,5 +699,45 @@ public class SAV {
 
     public GameData getGameData() {
         return gameData;
+    }
+    
+    
+    public void applyMagic() {
+        try {
+            IO original = new IO();
+            original.inputBIQ(new File("D:\\Civilization III\\Conquests\\Scenarios\\Random Uncompressed.biq"));
+            
+            original.city.clear();
+            int cityIndex = 0;
+            for (SavCITY city : this.realCities) {
+                CITY biqEquivalent = new CITY(original);
+                biqEquivalent.setName(city.getName());  //todo: C-style trim
+                biqEquivalent.setX(city.getX());
+                biqEquivalent.setY(city.getY());
+                biqEquivalent.setCulture(city.getCulturePoints());
+                biqEquivalent.setOwner(city.getOwner() - 1);
+                biqEquivalent.setOwnerType(CITY.OWNER_PLAYER);
+                biqEquivalent.setBorderLevel(city.getBorderLevel());
+                biqEquivalent.setSize(city.getCitizens().size());
+                
+                List<Integer> buildingIndices = city.getBuildingsPresent();
+                for (Integer index : buildingIndices) {
+                    biqEquivalent.addBuilding(index);
+                    if (index == 0) {
+                        biqEquivalent.setHasPalace((byte)1);
+                    }
+                }
+                
+                int tileIndex = original.calculateTileIndex(city.getX(), city.getY());
+                original.tile.get(tileIndex).setCity((short)cityIndex);
+                
+                original.city.add(biqEquivalent);
+                cityIndex++;
+            }
+            original.outputBIQ(new File("C:\\temp\\magic.biq"));
+        }
+        catch(Exception ex) {
+            System.err.println(Arrays.toString(ex.getStackTrace()));
+        }
     }
 }

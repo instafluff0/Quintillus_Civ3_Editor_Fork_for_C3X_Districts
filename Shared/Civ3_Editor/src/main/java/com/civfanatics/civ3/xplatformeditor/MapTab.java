@@ -2253,8 +2253,6 @@ public class MapTab extends JPanel{
                 existingUnitModel.addRow(dataElements.get(i));
             }
         }
-    }
-
         if (districtPanel.isVisible())
             updateDistrictPanel();
     }

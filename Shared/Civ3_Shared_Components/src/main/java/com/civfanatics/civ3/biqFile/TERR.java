@@ -637,6 +637,24 @@ public class TERR extends BIQSection{
             //end this byte
         }
     }
+    
+    public void handleSwappedGOOD(int source, int dest) {
+        boolean oldSourceSelection = allowedResources.get(source);
+        if (source < dest) {
+            for (int i = source; i < dest; i++) {
+                allowedResources.set(i, allowedResources.get(i + 1));
+            }
+            allowedResources.set(dest, oldSourceSelection);
+            storeGoods();
+        }
+        else {
+            for (int i = source; i > dest; i--) {
+                allowedResources.set(i, allowedResources.get(i - 1));
+            }
+            allowedResources.set(dest, oldSourceSelection);
+            storeGoods();
+        }
+    }
 
     public String toEnglish(){
         return toString();

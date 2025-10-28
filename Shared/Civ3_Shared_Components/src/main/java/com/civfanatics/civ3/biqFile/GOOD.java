@@ -10,9 +10,9 @@ package com.civfanatics.civ3.biqFile;
  * @author Quintillus
  */
 public class GOOD extends BIQSection{
-    private final static int BONUS = 0;
-    private final static int LUXURY = 1;
-    private final static int STRATEGIC = 2;
+    public final static int BONUS = 0;
+    public final static int LUXURY = 1;
+    public final static int STRATEGIC = 2;
     
     private int dataLength = 88;
     private String name = "";
@@ -80,6 +80,7 @@ public class GOOD extends BIQSection{
         return name;
     }
 
+    @Override
     public String getCivilopediaEntry()
     {
         return civilopediaEntry;

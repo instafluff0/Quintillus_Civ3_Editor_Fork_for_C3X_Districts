@@ -1,8 +1,8 @@
 package com.civfanatics.civ3.biqFile;
 
+import com.civfanatics.civ3.biqFile.util.MapDirection;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 /*
  * To change this template, choose Tools | Templates
@@ -56,44 +56,11 @@ public class TILE extends BIQSection{
 
     public final static int[]c3cOverlayMasks = {ROAD_MASK, RAILROAD_MASK, MINE_MASK, IRRIGATION_MASK,
         FORT_MASK, GOODY_HUT_MASK, POLLUTION_MASK, BARBARIAN_CAMP_MASK, CRATER_MASK, BARRICADE_MASK};
+    
+    public final static int RANDOM_BARBARIAN_TRIBE = 0x4B; //75 decimal
 
-    public static final int DISTRICT_STATE_UNDER_CONSTRUCTION = 0;
-    public static final int DISTRICT_STATE_COMPLETED = 1;
-
-    public static final int WDS_UNUSED = 0;
-    public static final int WDS_UNDER_CONSTRUCTION = 1;
-    public static final int WDS_COMPLETED = 2;
-    public static final int WDS_RUINED = 3;
-
-    public static class WonderDistrictInfo {
-        public int state = WDS_UNUSED;
-        public int cityId = -1;
-        public int wonderIndex = -1;
-
-        public WonderDistrictInfo copy() {
-            WonderDistrictInfo info = new WonderDistrictInfo();
-            info.state = state;
-            info.cityId = cityId;
-            info.wonderIndex = wonderIndex;
-            return info;
-        }
-    }
-
-    public static class DistrictData {
-        public int districtType = -1;
-        public int state = DISTRICT_STATE_COMPLETED;
-        public WonderDistrictInfo wonderInfo = new WonderDistrictInfo();
-
-        public DistrictData copy() {
-            DistrictData data = new DistrictData();
-            data.districtType = districtType;
-            data.state = state;
-            data.wonderInfo = wonderInfo != null ? wonderInfo.copy() : null;
-            return data;
-        }
-    }
-
-    public int resource = -1;
+    private GOOD resource;
+    public int resourceInt = -1;
     /**
      * Documentation for file and image.
      * The file variable selects which file contains the graphics for this tile.
@@ -163,9 +130,9 @@ public class TILE extends BIQSection{
     //1024 = standalone river to east
     //512 = standalone river to west
     //256 = standalone river to north
-    //32 = Pine Forest
-    //16 = Snow-Capped Mts
-    //1 = Bonus Grassland
+    public static final byte PINE_FOREST = 32;
+    public static final byte SNOW_CAPPED_MOUNTAIN = 16;
+    public static final byte BONUS_GRASSLAND = 1;
     
     /**
      * .
@@ -201,7 +168,6 @@ public class TILE extends BIQSection{
     public int index;   //index in the list of TILEs
     public List<Integer>unitsOnTile = new ArrayList<Integer>();
     public int unitWithBestDefence = -1;
-    private DistrictData districtData;
 
     public TILE(IO baselink)
     {
@@ -235,45 +201,6 @@ public class TILE extends BIQSection{
         this.c3cBaseTerrain = (byte)terrain;
         this.C3CRealBaseTerrain = (byte)(((byte)(c3cRealTerrain) << 4) | (byte)c3cBaseTerrain);
     }
-
-    public boolean hasDistrict() {
-        return districtData != null && districtData.districtType >= 0;
-    }
-
-    public DistrictData getDistrictData() {
-        return districtData;
-    }
-
-    public DistrictData ensureDistrictData() {
-        if (districtData == null) {
-            districtData = new DistrictData();
-        }
-        if (districtData.wonderInfo == null) {
-            districtData.wonderInfo = new WonderDistrictInfo();
-        }
-        return districtData;
-    }
-
-    public void setDistrict(int districtType, int state) {
-        DistrictData data = ensureDistrictData();
-        data.districtType = districtType;
-        data.state = state;
-        if (data.wonderInfo == null) {
-            data.wonderInfo = new WonderDistrictInfo();
-        }
-    }
-
-    public void clearDistrict() {
-        districtData = null;
-    }
-
-    public void setDistrictData(DistrictData data) {
-        if (data == null) {
-            districtData = null;
-        } else {
-            districtData = data.copy();
-        }
-    }
     public int getDataLength()
     {
         return dataLength;
@@ -283,6 +210,10 @@ public class TILE extends BIQSection{
     {
         return riverConnectionInfo;
     }
+    
+    public boolean hasRiverConnection(byte direction) {
+        return (riverConnectionInfo & direction) == direction;
+    }
 
     public byte getBorder()
     {
@@ -291,7 +222,7 @@ public class TILE extends BIQSection{
 
     public int getResource()
     {
-        return resource;
+        return resourceInt;
     }
 
     public byte getImage()
@@ -417,6 +348,14 @@ public class TILE extends BIQSection{
         return c3cRealTerrain;
     }
 
+    public int getXPos() {
+        return xPos;
+    }
+
+    public int getYPos() {
+        return yPos;
+    }
+
     public void setDataLength(int dataLength)
     {
         this.dataLength = dataLength;
@@ -450,7 +389,10 @@ public class TILE extends BIQSection{
 
     public void setResource(int resource)
     {
-        this.resource = resource;
+        this.resourceInt = resource;
+        if (baseLink.resource != null && resource != -1 && baseLink.resource.size() > resource) {
+            this.resource = baseLink.resource.get(resource);
+        }
     }
 
     public void setImage(byte image) 
@@ -494,11 +436,6 @@ public class TILE extends BIQSection{
     public void setRiverCrossingData(byte riverCrossingData)
     {
         this.riverCrossingData = riverCrossingData;
-    }
-
-    public void setBarbarianTribe(short barbarianTribe)
-    {
-        this.barbarianTribe = barbarianTribe;
     }
 
     public void setColony(short colony)
@@ -546,9 +483,11 @@ public class TILE extends BIQSection{
      * This is INTENTIONALLY package-level access; it should only be called when
      * a BIQ is being imported.  Elsewhere, the real/base terrain methods should
      * be used instead.
+     * Update: Made public so GameTILE could convert.  Still should not be
+     * accessed otherwise.
      * @param C3CRealBaseTerrain 
      */
-    void setC3CBaseRealTerrain(byte C3CRealBaseTerrain)
+    public void setC3CBaseRealTerrain(byte C3CRealBaseTerrain)
     {
         this.C3CRealBaseTerrain = C3CRealBaseTerrain;
         this.c3cRealTerrain = (byte)((C3CRealBaseTerrain & 0xF0) >>> 4);
@@ -638,6 +577,21 @@ public class TILE extends BIQSection{
         return (this.C3CBonuses & 0x0001) == 1;
     }
     
+    public boolean isStartLocation() {
+        return (this.C3CBonuses & TILE.PLAYER_START_MASK) == TILE.PLAYER_START_MASK;
+    }
+    
+    //N.B. This only considers the starting location flag in TILE, *not*
+    //the SLOC array, which may have its own thoughts about this tile being a
+    //start location.  In theory, these align, but there have been bugs related
+    //to them not aligning.
+    public void setStartingLocation(boolean flag) {
+        if (flag)
+            this.C3CBonuses = this.C3CBonuses | TILE.PLAYER_START_MASK;
+        else
+            this.C3CBonuses = this.C3CBonuses & ~TILE.PLAYER_START_MASK;
+    }
+    
     /**
      * Sets the base terrain of a tile.
      * Will handle nibbles and PTW/Conquests differences for you.
@@ -696,7 +650,7 @@ public class TILE extends BIQSection{
         toReturn = toReturn + "dataLength: " + dataLength + lineReturn;
         toReturn = toReturn + "riverConnectionInfo: " + riverConnectionInfo + lineReturn;
         toReturn = toReturn + "border: " + border + lineReturn;
-        toReturn = toReturn + "resource: " + resource + lineReturn;
+        toReturn = toReturn + "resource: " + resourceInt + lineReturn;
         toReturn = toReturn + "image: " + image + lineReturn;
         toReturn = toReturn + "file: " + file + lineReturn;
         toReturn = toReturn + "questionMark: " + questionMark + lineReturn;
@@ -748,9 +702,9 @@ public class TILE extends BIQSection{
         {
                 toReturn = toReturn + "Border: " + border + separator + two.getBorder() + lineReturn;
         }
-        if (!(resource == two.getResource()))
+        if (!(resourceInt == two.getResource()))
         {
-                toReturn = toReturn + "Resource: " + resource + separator + two.getResource() + lineReturn;
+                toReturn = toReturn + "Resource: " + resourceInt + separator + two.getResource() + lineReturn;
         }
         if (!(image == two.getImage()))
         {
@@ -1021,7 +975,12 @@ public class TILE extends BIQSection{
      * @param barbarianCamp 
      */
     public void setBarbarianCamp(boolean barbarianCamp) {
-        setOverlay(barbarianCamp, BARBARIAN_CAMP_MASK);
+        if (barbarianCamp) {
+            addBarbarianCamp();
+        }
+        else {
+            removeBarbarianCamp();
+        }
     }
     
     /**
@@ -1048,6 +1007,21 @@ public class TILE extends BIQSection{
         setOverlay(crater, CRATER_MASK);
     }
     
+    private void addBarbarianCamp() {
+        C3COverlays = C3COverlays | BARBARIAN_CAMP_MASK;
+        barbarianTribe = RANDOM_BARBARIAN_TRIBE;
+    }
+    
+    public void setBarbarianTribe(short tribe) {
+        C3COverlays = C3COverlays | BARBARIAN_CAMP_MASK;    //should already be true, but to avoid inconsistencies
+        barbarianTribe = tribe;
+    }
+    
+    private void removeBarbarianCamp() {
+        C3COverlays = C3COverlays & (~BARBARIAN_CAMP_MASK);
+        barbarianTribe = -1;
+    }
+    
     /**
      * General-purpose overlay-setting method to reduce code duplication.
      * Will allow updating to allow pre-Conquests in one location only.
@@ -1059,5 +1033,165 @@ public class TILE extends BIQSection{
             C3COverlays = C3COverlays | MASK;
         else
             C3COverlays = C3COverlays & ~MASK;
+    }
+    
+    public void handleSwappedGood() {
+        if (this.resourceInt != -1) {
+            this.resourceInt = resource.getIndex();
+        }
+    }
+    
+    public TILE neighbor(MapDirection direction) {
+        switch(direction) {
+            case NORTHWEST:
+                return getTile(this.xPos - 1, this.yPos - 1);
+            case NORTH:
+                return getTile(this.xPos, this.yPos - 1);
+            case NORTHEAST:
+                return getTile(this.xPos + 1, this.yPos - 1);
+            case EAST:
+                return getTile(this.xPos + 1, this.yPos);
+            case SOUTHEAST:
+                return getTile(this.xPos + 1, this.yPos + 1);
+            case SOUTH:
+                return getTile(this.xPos, this.yPos + 1);
+            case SOUTHWEST:
+                return getTile(this.xPos - 1, this.yPos + 1);
+            case WEST:
+                return getTile(this.xPos - 1, this.yPos);
+            default:
+                return null;
+        }
+    }
+    
+    private TILE getTile(int xPos, int yPos)
+    {
+        int index = 0;
+        //always add in a width-worth * yPos/2 (truncated)
+        index+=((yPos/2)*(baseLink.worldMap.get(0).width));
+        if (yPos % 2 == 1)  //add in half a width worth of tiles
+            index+=((baseLink.worldMap.get(0).width)/2);
+        index+=xPos/2;
+        try{
+            return baseLink.tile.get(index);
+        }
+        catch(java.lang.IndexOutOfBoundsException e){
+            return null;
+        }
+    }
+    
+    /**
+     * Returns the "hard" owner type, e.g. direct control by city center, colony, or
+     * unit.  Just being in the borders of a civ is not sufficient.
+     * @return 
+     */
+    public int getHardOwnerType() {
+        if (this.getColony() != -1) {
+            CLNY colony = baseLink.colony.get(this.getColony());
+            return colony.getOwnerType();
+        }
+        else if (this.getCity() != -1) {
+            CITY city = baseLink.city.get(this.getCity());
+            return city.getOwnerType();
+        }
+        else if (this.unitsOnTile.size() > 0) {
+            UNIT mapUnit = baseLink.mapUnit.get(this.unitsOnTile.get(0));
+            return mapUnit.getOwnerType();
+        }
+        else {
+            return CITY.OWNER_NONE;
+        }
+    }
+    
+    /**
+     * Returns the "hard" owner, e.g. direct control by city center, colony, or
+     * unit.  Just being in the borders of a civ is not sufficient.
+     * @return
+     */
+    public int getHardOwner() {
+        if (this.getColony() != -1) {
+            CLNY colony = baseLink.colony.get(this.getColony());
+            return colony.getOwner();
+        }
+        else if (this.getCity() != -1) {
+            CITY city = baseLink.city.get(this.getCity());
+            return city.getOwner();
+        }
+        else if (this.unitsOnTile.size() > 0) {
+            UNIT mapUnit = baseLink.mapUnit.get(this.unitsOnTile.get(0));
+            return mapUnit.getOwner();
+        }
+        else {
+            return -1;
+        }
+    }
+
+    // District-related constants
+    public final static int DISTRICT_STATE_COMPLETED = 2;
+    public final static int WDS_COMPLETED = 2;
+
+    // District data for this tile
+    private DistrictData districtData;
+
+    /**
+     * Inner class for district data
+     */
+    public static class DistrictData {
+        public int districtId = -1;
+        public int districtType = -1;
+        public int state = 0;
+        public WonderDistrictInfo wonderInfo;
+    }
+
+    /**
+     * Inner class for wonder district information
+     */
+    public static class WonderDistrictInfo {
+        public int wonderId = -1;
+        public int wonderIndex = -1;
+        public int cityId = -1;
+        public int state = 0;
+    }
+
+    /**
+     * Check if this tile has a district
+     */
+    public boolean hasDistrict() {
+        return districtData != null && districtData.districtId >= 0;
+    }
+
+    /**
+     * Get district data for this tile (may be null)
+     */
+    public DistrictData getDistrictData() {
+        return districtData;
+    }
+
+    /**
+     * Set district on this tile
+     */
+    public void setDistrict(int districtId, int state) {
+        if (districtData == null) {
+            districtData = new DistrictData();
+        }
+        districtData.districtId = districtId;
+        districtData.state = state;
+    }
+
+    /**
+     * Clear district from this tile
+     */
+    public void clearDistrict() {
+        districtData = null;
+    }
+
+    /**
+     * Ensure district data exists and return it
+     */
+    public DistrictData ensureDistrictData() {
+        if (districtData == null) {
+            districtData = new DistrictData();
+        }
+        return districtData;
     }
 }

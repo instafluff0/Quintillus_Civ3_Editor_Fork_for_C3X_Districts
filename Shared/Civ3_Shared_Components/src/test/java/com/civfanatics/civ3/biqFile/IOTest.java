@@ -33,6 +33,26 @@ public class IOTest {
         File currentFile = new File("src/test/java/com/civfanatics/civ3/biqFile/Standard Current.biq");
         currentFile.deleteOnExit();
         
+        testForBinaryEquality(correctFile, currentFile);
+    }
+    
+    /**
+     * Tests that diacritics-enabled characters that are in Windows-1252, but not ISO-8859-1, are handled correctly.
+     * AoI is also a more generally complex scenario, notably including multiple units with the same name and a lot more
+     * data.
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    @Test
+    public void testInputAndOutputAreBinaryEqual_AoI_142() throws FileNotFoundException, IOException{
+        File correctFile = new File("src/test/java/com/civfanatics/civ3/biqFile/AoI Editor 1.42 Beta.biq");
+        File currentFile = new File("src/test/java/com/civfanatics/civ3/biqFile/AoI4.1-Current.biq");
+        currentFile.deleteOnExit();
+        
+        testForBinaryEquality(correctFile, currentFile);
+    }
+
+    private void testForBinaryEquality(File correctFile, File currentFile) throws IOException, FileNotFoundException {
         IO newBIQ = new IO();
         boolean successfulInput = newBIQ.inputBIQ(correctFile);
         assertTrue("Input unsuccessful", successfulInput);

@@ -14,6 +14,8 @@ public class SavLEAD {
     
     static Logger logger = Logger.getLogger(SavLEAD.class);
     
+    private static int MAX_CULT_SEARCH_SIZE = 0x3000;
+    
     private static int THIRTY_TWO = 32;
     
     private String header;
@@ -335,11 +337,11 @@ public class SavLEAD {
         //Need to move this inside our CULT search b/c we're jumping forward
         //if (raceID != -1) {
             //Search for a CULT and join it
-            byte[] preCult = new byte[0x2000];
-            in.mark(0x2001);
-            in.read(preCult, 0, 0x2000);
+            byte[] preCult = new byte[MAX_CULT_SEARCH_SIZE];
+            in.mark(MAX_CULT_SEARCH_SIZE + 1);
+            in.read(preCult, 0, MAX_CULT_SEARCH_SIZE);
             int c = 0;
-            for (c = 0; c < 0x2000; c++) {
+            for (c = 0; c < MAX_CULT_SEARCH_SIZE - 3; c++) {
                 String string = new String(preCult, c, 4);
                 if ("CULT".equals(string)) {
                     break;
@@ -467,4 +469,462 @@ public class SavLEAD {
             citiesPerCont[c] = in.readInt();
         }        
     }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public int getDataLength() {
+        return dataLength;
+    }
+
+    public int getPlayerID() {
+        return playerID;
+    }
+
+    public int getRaceID() {
+        return raceID;
+    }
+
+    public int getUnknown1() {
+        return unknown1;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public int getCapitalCity() {
+        return capitalCity;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public int getUnknown2() {
+        return unknown2;
+    }
+
+    public int getUnknown2PartTwo() {
+        return unknown2PartTwo;
+    }
+
+    public int getGoldenAgeEndTurn() {
+        return goldenAgeEndTurn;
+    }
+
+    public int getPlayerFlags() {
+        return playerFlags;
+    }
+
+    public int getGoldPart1() {
+        return goldPart1;
+    }
+
+    public int getGoldPart2() {
+        return goldPart2;
+    }
+
+    public float getScore() {
+        return score;
+    }
+
+    public int[] getUnknown76() {
+        return unknown76;
+    }
+
+    public int getTurnsOfAnarchy() {
+        return turnsOfAnarchy;
+    }
+
+    public int getGovernment() {
+        return government;
+    }
+
+    public int getMobilization() {
+        return mobilization;
+    }
+
+    public int[] getSecondUnknown76() {
+        return secondUnknown76;
+    }
+
+    public int getEra() {
+        return era;
+    }
+
+    public int getBeakers() {
+        return beakers;
+    }
+
+    public int getResearching() {
+        return researching;
+    }
+
+    public int getTurnsResearched() {
+        return turnsResearched;
+    }
+
+    public int getFutureTechsKnown() {
+        return futureTechsKnown;
+    }
+
+    public short[] getUnitsPerStratOwned() {
+        return unitsPerStratOwned;
+    }
+
+    public short[] getUnitsPerStratBeingBuilt() {
+        return unitsPerStratBeingBuilt;
+    }
+
+    public int getNumArmies() {
+        return numArmies;
+    }
+
+    public int getNumUnits() {
+        return numUnits;
+    }
+
+    public int getUnknown3() {
+        return unknown3;
+    }
+
+    public int getNumCities() {
+        return numCities;
+    }
+
+    public int getNumColonies() {
+        return numColonies;
+    }
+
+    public int getNumConts() {
+        return numConts;
+    }
+
+    public int getUnknown4() {
+        return unknown4;
+    }
+
+    public int getLuxuryRate() {
+        return luxuryRate;
+    }
+
+    public int getScienceRate() {
+        return scienceRate;
+    }
+
+    public int getTaxRate() {
+        return taxRate;
+    }
+
+    public int[] getAttUnknown1() {
+        return attUnknown1;
+    }
+
+    public int[] getAttCanceledDeal() {
+        return attCanceledDeal;
+    }
+
+    public int[] getAttUnknown2() {
+        return attUnknown2;
+    }
+
+    public int[] getAttCaughtSpy() {
+        return attCaughtSpy;
+    }
+
+    public int[] getAttUnknown3() {
+        return attUnknown3;
+    }
+
+    public int[] getAttTribute() {
+        return attTribute;
+    }
+
+    public int[] getAttUnknown4() {
+        return attUnknown4;
+    }
+
+    public int[] getAttGift() {
+        return attGift;
+    }
+
+    public int[] getAttUnknown5() {
+        return attUnknown5;
+    }
+
+    public int[] getAttICBM() {
+        return attICBM;
+    }
+
+    public int[] getAttICBMOther() {
+        return attICBMOther;
+    }
+
+    public int[] getRefuseContact() {
+        return refuseContact;
+    }
+
+    public int[] getWarWearinessPoints() {
+        return warWearinessPoints;
+    }
+
+    public byte[] getWarStatus() {
+        return warStatus;
+    }
+
+    public byte[] getEmbassies() {
+        return embassies;
+    }
+
+    public byte[] getSpies() {
+        return spies;
+    }
+
+    public byte[] getFailedSpyMission() {
+        return failedSpyMission;
+    }
+
+    public int[] getBorderViolation() {
+        return borderViolation;
+    }
+
+    public int[] getGoldToLead() {
+        return goldToLead;
+    }
+
+    public int[] getContact() {
+        return contact;
+    }
+
+    public int[] getAgreements() {
+        return agreements;
+    }
+
+    public int[] getAlliances() {
+        return alliances;
+    }
+
+    public int[] getEmbargoes() {
+        return embargoes;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public String getLeaderName() {
+        return leaderName;
+    }
+
+    public String getLeaderTitle() {
+        return leaderTitle;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getNoun() {
+        return noun;
+    }
+
+    public String getAdjective() {
+        return adjective;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public int getSkipped1() {
+        return skipped1;
+    }
+
+    public int getSkipped2() {
+        return skipped2;
+    }
+
+    public int getSkipped3() {
+        return skipped3;
+    }
+
+    public int getSkipped4() {
+        return skipped4;
+    }
+
+    public int getSkipped5() {
+        return skipped5;
+    }
+
+    public int getSkipped6() {
+        return skipped6;
+    }
+
+    public int getUnknown18_1() {
+        return unknown18_1;
+    }
+
+    public int getVictoryPoints() {
+        return victoryPoints;
+    }
+
+    public int getUnknown18_2() {
+        return unknown18_2;
+    }
+
+    public int getVpFromLocation() {
+        return vpFromLocation;
+    }
+
+    public int getVpFromCapture() {
+        return vpFromCapture;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public int getFoundedCities() {
+        return foundedCities;
+    }
+
+    public int getRemainingHeaderLength() {
+        return remainingHeaderLength;
+    }
+
+    public int[] getNumDiploEntries() {
+        return numDiploEntries;
+    }
+
+    public DiploTableEntry[][] getDiploTableEntries() {
+        return diploTableEntries;
+    }
+
+    public short[] getBuildingCount() {
+        return buildingCount;
+    }
+
+    public short[] getBuildingsInConstruction() {
+        return buildingsInConstruction;
+    }
+
+    public short[] getBuildingData() {
+        return buildingData;
+    }
+
+    public int[] getSWCity() {
+        return SWCity;
+    }
+
+    public byte[] getSWBuilt() {
+        return SWBuilt;
+    }
+
+    public short[] getUnitCount() {
+        return unitCount;
+    }
+
+    public short[] getUnitsInConstruction() {
+        return unitsInConstruction;
+    }
+
+    public short[] getUnitData() {
+        return unitData;
+    }
+
+    public short[] getSsPartsData() {
+        return ssPartsData;
+    }
+
+    public TradeNetworkData getTradeNetworkData() {
+        return tradeNetworkData;
+    }
+
+    public byte[] getGoodsAvailable() {
+        return goodsAvailable;
+    }
+
+    public int[] getCitiesPerCont() {
+        return citiesPerCont;
+    }
+
+    public String getCultHeader() {
+        return cultHeader;
+    }
+
+    public int getCultLength() {
+        return cultLength;
+    }
+
+    public int getCultUnknown() {
+        return cultUnknown;
+    }
+
+    public int getTotalCulture() {
+        return totalCulture;
+    }
+
+    public int getCultureGainedLastTurn() {
+        return cultureGainedLastTurn;
+    }
+
+    public int getCultUnknown2() {
+        return cultUnknown2;
+    }
+
+    public String getEspnIndicator() {
+        return espnIndicator;
+    }
+
+    public int getEspnLength() {
+        return espnLength;
+    }
+
+    public int getEspnUnknown() {
+        return espnUnknown;
+    }
+
+    public String getEspn2() {
+        return espn2;
+    }
+
+    public int getEspn2Length() {
+        return espn2Length;
+    }
+
+    public int getEspn2Unknown() {
+        return espn2Unknown;
+    }
+
+    public int getScienceQueueSize() {
+        return scienceQueueSize;
+    }
+
+    public int[] getScienceQueue() {
+        return scienceQueue;
+    }
+
+    public int[] getNumUnknownTriplet1Entries() {
+        return numUnknownTriplet1Entries;
+    }
+
+    public DiploTableEntry[][] getUnknownDiploStruct() {
+        return unknownDiploStruct;
+    }
+
+    public int[] getNumUnknownTriplet2Entries() {
+        return numUnknownTriplet2Entries;
+    }
+
+    public DiploTableEntry[][] getUnknownDiploStruct2() {
+        return unknownDiploStruct2;
+    }
+
+    public byte[] getInputFour() {
+        return inputFour;
+    }
+    
+    
 }

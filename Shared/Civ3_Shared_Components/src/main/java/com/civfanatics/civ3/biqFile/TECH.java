@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 public class TECH extends BIQSection implements Serializable {
     private int dataLength = 112; //112 in Conquests; 104 in PTW
-    private int techIndex;
+    //index inherited from BIQSection
     private String name = "";
     private String civilopediaEntry = "";
     private int cost;
@@ -29,29 +29,29 @@ public class TECH extends BIQSection implements Serializable {
     private TECH prerequisite3;
     private TECH prerequisite4;
     private int flags;
-    private boolean enablesDiplomats;
-    private boolean enablesIrrigationWithoutFreshWater;
-    private boolean enablesBridges;
-    private boolean disablesFloodPlainDisease;
-    private boolean enablesConscription;
-    private boolean enablesMobilizationLevels;
-    private boolean enablesRecycling;
-    private boolean enablesPrecisionBombing;
-    private boolean enablesMPP;
-    private boolean enablesROP;
-    private boolean enablesAlliances;
-    private boolean enablesTradeEmbargoes;
-    private boolean doublesWealth;
-    private boolean enablesSeaTrade;
-    private boolean enablesOceanTrade;
-    private boolean enablesMapTrading;
-    private boolean enablesCommunicationTrading;
-    private boolean notRequiredForAdvancement;
-    private boolean doublesWorkRate;
-    private boolean cannotBeTraded;
-    private boolean permitsSacrifice;
-    private boolean bonusTech;
-    private boolean revealMap;
+        private boolean enablesDiplomats;
+        private boolean enablesIrrigationWithoutFreshWater;
+        private boolean enablesBridges;
+        private boolean disablesFloodPlainDisease;
+        private boolean enablesConscription;
+        private boolean enablesMobilizationLevels;
+        private boolean enablesRecycling;
+        private boolean enablesPrecisionBombing;
+        private boolean enablesMPP;
+        private boolean enablesROP;
+        private boolean enablesAlliances;
+        private boolean enablesTradeEmbargoes;
+        private boolean doublesWealth;
+        private boolean enablesSeaTrade;
+        private boolean enablesOceanTrade;
+        private boolean enablesMapTrading;
+        private boolean enablesCommunicationTrading;
+        private boolean notRequiredForAdvancement;
+        private boolean doublesWorkRate;
+        private boolean cannotBeTraded;
+        private boolean permitsSacrifice;
+        private boolean bonusTech;
+        private boolean revealMap;
     //the following is Conquests-only
     private int flavors;
     private int numFlavors;
@@ -84,6 +84,33 @@ public class TECH extends BIQSection implements Serializable {
             flavours.add(false);
 
     }
+    
+    public TECH clone() {
+        TECH other = new TECH(this.baseLink);
+        other.name = this.name;
+        other.civilopediaEntry = this.civilopediaEntry;
+        other.cost = this.cost;
+        other.era = this.era;
+        other.advanceIcon = this.advanceIcon;
+        other.x = this.x;
+        other.y = this.y;
+        other.prerequisite1Int = this.prerequisite1Int;
+        other.prerequisite2Int = this.prerequisite2Int;
+        other.prerequisite3Int = this.prerequisite3Int;
+        other.prerequisite4Int = this.prerequisite4Int;
+        other.prerequisite1 = this.prerequisite1;
+        other.prerequisite2 = this.prerequisite2;
+        other.prerequisite3 = this.prerequisite3;
+        other.prerequisite4 = this.prerequisite4;
+        other.flags = this.flags;
+        other.flavors = this.flavors;
+        other.numFlavors = this.numFlavors;
+        other.questionMark = this.questionMark;
+        
+        other.extractEnglish(other.numFlavors);
+        return other;
+    }
+    
     public void trim()
     {
         name = name.trim();
@@ -95,6 +122,7 @@ public class TECH extends BIQSection implements Serializable {
         return dataLength;
     }
 
+    @Override
     public String getName()
     {
         return name;
@@ -512,44 +540,44 @@ public class TECH extends BIQSection implements Serializable {
         //do need to recreate binary since the flavor got removed
     }
     
-    public void handleDeletedTechnology(int index)
+    public void handleDeletedTechnology(int deletedTechIndex)
     {
         //Note that we only need to update the TECH pointers if
         //they were deleted; otherwise they are still valid.
-        if (prerequisite1Int == index) {
+        if (prerequisite1Int == deletedTechIndex) {
             prerequisite1Int = -1;
             prerequisite1 = null;
         }
-        else if (prerequisite1Int > index)
+        else if (prerequisite1Int > deletedTechIndex)
             prerequisite1Int--;
         
-        if (prerequisite2Int == index) {
+        if (prerequisite2Int == deletedTechIndex) {
             prerequisite2Int = -1;
             prerequisite2 = null;
         }
-        else if (prerequisite2Int > index)
+        else if (prerequisite2Int > deletedTechIndex)
             prerequisite2Int--;
         
-        if (prerequisite3Int == index) {
+        if (prerequisite3Int == deletedTechIndex) {
             prerequisite3Int = -1;
             prerequisite3 = null;
         }
-        else if (prerequisite3Int > index)
+        else if (prerequisite3Int > deletedTechIndex)
             prerequisite3Int--;
         
-        if (prerequisite4Int == index) {
+        if (prerequisite4Int == deletedTechIndex) {
             prerequisite4Int = -1;
             prerequisite4 = null;
         }
-        else if (prerequisite4Int > index)
+        else if (prerequisite4Int > deletedTechIndex)
             prerequisite4Int--;
         
-        if (this.techIndex > index) {
-            this.techIndex--;
+        if (this.index > deletedTechIndex) {
+            this.index--;
         }
-        else if (this.techIndex == index) {
+        else if (this.index == deletedTechIndex) {
             //getting deleted soon anyway, but just to be safe...
-            this.techIndex = -1;
+            this.index = -1;
         }
     }
     
@@ -800,7 +828,7 @@ public class TECH extends BIQSection implements Serializable {
     {
         String lineReturn = java.lang.System.getProperty("line.separator");
         String toReturn = "name: " + name + lineReturn;
-        toReturn = toReturn + "index: " + techIndex + lineReturn;
+        toReturn = toReturn + "index: " + index + lineReturn;
         toReturn = toReturn + "civilopediaEntry: " + civilopediaEntry + lineReturn;
         toReturn = toReturn + "dataLength: " + dataLength + lineReturn;
         toReturn = toReturn + "cost: " + cost + lineReturn;
@@ -822,7 +850,7 @@ public class TECH extends BIQSection implements Serializable {
     {
         String lineReturn = java.lang.System.getProperty("line.separator");
         String toReturn = "name: " + name + lineReturn;
-        toReturn = toReturn + "index: " + techIndex + lineReturn;
+        toReturn = toReturn + "index: " + index + lineReturn;
         toReturn = toReturn + "civilopediaEntry: " + civilopediaEntry + lineReturn;
         toReturn = toReturn + "dataLength: " + dataLength + lineReturn;
         toReturn = toReturn + "cost: " + cost + lineReturn;
@@ -882,8 +910,8 @@ public class TECH extends BIQSection implements Serializable {
         {
                 toReturn = toReturn + "DataLength: " + dataLength + separator + two.getDataLength() + lineReturn;
         }
-        if (techIndex != two.getIndex()) {
-            toReturn = toReturn = "index: " + techIndex + separator + two.getIndex() + lineReturn;
+        if (index != two.getIndex()) {
+            toReturn = toReturn = "index: " + index + separator + two.getIndex() + lineReturn;
         }
         if (civilopediaEntry.compareTo(two.getCivilopediaEntry()) != 0)
         {
@@ -1051,14 +1079,6 @@ public class TECH extends BIQSection implements Serializable {
         if (string.equals("Name"))
             return this.name;
         throw new UnsupportedOperationException();
-    }
-    
-    public int getIndex() {
-        return this.techIndex;
-    }
-    
-    public void setIndex(int index) {
-        this.techIndex = index;
     }
 
     public int getNumFlavors() {

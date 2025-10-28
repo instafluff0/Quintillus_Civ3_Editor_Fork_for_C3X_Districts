@@ -50,24 +50,24 @@ public class HistTurn {
         this.civIds = civIds;
     }
 
-    public List<Integer> getPower() {
-        return power;
+    public Integer getPower(int player) {
+        return power.get(player);
     }
 
     public void setPower(List<Integer> power) {
         this.power = power;
     }
 
-    public List<Integer> getScore() {
-        return score;
+    public Integer getScore(int player) {
+        return score.get(player);
     }
 
     public void setScore(List<Integer> score) {
         this.score = score;
     }
 
-    public List<Integer> getCulture() {
-        return culture;
+    public Integer getCulture(int player) {
+        return culture.get(player);
     }
 
     public void setCulture(List<Integer> culture) {

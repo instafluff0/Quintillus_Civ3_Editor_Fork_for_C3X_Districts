@@ -43,8 +43,10 @@ public class BLDG extends BIQSection {
     private TECH reqAdvance;
     private int obsoleteByInt;
     private TECH obsoleteBy;
-    private int reqResource1;
-    private int reqResource2;
+    private int reqResource1Int;
+    private int reqResource2Int;
+    private GOOD reqResource1;
+    private GOOD reqResource2;
     private int improvements;   //binary
     private int otherChar;      //binary
     private int smallWonderCharacteristics;    //binary
@@ -59,7 +61,7 @@ public class BLDG extends BIQSection {
     private boolean centerOfEmpire;
     private boolean veteranUnits;
     private boolean increasedResearch;
-    private boolean increasedLuxuries;
+    private boolean increasedLuxuries;  //lux slider
     private boolean increasedTaxes;
     private boolean removePopPollution;
     private boolean reduceBldgPollution;
@@ -67,7 +69,7 @@ public class BLDG extends BIQSection {
     //next byte
     private boolean reducesCorruption;
     private boolean doublesCityGrowthRate;
-    private boolean increasesLuxuryTrade;
+    private boolean increasesLuxuryTrade;   //marketplace
     private boolean allowCityLevel2;
     private boolean allowCityLevel3;
     private boolean replacesOtherWithThisTag;
@@ -155,8 +157,8 @@ public class BLDG extends BIQSection {
         this.reqGovernment = -1;
         this.reqAdvanceInt = -1;
         this.reqAdvance = null;
-        this.reqResource1 = -1;
-        this.reqResource2 = -1;
+        this.reqResource1Int = -1;
+        this.reqResource2Int = -1;
         this.doublesHappiness = -1;
         this.gainOnContinent = -1;
         this.gainInEveryCity = -1;
@@ -179,8 +181,8 @@ public class BLDG extends BIQSection {
         this.reqGovernment = -1;
         this.reqAdvanceInt = -1;
         this.reqAdvance = null;
-        this.reqResource1 = -1;
-        this.reqResource2 = -1;
+        this.reqResource1Int = -1;
+        this.reqResource2Int = -1;
         this.doublesHappiness = -1;
         this.gainOnContinent = -1;
         this.gainInEveryCity = -1;
@@ -391,12 +393,18 @@ public class BLDG extends BIQSection {
 
     public void setReqResource1(int reqResource1)
     {
-        this.reqResource1 = reqResource1;
+        this.reqResource1Int = reqResource1;
+        if (baseLink.resource != null && reqResource1Int != -1 && baseLink.resource.size() > reqResource1Int) {
+            this.reqResource1 = baseLink.resource.get(reqResource1Int);
+        }
     }
 
     public void setReqResource2(int reqResource2)
     {
-        this.reqResource2 = reqResource2;
+        this.reqResource2Int = reqResource2;
+        if (baseLink.resource != null && reqResource2Int != -1 && baseLink.resource.size() > reqResource2Int) {
+            this.reqResource2 = baseLink.resource.get(reqResource2Int);
+        }
     }
 
     public void setImprovements(int improvements)
@@ -909,12 +917,12 @@ public class BLDG extends BIQSection {
 
     public int getReqResource1()
     {
-        return reqResource1;
+        return reqResource1Int;
     }
 
     public int getReqResource2()
     {
-        return reqResource2;
+        return reqResource2Int;
     }
 
     public int getImprovements()
@@ -1343,6 +1351,15 @@ public class BLDG extends BIQSection {
         }
     }
     
+    public void handleSwappedGood() {
+        if (reqResource1Int != -1) {
+            reqResource1Int = reqResource1.getIndex();
+        }
+        if (reqResource2Int != -1) {
+            reqResource2Int = reqResource2.getIndex();
+        }
+    }
+    
     public void handleDeletedTech(int index)
     {
         if (reqAdvanceInt == index) {
@@ -1364,7 +1381,7 @@ public class BLDG extends BIQSection {
         }
     }
     
-    public void handleSwappedTech(int source, int destination) {
+    public void handleSwappedTech() {
         if (reqAdvanceInt != -1) {
             reqAdvanceInt = reqAdvance.getIndex();
         }
@@ -1447,8 +1464,8 @@ public class BLDG extends BIQSection {
         toReturn = toReturn + "spaceshipPart: " + spaceshipPart + lineReturn;
         toReturn = toReturn + "reqAdvance: " + reqAdvance + lineReturn;
         toReturn = toReturn + "obsoleteBy: " + obsoleteBy + lineReturn;
-        toReturn = toReturn + "reqResource1: " + reqResource1 + lineReturn;
-        toReturn = toReturn + "reqResource2: " + reqResource2 + lineReturn;
+        toReturn = toReturn + "reqResource1: " + reqResource1Int + lineReturn;
+        toReturn = toReturn + "reqResource2: " + reqResource2Int + lineReturn;
         toReturn = toReturn + "improvements: " + improvements + lineReturn;
         toReturn = toReturn + "otherChar: " + otherChar + lineReturn;
         toReturn = toReturn + "smallWonder: " + smallWonder + lineReturn;
@@ -2104,8 +2121,8 @@ public class BLDG extends BIQSection {
         toReturn = toReturn + "spaceshipPart: " + spaceshipPart + lineReturn;
         toReturn = toReturn + "reqAdvance: " + reqAdvance + lineReturn;
         toReturn = toReturn + "obsoleteBy: " + obsoleteBy + lineReturn;
-        toReturn = toReturn + "reqResource1: " + reqResource1 + lineReturn;
-        toReturn = toReturn + "reqResource2: " + reqResource2 + lineReturn;
+        toReturn = toReturn + "reqResource1: " + reqResource1Int + lineReturn;
+        toReturn = toReturn + "reqResource2: " + reqResource2Int + lineReturn;
         toReturn = toReturn + "improvements" + improvements + lineReturn;
         toReturn = toReturn + "  centerOfEmpire: " + centerOfEmpire + lineReturn;
         toReturn = toReturn + "  veteranUnits: " + veteranUnits + lineReturn;
@@ -2311,13 +2328,13 @@ public class BLDG extends BIQSection {
         {
                 toReturn = toReturn + "ObsoleteBy: " + obsoleteByInt + separator + two.getObsoleteBy() + lineReturn;
         }
-        if (!(reqResource1 == two.getReqResource1()))
+        if (!(reqResource1Int == two.getReqResource1()))
         {
-                toReturn = toReturn + "ReqResource1: " + reqResource1+ separator + two.getReqResource1() + lineReturn;
+                toReturn = toReturn + "ReqResource1: " + reqResource1Int+ separator + two.getReqResource1() + lineReturn;
         }
-        if (!(reqResource2 == two.getReqResource2()))
+        if (!(reqResource2Int == two.getReqResource2()))
         {
-                toReturn = toReturn + "ReqResource2: " + reqResource2+ separator + two.getReqResource2() + lineReturn;
+                toReturn = toReturn + "ReqResource2: " + reqResource2Int+ separator + two.getReqResource2() + lineReturn;
         }
         if (!(improvements == two.getImprovements()))
         {

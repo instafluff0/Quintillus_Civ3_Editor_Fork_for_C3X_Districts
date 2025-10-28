@@ -4,7 +4,11 @@ package com.civfanatics.civ3.savFile;
 import com.civfanatics.civ3.biqFile.util.LittleEndianDataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Histograph.
@@ -62,29 +66,30 @@ public class HIST {
         }
     }
     
-    public List<List<Integer>> getScores() {
-        return null;
-    }
-    
-    public List<Integer> getPowerForPlayer(int playerID) {
+    public List<Integer> getHistographScoresForPlayer(int playerID, BiFunction<HistTurn, Integer, Integer> scoreComponentFunction) {
+        
         List<Integer> power = new ArrayList<Integer>(turns.size());
         for (HistTurn turn : turns) {
-            int i = 0;
+            int playerIdInTurn = 0;
             boolean foundPlayer = false;
-            for (i = 0; i < turn.getCivIds().size(); i++) {
-                if (turn.getCivIds().get(i) == playerID) {
+            for (playerIdInTurn = 0; playerIdInTurn < turn.getCivIds().size(); playerIdInTurn++) {
+                if (turn.getCivIds().get(playerIdInTurn) == playerID) {
                     foundPlayer = true;
                     break;
                 }
             }
             if (foundPlayer) {
-                power.add(turn.getPower().get(i));
+                power.add(scoreComponentFunction.apply(turn, playerIdInTurn));
             }
             else {
                 power.add(0);
             }
         }
         return power;
+    }
+    
+    public int getNumTurns() {
+        return turns.size();
     }
     
 }

@@ -16,7 +16,8 @@ public abstract class BIQSection implements Serializable {
     /**
      * The baseLink is a link to the base BIQ from this section.
      */
-    transient IO baseLink;
+    transient public IO baseLink;
+    transient int index = -1;
     
     public BIQSection(){};
 
@@ -85,4 +86,20 @@ public abstract class BIQSection implements Serializable {
     abstract public Object getProperty(String propertyName) throws UnsupportedOperationException;
 
     abstract public String compareTo(BIQSection section, String separator);
+    
+    public int getIndex() {
+        return index;
+    }
+    
+    public void setIndex(int newIndex) {
+        this.index = newIndex;
+    }
+    
+    public String getName() {
+        return "";
+    }
+    
+    public String getCivilopediaEntry() {
+        return "";
+    }
 }

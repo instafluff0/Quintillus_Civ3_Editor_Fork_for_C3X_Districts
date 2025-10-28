@@ -189,6 +189,9 @@ public class CITY extends BIQSection{
     {
         this.buildingIDs.add(newBuildingID);
         dataLength+=4;
+        if (baselink.buildings.get(newBuildingID).getBombardDefence() > 0) {
+            this.wallStyleBuilding = true;
+        }
     }
     
     /**
@@ -224,6 +227,7 @@ public class CITY extends BIQSection{
                 break;
             }
         }
+        updateWallStyleBuildingStatus();
     }
     
     /**
@@ -233,6 +237,7 @@ public class CITY extends BIQSection{
     {
         dataLength-=buildingIDs.size()*4;
         buildingIDs.clear();
+        this.wallStyleBuilding = false;
     }
     
     /**
@@ -252,14 +257,7 @@ public class CITY extends BIQSection{
             if (currentID > buildingID)
                 buildingIDs.set(i, currentID - 1);
         }
-        //If Java supported arithmetic if statements, we could have written this whole method as so:
-        //for (int i = 0; i < buildingIDs.size(); i++)
-        //{
-        //    int currentID = buildingIDs.get(i);
-        //    if (currentID - buildingID) , buildingIDs.remove(i--), buildingIDs.set(i, currentID - 1);
-        //}
-        //Who says the arithmetic if isn't great?  Real programmers like arithmetic if statements - 
-        //they make the code more interesting (and sometimes even more concise!).
+        updateWallStyleBuildingStatus();
     }
     
     public boolean hasBuilding(int buildingID)
@@ -271,10 +269,24 @@ public class CITY extends BIQSection{
     {
         return wallStyleBuilding;
     }
+    
+    public boolean isCapital() {
+        for (int buildingID : buildingIDs) {
+            if (baselink.buildings.get(buildingID).getCenterOfEmpire()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    public void setWallStyleBuilding(boolean wallStyleBuilding)
-    {
-        this.wallStyleBuilding = wallStyleBuilding;
+    public void updateWallStyleBuildingStatus() {
+        for (int buildingID : buildingIDs) {
+            if (baselink.buildings.get(buildingID).getBombardDefence() > 0) {
+                this.wallStyleBuilding = true;
+                return;
+            }
+        }
+        this.wallStyleBuilding = false;
     }
     
     /**

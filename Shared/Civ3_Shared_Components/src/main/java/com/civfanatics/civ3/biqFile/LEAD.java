@@ -53,9 +53,21 @@ public class LEAD extends BIQSection{
         startingTechnologyInt = new ArrayList<Integer>();
         startingTechnology = new ArrayList<TECH>();
         government = 1; //despotism
-        difficulty = 2; //regent
+        difficulty = -1; //any
         civ = -3;
+        startCash = 10;
     }
+    
+    /**
+     * Adds a couple start units as default ones, similar to the Firaxis editor.
+     * This should only be called when a player is added in the editor, not
+     * when imported from a BIQ.
+     */
+    public void addDefaultStartUnits() {
+        startUnitsByType.put(baseLink.unit.get(0), 1);
+        startUnitsByType.put(baseLink.unit.get(1), 1);
+    }
+    
     public void trim()
     {
         leaderName = leaderName.trim();

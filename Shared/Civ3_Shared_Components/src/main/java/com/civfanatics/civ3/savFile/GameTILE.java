@@ -1,6 +1,8 @@
 
 package com.civfanatics.civ3.savFile;
 
+import com.civfanatics.civ3.biqFile.TILE;
+import com.civfanatics.civ3.biqFile.civ3Version;
 import com.civfanatics.civ3.biqFile.util.LittleEndianDataInputStream;
 import java.io.IOException;
 
@@ -17,7 +19,7 @@ public class GameTILE {
     private int resources;
     private int topUnitID;
     private byte image;
-    private int file;
+    private byte file;
     private short unknown2;
     private byte overlayBits;   //See TILE2 for C3C
     private byte terrainBits;   //real/base
@@ -56,6 +58,34 @@ public class GameTILE {
     byte[] unknownBytes = new byte[10]; //10
     
     byte[] inputFour = new byte[4];
+    
+    public TILE toBIQTile() {
+        TILE t = new TILE(civ3Version.CONQUESTS);
+        t.setRiverConnectionInfo(this.riverInfo);   //According to Gramphos (post #3), this is correct
+        t.setBorder(this.riverData);    //todo: definitely verify.  most likely not right.  may have to calculate
+        t.setImage(this.image);
+        t.setFile(this.file);
+        t.setQuestionMark(this.unknown);    //probably okay; in same place in both structs
+        t.setOverlays(this.overlayBits);
+        t.setBaseRealTerrain(this.terrainBits); //correct according to documentation
+        t.setBonuses(this.bonusBits);
+        t.setRiverCrossingData((byte)(0)); //following guidance in TILE docs that this can always be zero; use river connection info instead
+        t.setBarbarianTribe(this.barbCampID);
+        t.setColony(this.colonyID);
+        t.setCity(this.cityID);
+        t.setContinent(this.continent);
+        //skipping question mark 2 and leaving it as always 6, as per notes that other values are crash-prone
+        //todo: VPL.  probably can derive from overlays?  or is it elsewhere?  or one of the unknowns?
+        t.setRuin(this.hasRuins);
+        t.setC3COverlays(this.overlayBitsC3C);
+        t.setQuestionMark3((byte)(this.unknown3 & 0xFF));   //highly suspect due to different lengths
+        t.setC3CBaseRealTerrain(this.terrainBitsC3C);
+        t.setQuestionMark4(this.unknown4);  //todo: try to verify
+        //todo: set fog of war based on visibility, if appropriate
+        t.setC3CBonuses(this.bonusBitsC3C);
+        t.setQuestionMark5(this.unknown5);  //todo: try to verify
+        return t;
+    }
     
     public void readDataSection(LittleEndianDataInputStream in) throws IOException {
         in.read(inputFour, 0, 4);

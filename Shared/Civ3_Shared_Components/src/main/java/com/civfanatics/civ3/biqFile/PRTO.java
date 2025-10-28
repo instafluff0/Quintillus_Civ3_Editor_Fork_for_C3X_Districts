@@ -45,9 +45,12 @@ public class PRTO extends BIQSection{
     private TECH requiredTech;
     private int upgradeToInt = -1;
     private PRTO upgradeTo;
-    private int requiredResource1 = -1;
-    private int requiredResource2 = -1;
-    private int requiredResource3 = -1;
+    private int requiredResource1Int = -1;
+    private int requiredResource2Int = -1;
+    private int requiredResource3Int = -1;
+    private GOOD requiredResource1;
+    private GOOD requiredResource2;
+    private GOOD requiredResource3;
     int unitAbilities;  //package private - set when importing, but should not generally be accessed
     int AIStrategy;  //package private - set when importing, but should not generally be accessed
     /**
@@ -59,9 +62,9 @@ public class PRTO extends BIQSection{
     int standardOrdersSpecialActions;  //package private - set when importing, but should not generally be accessed
     int airMissions; //package private - set when importing, but should not generally be accessed
     private int unitClass;
-    public static int CLASS_LAND = 0;
-    public static int CLASS_SEA = 1;
-    public static int CLASS_AIR = 2;
+        public static int CLASS_LAND = 0;
+        public static int CLASS_SEA = 1;
+        public static int CLASS_AIR = 2;
     private int otherStrategy = -1;
     private int hitPointBonus;
     //PTW Modifiers are PACKAGE private.  They need to be importable, but we DON'T
@@ -84,7 +87,7 @@ public class PRTO extends BIQSection{
     private int enslaveResultsInInt = -1;
     private PRTO enslaveResultsIn;
     private int questionMark5 = 1;
-    private ArrayList<Integer>stealthTargetsInt;
+    private List<Integer>stealthTargetsInt;
     private ArrayList<PRTO>stealthTargets;
     private int questionMark6 = 1;
     //private int numLegalBuildingTelepads;  //present in BIQ file
@@ -95,6 +98,11 @@ public class PRTO extends BIQSection{
     private int questionMark8 = 0;
     private int airDefence;
 
+    /*
+     ******************************************
+     * From here onward are derived variables * 
+     ******************************************
+     */
     private boolean wheeled;
     private boolean footSoldier;
     private boolean blitz;
@@ -294,6 +302,81 @@ public class PRTO extends BIQSection{
         
         this.dataLength+=numTerrains;   //for ignore movement - 14 for Conquests, 12 for earlier
     }
+    
+    @Override
+    public PRTO clone() {
+        PRTO other = new PRTO(this.baseLink, baseLink.unit.size());
+        other.zoneOfControl = this.zoneOfControl;
+        other.name = this.name;
+        other.civilopediaEntry = this.civilopediaEntry;
+        other.bombardStrength = this.bombardStrength;
+        other.bombardRange = this.bombardRange;
+        other.capacity = this.capacity;
+        other.shieldCost = this.shieldCost;
+        other.defence = this.defence;
+        other.iconIndex = this.iconIndex;
+        other.attack = this.attack;
+        other.operationalRange = this.operationalRange;
+        other.populationCost = this.populationCost;
+        other.rateOfFire = this.rateOfFire;
+        other.movement = this.movement;
+        other.requiredTechInt = this.requiredTechInt;
+        other.requiredTech = this.requiredTech;
+        other.upgradeToInt = this.upgradeToInt;
+        other.upgradeTo = this.upgradeTo;
+        other.requiredResource1Int = this.requiredResource1Int;
+        other.requiredResource2Int = this.requiredResource2Int;
+        other.requiredResource3Int = this.requiredResource3Int;
+        other.requiredResource1 = this.requiredResource1;
+        other.requiredResource2 = this.requiredResource2;
+        other.requiredResource3 = this.requiredResource3;
+        other.unitAbilities = this.unitAbilities;
+        other.AIStrategy = this.AIStrategy;
+        other.availableTo = this.availableTo;
+        other.standardOrdersSpecialActions = this.standardOrdersSpecialActions;
+        other.airMissions = this.airMissions;
+        other.unitClass = this.unitClass;
+        other.otherStrategy = this.otherStrategy;
+        other.hitPointBonus = this.hitPointBonus;
+        other.PTWStandardOrders = this.PTWStandardOrders;
+        other.PTWSpecialActions = this.PTWSpecialActions;
+        other.PTWWorkerActions = this.PTWWorkerActions;
+        other.PTWAirMissions = this.PTWAirMissions;
+        other.PTWActionsMix = this.PTWActionsMix;
+        other.unknown = this.unknown;
+        other.bombardEffects = this.bombardEffects;
+        other.ignoreMovementCost = new byte[this.ignoreMovementCost.length];
+        System.arraycopy(this.ignoreMovementCost, 0, other.ignoreMovementCost, 0, other.ignoreMovementCost.length);
+        other.requiresSupport = this.requiresSupport;
+        other.useExactCost = this.useExactCost;
+        other.telepadRange = this.telepadRange;
+        other.questionMark3 = this.questionMark3;
+        other.legalUnitTelepadsInt = new ArrayList<Integer>();
+        other.legalUnitTelepadsInt.addAll(this.legalUnitTelepadsInt);
+        other.legalUnitTelepads = new ArrayList<PRTO>();
+        other.legalUnitTelepads.addAll(this.legalUnitTelepads);
+        other.enslaveResultsInInt = this.enslaveResultsInInt;
+        other.enslaveResultsIn = this.enslaveResultsIn;
+        other.questionMark5 = this.questionMark5;
+        other.stealthTargetsInt = new ArrayList<Integer>();
+        other.stealthTargetsInt.addAll(this.stealthTargetsInt);
+        other.stealthTargets = new ArrayList<PRTO>();
+        other.stealthTargets.addAll(this.stealthTargets);
+        other.questionMark6 = this.questionMark6;
+        other.legalBuildingTelepads = new ArrayList<Integer>();
+        other.legalBuildingTelepads.addAll(this.legalBuildingTelepads);
+        other.createsCraters = this.createsCraters;
+        other.workerStrength1 = this.workerStrength1;
+        other.workerStrengthFloat = this.workerStrengthFloat;
+        other.questionMark8 = this.questionMark8;
+        other.airDefence = this.airDefence;
+        
+        other.extractEnglish();
+        
+        other.dataLength = this.dataLength;
+        return other;
+    }
+    
     public void trim()
     {
         name = name.trim();
@@ -442,19 +525,28 @@ public class PRTO extends BIQSection{
         }
     }
 
-    public void setRequiredResource1(int requiredResource1)
+    public void setRequiredResource1(int requiredResource1Int)
     {
-        this.requiredResource1 = requiredResource1;
+        this.requiredResource1Int = requiredResource1Int;
+        if (baseLink.resource != null && requiredResource1Int != -1 && baseLink.resource.size() > requiredResource1Int) {
+            this.requiredResource1 = baseLink.resource.get(requiredResource1Int);
+        }
     }
 
     public void setRequiredResource2(int requiredResource2)
     {
-        this.requiredResource2 = requiredResource2;
+        this.requiredResource2Int = requiredResource2;
+        if (baseLink.resource != null && requiredResource2Int != -1 && baseLink.resource.size() > requiredResource2Int) {
+            this.requiredResource2 = baseLink.resource.get(requiredResource2Int);
+        }
     }
 
     public void setRequiredResource3(int requiredResource3)
     {
-        this.requiredResource3 = requiredResource3;
+        this.requiredResource3Int = requiredResource3;
+        if (baseLink.resource != null && requiredResource3Int != -1 && baseLink.resource.size() > requiredResource3Int) {
+            this.requiredResource3 = baseLink.resource.get(requiredResource3Int);
+        }
     }
 
     public void setUnitAbilities(int unitAbilities)
@@ -498,6 +590,18 @@ public class PRTO extends BIQSection{
         }
     }
     
+    public void handleSwappedGOOD() {
+        if (requiredResource1Int != -1) {
+            this.requiredResource1Int = requiredResource1.getIndex();
+        }
+        if (requiredResource2Int != -1) {
+            this.requiredResource2Int = requiredResource2.getIndex();
+        }
+        if (requiredResource3Int != -1) {
+            this.requiredResource3Int = requiredResource3.getIndex();
+        }
+    }
+    
     /**
      * Clears out the availableTo variable, in effect setting the unit available to no civs.
      * Typically used when re-saving which civs a unit is available to.
@@ -516,6 +620,12 @@ public class PRTO extends BIQSection{
         int add = 1;
         add = add << index;
         this.availableTo = this.availableTo | add;
+    }
+    
+    public void setUnavailableTo(int index) {
+        int add = 1;
+        add = add << index;
+        this.availableTo = this.availableTo & ~add;
     }
     
     /**
@@ -1848,15 +1958,15 @@ public class PRTO extends BIQSection{
     }
     
     public int getRequiredResource1() {
-        return requiredResource1;
+        return requiredResource1Int;
     }
     
     public int getRequiredResource2() {
-        return requiredResource2;
+        return requiredResource2Int;
     }
     
     public int getRequiredResource3() {
-        return requiredResource3;
+        return requiredResource3Int;
     }
     
     public int getUnitClass() {
@@ -2245,18 +2355,18 @@ public class PRTO extends BIQSection{
     
     public void handleDeletedResource(int index)
     {
-        if (requiredResource1 == index)
-            requiredResource1 = -1;
-        else if (requiredResource1 > index)
-            requiredResource1--;
-        if (requiredResource2 == index)
-            requiredResource2 = -1;
-        else if (requiredResource2 > index)
-            requiredResource2--;
-        if (requiredResource3 == index)
-            requiredResource3 = -1;
-        else if (requiredResource3 > index)
-            requiredResource3--;
+        if (requiredResource1Int == index)
+            requiredResource1Int = -1;
+        else if (requiredResource1Int > index)
+            requiredResource1Int--;
+        if (requiredResource2Int == index)
+            requiredResource2Int = -1;
+        else if (requiredResource2Int > index)
+            requiredResource2Int--;
+        if (requiredResource3Int == index)
+            requiredResource3Int = -1;
+        else if (requiredResource3Int > index)
+            requiredResource3Int--;
     }
     
     public void handleDeletedTechnology(int index)
@@ -2282,12 +2392,31 @@ public class PRTO extends BIQSection{
         }
         else if (upgradeToInt > index)
             upgradeToInt--;
+        
         if (enslaveResultsInInt == index) {
             enslaveResultsInInt = -1;
             enslaveResultsIn = null;
         }
-        else if (enslaveResultsInInt > index)
+        else if (enslaveResultsInInt > index) {
             enslaveResultsInInt--;
+        }
+        
+        List<Integer> newStealthTargetList = new ArrayList<Integer>();
+        int stealthIndex = 0;
+        for (int stealthTarget : this.stealthTargetsInt) {
+            if (stealthTarget < index) {
+                newStealthTargetList.add(stealthTarget);
+            }
+            else if (stealthTarget == index) {
+                //no longer a stealth target, don't carry over
+                this.stealthTargets.remove(stealthIndex);
+            }
+            else {
+                newStealthTargetList.add(stealthTarget - 1);
+            }
+            stealthIndex++;
+        }
+        this.stealthTargetsInt = newStealthTargetList;
         
         if (this.index > index) {
             this.index--;
@@ -2328,9 +2457,9 @@ public class PRTO extends BIQSection{
             toReturn = toReturn + "movement: " + movement + lineReturn;
             toReturn = toReturn + "requiredTech: " + requiredTechInt + lineReturn;
             toReturn = toReturn + "upgradeTo: " + upgradeToInt + lineReturn;
-            toReturn = toReturn + "requiredResource1: " + requiredResource1 + lineReturn;
-            toReturn = toReturn + "requiredResource2: " + requiredResource2 + lineReturn;
-            toReturn = toReturn + "requiredResource3: " + requiredResource3 + lineReturn;
+            toReturn = toReturn + "requiredResource1: " + requiredResource1Int + lineReturn;
+            toReturn = toReturn + "requiredResource2: " + requiredResource2Int + lineReturn;
+            toReturn = toReturn + "requiredResource3: " + requiredResource3Int + lineReturn;
             toReturn = toReturn + "unitAbilities: " + unitAbilities + lineReturn;
             toReturn = toReturn + "AIStrategy: " + AIStrategy + lineReturn;
             toReturn = toReturn + "availableTo: " + availableTo + lineReturn;
@@ -3710,9 +3839,9 @@ public class PRTO extends BIQSection{
             toReturn = toReturn + "movement: " + movement + lineReturn;
             toReturn = toReturn + "requiredTech: " + requiredTechInt + lineReturn;
             toReturn = toReturn + "upgradeTo: " + upgradeToInt + lineReturn;
-            toReturn = toReturn + "requiredResource1: " + requiredResource1 + lineReturn;
-            toReturn = toReturn + "requiredResource2: " + requiredResource2 + lineReturn;
-            toReturn = toReturn + "requiredResource3: " + requiredResource3 + lineReturn;
+            toReturn = toReturn + "requiredResource1: " + requiredResource1Int + lineReturn;
+            toReturn = toReturn + "requiredResource2: " + requiredResource2Int + lineReturn;
+            toReturn = toReturn + "requiredResource3: " + requiredResource3Int + lineReturn;
             toReturn = toReturn + "unitAbilities: " + unitAbilities + lineReturn;
                 toReturn = toReturn + "  wheeled: " + wheeled + lineReturn;
                 toReturn = toReturn + "  footSoldier: " + footSoldier + lineReturn;
@@ -3972,17 +4101,17 @@ public class PRTO extends BIQSection{
         {
                 toReturn = toReturn + "UpgradeTo: " + upgradeToInt + separator + two.upgradeToInt + lineReturn;
         }
-        if (!(requiredResource1 == two.requiredResource1))
+        if (!(requiredResource1Int == two.requiredResource1Int))
         {
-                toReturn = toReturn + "RequiredResource1: " + requiredResource1 + separator + two.requiredResource1 + lineReturn;
+                toReturn = toReturn + "RequiredResource1: " + requiredResource1Int + separator + two.requiredResource1Int + lineReturn;
         }
-        if (!(requiredResource2 == two.requiredResource2))
+        if (!(requiredResource2Int == two.requiredResource2Int))
         {
-                toReturn = toReturn + "RequiredResource2: " + requiredResource2 + separator + two.requiredResource2 + lineReturn;
+                toReturn = toReturn + "RequiredResource2: " + requiredResource2Int + separator + two.requiredResource2Int + lineReturn;
         }
-        if (!(requiredResource3 == two.requiredResource3))
+        if (!(requiredResource3Int == two.requiredResource3Int))
         {
-                toReturn = toReturn + "RequiredResource3: " + requiredResource3 + separator + two.requiredResource3 + lineReturn;
+                toReturn = toReturn + "RequiredResource3: " + requiredResource3Int + separator + two.requiredResource3Int + lineReturn;
         }
         if (!(unitAbilities == two.unitAbilities))
         {
@@ -4772,6 +4901,7 @@ public class PRTO extends BIQSection{
         //What better way to check for an infinite upgrade path than with an infinite loop?
         PRTO unitBeingChecked = this;
         String upgradePath = this.name + " --> ";
+        int unitsCounted = 0;
         while (true) {
             unitBeingChecked = unitBeingChecked.upgradeTo;
             upgradePath = upgradePath + unitBeingChecked.name;
@@ -4783,6 +4913,10 @@ public class PRTO extends BIQSection{
             }
             upgradePath = upgradePath + " --> ";
             encounteredPRTOs.add(unitBeingChecked);
+            unitsCounted++;
+            if (unitsCounted % 5 == 0) {
+                upgradePath = upgradePath + "<br/>";
+            }
         }
     }
 
@@ -4791,86 +4925,5 @@ public class PRTO extends BIQSection{
         if (string.equals("Name"))
             return this.name;
         throw new UnsupportedOperationException();
-    }
-    
-    /**
-     * Clones a unit.  This is taken from the inputPRTO method of IO.java.  It deals
-     * with the raw data, calling the same helper methods as that method.  This
-     * should take care of all required setup/calculations.
-     * 
-     * N.B. I do not store Strategy Maps separately as Firaxis does.  That made
-     * logic very confusing.  Instead, I keep track of strategies within the AIStrategies
-     * variable, which is part of the BIQ.  The outputPRTO handles safely writing
-     * all of them to file, and this should work for cloned units, too.
-     * @return 
-     */
-    public PRTO clone() {
-        PRTO other = new PRTO(baseLink, index);
-        //Data length should be auto-calculated
-        other.zoneOfControl = zoneOfControl;
-        other.name = name;
-        other.civilopediaEntry = civilopediaEntry;
-        other.bombardStrength = bombardStrength;
-        other.bombardRange = bombardRange;
-        other.capacity = capacity;
-        other.shieldCost = shieldCost;
-        other.defence = defence;
-        other.iconIndex = iconIndex;
-        other.attack = attack;
-        other.operationalRange = operationalRange;
-        other.populationCost = populationCost;
-        other.rateOfFire = rateOfFire;
-        other.movement = movement;
-        other.requiredTechInt = requiredTechInt;
-        other.requiredTech = requiredTech;
-        other.upgradeToInt = upgradeToInt;
-        other.upgradeTo = upgradeTo;
-        other.requiredResource1 = requiredResource1;
-        other.requiredResource2 = requiredResource2;
-        other.requiredResource3 = requiredResource3;
-        other.unitAbilities = unitAbilities;
-        other.AIStrategy = AIStrategy;
-        other.availableTo = availableTo;
-        other.standardOrdersSpecialActions = standardOrdersSpecialActions;
-        other.airMissions = airMissions;
-        other.unitClass = unitClass;
-        other.otherStrategy = otherStrategy;
-        other.hitPointBonus = hitPointBonus;
-        
-        //PTW+
-        other.PTWStandardOrders = PTWStandardOrders;
-        other.PTWSpecialActions = PTWSpecialActions;
-        other.PTWWorkerActions = PTWWorkerActions;
-        other.PTWAirMissions = PTWAirMissions;
-        other.PTWActionsMix = PTWActionsMix;
-        other.bombardEffects = bombardEffects;
-        System.arraycopy(ignoreMovementCost, 0, other.ignoreMovementCost, 0, ignoreMovementCost.length);
-        other.requiresSupport = requiresSupport;
-        
-        //Conquests+
-        other.useExactCost = useExactCost;
-        other.telepadRange = telepadRange;
-        other.questionMark3 = questionMark3;
-        for (int i = 0; i < legalUnitTelepadsInt.size(); i++) {
-            other.addUnitTelepad(legalUnitTelepadsInt.get(i));
-        }
-        other.enslaveResultsInInt = enslaveResultsInInt;
-        other.questionMark5 = questionMark5;
-        for (int i = 0; i < stealthTargetsInt.size(); i++) {
-            other.addStealthAttackTarget(stealthTargetsInt.get(i));
-        }
-        other.questionMark6 = questionMark6;
-        for (int i = 0; i < legalBuildingTelepads.size(); i++) {
-            other.addBuildingTelepad(legalBuildingTelepads.get(i));
-        }
-        other.createsCraters = createsCraters;
-        other.workerStrengthFloat = workerStrengthFloat;
-        other.questionMark8 = questionMark8;
-        other.airDefence = airDefence;
-                
-        //Parse out all the bitfields et. al.
-        other.trim();
-        other.extractEnglish();        
-        return other;
     }
 }

@@ -40,7 +40,8 @@ public class RULE extends BIQSection{
     private PRTO buildArmyUnit;
     private int buildingDefensiveBonus;
     private int citizenDefensiveBonus;
-    private int defaultMoneyResource;
+    private int defaultMoneyResourceInt;
+    private GOOD defaultMoneyResource;
     private int chanceToInterceptAirMissions;
     private int chanceToInterceptStealthMissions;
     private int startingTreasury;
@@ -68,7 +69,7 @@ public class RULE extends BIQSection{
     //In BIQ: int numCultureLevels.  We calculate it dynamically here.
     private ArrayList<String>culturalLevelNames;    
     private int borderExpansionMultiplier;
-    private int borderFactor;
+    private int borderFactor = 10;
     private int futureTechCost;
     private int goldenAgeDuration;
     private int maximumResearchTime;
@@ -214,7 +215,7 @@ public class RULE extends BIQSection{
 
     public int getDefaultMoneyResource()
     {
-        return defaultMoneyResource;
+        return defaultMoneyResourceInt;
     }
 
     public int getChanceToInterceptAirMissions()
@@ -499,7 +500,10 @@ public class RULE extends BIQSection{
 
     public void setDefaultMoneyResource(int defaultMoneyResource)
     {
-        this.defaultMoneyResource = defaultMoneyResource;
+        this.defaultMoneyResourceInt = defaultMoneyResource;
+        if (baseLink.resource != null && defaultMoneyResourceInt != -1 && baseLink.resource.size() > defaultMoneyResourceInt) {
+            this.defaultMoneyResource = baseLink.resource.get(defaultMoneyResourceInt);
+        }
     }
 
     public void setChanceToInterceptAirMissions(int chanceToInterceptAirMissions)
@@ -826,6 +830,12 @@ public class RULE extends BIQSection{
         }
     }
     
+    public void handleSwappedGood() {
+        if (defaultMoneyResource != null) {
+            defaultMoneyResourceInt = defaultMoneyResource.getIndex();
+        }
+    }
+    
     public void handleDeletedDifficulty(int index)
     {
         if (index != 0 && index <= defaultDifficultyLevel)   //decrement the default difficulty
@@ -869,7 +879,7 @@ public class RULE extends BIQSection{
         toReturn = toReturn + "buildArmyUnit: " + buildArmyUnitInt + lineReturn;
         toReturn = toReturn + "buildingDefensiveBonus: " + buildingDefensiveBonus + lineReturn;
         toReturn = toReturn + "citizenDefensiveBonus: " + citizenDefensiveBonus + lineReturn;
-        toReturn = toReturn + "defaultMoneyResource: " + defaultMoneyResource + lineReturn;
+        toReturn = toReturn + "defaultMoneyResource: " + defaultMoneyResourceInt + lineReturn;
         toReturn = toReturn + "chanceToInterceptAirMissions: " + chanceToInterceptAirMissions + lineReturn;
         toReturn = toReturn + "chanceToInterceptStealthMissions: " + chanceToInterceptStealthMissions + lineReturn;
         toReturn = toReturn + "startingTreasury: " + startingTreasury + lineReturn;
@@ -1010,9 +1020,9 @@ public class RULE extends BIQSection{
         {
                 toReturn = toReturn + "CitizenDefensiveBonus: " + citizenDefensiveBonus + separator + two.getCitizenDefensiveBonus() + lineReturn;
         }
-        if (!(defaultMoneyResource == two.getDefaultMoneyResource()))
+        if (!(defaultMoneyResourceInt == two.getDefaultMoneyResource()))
         {
-                toReturn = toReturn + "DefaultMoneyResource: " + defaultMoneyResource + separator + two.getDefaultMoneyResource() + lineReturn;
+                toReturn = toReturn + "DefaultMoneyResource: " + defaultMoneyResourceInt + separator + two.getDefaultMoneyResource() + lineReturn;
         }
         if (!(chanceToInterceptAirMissions == two.getChanceToInterceptAirMissions()))
         {
