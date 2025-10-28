@@ -264,6 +264,10 @@ public class MapPanel extends JPanel implements Runnable{
                 setCursor(crosshair);
                 Main.pnlTabs.mapTab.setBrushImages(4);
                 break;
+            case MODE_DISTRICT:
+                setCursor(crosshair);
+                Main.pnlTabs.mapTab.setBrushImages(5);
+                break;
             case MODE_OVERLAY:
                 Main.pnlTabs.mapTab.setBrushImages(3);
             case MODE_RELOCATE:
@@ -276,7 +280,7 @@ public class MapPanel extends JPanel implements Runnable{
                 break;
             default:
                 //Fog
-                Main.pnlTabs.mapTab.setBrushImages(5);
+                Main.pnlTabs.mapTab.setBrushImages(6);
                 setCursor(standard);
                 break;
         }
@@ -488,8 +492,11 @@ public class MapPanel extends JPanel implements Runnable{
                     else {
                         handleOverlayEvent(mapX, mapY);    
                     }
-                    mapTab.alertToSquarePress(mapX, mapY);
-                    break;
+               mapTab.alertToSquarePress(mapX, mapY);
+               break;
+               case Brush.MODE_DISTRICT:
+                   mapTab.handleDistrictClick(mapX, mapY);
+                   break;
                case Brush.MODE_SETTLEMENT:
                    handleCityEvent(mapX, mapY);
                    mapTab.alertToSquarePress(mapX, mapY);

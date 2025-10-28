@@ -24,6 +24,7 @@ public class Brush {
     public static final int MODE_RELOCATE_CITY_AND_UNITS = 6;
     public static final int MODE_ADD_FOG = 7;
     public static final int MODE_REMOVE_FOG = 8;
+    public static final int MODE_DISTRICT = 9;
     
 
 

@@ -39,6 +39,7 @@ import com.civfanatics.civ3.xplatformeditor.CustomComponents.JSpinnerInTableEdit
 import com.civfanatics.civ3.xplatformeditor.CustomComponents.JLabelInTableEditor;
 import com.civfanatics.civ3.xplatformeditor.CustomComponents.JLabelInTableRenderer;
 import com.civfanatics.civ3.xplatformeditor.tabs.map.Brush;
+import com.civfanatics.civ3.xplatformeditor.districts.DistrictDefinitions;
 import com.civfanatics.civ3.biqFile.CITY;
 import com.civfanatics.civ3.biqFile.CLNY;
 import com.civfanatics.civ3.biqFile.IO;
@@ -55,7 +56,10 @@ import com.civfanatics.civ3.xplatformeditor.CustomComponents.UpdateableComboBoxM
 import com.civfanatics.civ3.xplatformeditor.specialty.SafetyLevel;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -74,7 +78,9 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -212,10 +218,17 @@ public class MapTab extends JPanel{
 
 
     JPanel cityPanel = new JPanel();
+    JPanel districtPanel = new JPanel();
 
     JScrollPane buildingsScroll = new JScrollPane();
     JList lstBuildings = new JList();
     DefaultListModel buildingsModel = new DefaultListModel();
+    DefaultListModel<DistrictDefinitions.DistrictDefinition> districtListModel = new DefaultListModel<DistrictDefinitions.DistrictDefinition>();
+    JList<DistrictDefinitions.DistrictDefinition> lstDistricts = new JList<DistrictDefinitions.DistrictDefinition>(districtListModel);
+    JButton btnAssignWonder = new JButton("Assign Wonder");
+    JButton btnDeleteDistrict = new JButton("Delete district");
+    JLabel lblDistrictHeader = new JLabel();
+    JLabel lblWonderAssignment = new JLabel();
 
     JPanel ownerPanel = new JPanel();
     ButtonGroup ownerType = new ButtonGroup();
@@ -250,6 +263,7 @@ public class MapTab extends JPanel{
     IconPanel selectIcon;
     IconPanel unitIcon;
     IconPanel terrainIcon;
+    IconPanel districtIcon;
     IconPanel fogIcon;
     IconPanel diameterOne;
     IconPanel diameterThree;
@@ -261,6 +275,7 @@ public class MapTab extends JPanel{
     BufferedImage unitPNG;
     BufferedImage overlayPNG;
     BufferedImage cityPNG;
+    BufferedImage districtPNG;
     BufferedImage fogPNG;
     BufferedImage onePNG;
     BufferedImage threePNG;
@@ -274,6 +289,7 @@ public class MapTab extends JPanel{
     BufferedImage terrainActive;
     BufferedImage overlayActive;
     BufferedImage cityActive;
+    BufferedImage districtActive;
     BufferedImage fogActive;
 
     JFrame homeFrame;
@@ -283,6 +299,8 @@ public class MapTab extends JPanel{
     JPanel showRSP = new JPanel();
     
     boolean borderHidden = false;
+    boolean updatingDistrictSelection = false;
+    DistrictDefinitions districtDefinitions;
     
     UnitNameWindow unitNameWindow = new UnitNameWindow();
         
@@ -371,6 +389,14 @@ public class MapTab extends JPanel{
     public void setUp(IO biq)
     {
         this.biq = biq;
+        districtDefinitions = null;
+        districtListModel.clear();
+        ensureDistrictDefinitions();
+        districtPanel.setVisible(false);
+        btnAssignWonder.setVisible(false);
+        btnAssignWonder.setEnabled(false);
+        btnDeleteDistrict.setEnabled(false);
+        lblWonderAssignment.setText("");
         mapIsLive = false;  //combo boxes shouldn't fire events when actions occur
         if (biq.player.size() > 0)
         {
@@ -511,6 +537,7 @@ public class MapTab extends JPanel{
             @Override
             public void mouseReleased(MouseEvent e)
             {
+                hideDistrictPanel();
                 map.brush.mode = Brush.MODE_SELECT;
                 map.setMapCursor(map.brush.mode);
                 setBrushImages(1);
@@ -523,6 +550,7 @@ public class MapTab extends JPanel{
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() instanceof SuperJTextField)
                     return;
+                hideDistrictPanel();
                 map.brush.mode = Brush.MODE_SELECT;
                 map.setMapCursor(map.brush.mode);
                 setBrushImages(1);
@@ -640,6 +668,7 @@ public class MapTab extends JPanel{
             @Override
             public void mouseReleased(MouseEvent e)
             {
+                hideDistrictPanel();
                 map.brush.mode = Brush.MODE_SETTLEMENT;
                 map.setMapCursor(map.brush.mode);
                 setBrushImages(4);
@@ -652,6 +681,7 @@ public class MapTab extends JPanel{
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 if (KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() instanceof SuperJTextField)
                     return;
+                hideDistrictPanel();
                 map.brush.mode = Brush.MODE_SETTLEMENT;
                 map.setMapCursor(map.brush.mode);
                 setBrushImages(4);
@@ -666,7 +696,36 @@ public class MapTab extends JPanel{
         {
             logger.error("ImageIO error on City_2.png", e);
         }
-        
+
+        //DISTRICTS
+        iconConstraints.gridx++;
+        districtIcon = new IconPanel();
+        districtIcon.setToolTipText("Districts (D) - Manage Districts");
+        districtIcon.setVisible(true);
+        districtIcon.setMinimumSize(new Dimension(24, 24));
+        districtIcon.setPreferredSize(new Dimension(24, 24));
+        districtIcon.setMaximumSize(new Dimension(24, 24));
+        districtIcon.setSize(new Dimension(24, 24));
+        districtIcon.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                activateDistrictMode();
+            }
+        });
+        districtIcon.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('D', 0), "districtSelect");
+        districtIcon.getActionMap().put("districtSelect", new AbstractAction(){
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                if (KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() instanceof SuperJTextField)
+                    return;
+                activateDistrictMode();
+            }
+        });
+        pnlIcons.add(districtIcon, iconConstraints);
+        districtPNG = createDistrictIcon(false);
+        districtActive = createDistrictIcon(true);
+        districtIcon.setImage(districtPNG);
+
         
         //FOG
         iconConstraints.gridx++;
@@ -1141,6 +1200,75 @@ public class MapTab extends JPanel{
         rsc.weighty = 0.8;
         rsc.fill = GridBagConstraints.VERTICAL;     //MAY NEED ADJUSTED TO BOTH
         rightSidePanel.add(cityPanel, rsc);
+
+        rsc.gridy++;
+        rsc.gridwidth = 5;
+        districtPanel.setBorder(BorderFactory.createTitledBorder("Districts"));
+        GridBagLayout districtLayout = new GridBagLayout();
+        districtPanel.setLayout(districtLayout);
+        GridBagConstraints dgc = new GridBagConstraints();
+        dgc.gridx = 0;
+        dgc.gridy = 0;
+        dgc.gridwidth = 1;
+        dgc.insets = new Insets(2, 2, 2, 2);
+        dgc.anchor = GridBagConstraints.WEST;
+        lblDistrictHeader.setText("Districts");
+        districtPanel.add(lblDistrictHeader, dgc);
+
+        lstDistricts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        lstDistricts.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting() || updatingDistrictSelection)
+                    return;
+                DistrictDefinitions.DistrictDefinition def = lstDistricts.getSelectedValue();
+                if (def != null)
+                    setDistrictForSelectedTile(def.id);
+            }
+        });
+
+        JScrollPane districtScroll = new JScrollPane(lstDistricts);
+        districtScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        dgc.gridy++;
+        dgc.fill = GridBagConstraints.BOTH;
+        dgc.weightx = 1;
+        dgc.weighty = 1;
+        districtPanel.add(districtScroll, dgc);
+
+        lblWonderAssignment.setText("");
+        dgc.gridy++;
+        dgc.weighty = 0;
+        dgc.fill = GridBagConstraints.HORIZONTAL;
+        districtPanel.add(lblWonderAssignment, dgc);
+
+        JPanel districtButtons = new JPanel(new GridBagLayout());
+        GridBagConstraints dbc = new GridBagConstraints();
+        dbc.gridx = 0;
+        dbc.gridy = 0;
+        dbc.insets = new Insets(2, 2, 2, 2);
+        dbc.anchor = GridBagConstraints.WEST;
+        btnAssignWonder.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                handleWonderAssignment();
+            }
+        });
+        districtButtons.add(btnAssignWonder, dbc);
+
+        dbc.gridx++;
+        btnDeleteDistrict.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                deleteSelectedDistrict();
+            }
+        });
+        districtButtons.add(btnDeleteDistrict, dbc);
+
+        dgc.gridy++;
+        districtPanel.add(districtButtons, dgc);
+
+        btnAssignWonder.setEnabled(false);
+        btnAssignWonder.setVisible(false);
+        btnDeleteDistrict.setEnabled(false);
+        districtPanel.setVisible(false);
+        rightSidePanel.add(districtPanel, rsc);
         
         cmbTribe = new JComboBox();
         cmbTribe.setModel(tribeModel);
@@ -2126,7 +2254,11 @@ public class MapTab extends JPanel{
             }
         }
     }
-    
+
+        if (districtPanel.isVisible())
+            updateDistrictPanel();
+    }
+
     public void addPlayerToModel(String player) {
         mdlPlayers.addElement(player);
     }
@@ -2881,6 +3013,7 @@ public class MapTab extends JPanel{
 
     private void terrainIconAction()
     {
+        hideDistrictPanel();
         map.brush.mode = Brush.MODE_TERRAIN;
         final JDialog selectedTerrainFrame = new JDialog((JFrame)null, "Select terrain", true);
         selectedTerrainFrame.setPreferredSize(new Dimension(240, 100));
@@ -2990,6 +3123,7 @@ public class MapTab extends JPanel{
     
     private void overlayIconAction()
     {
+        hideDistrictPanel();
         map.brush.mode = Brush.MODE_OVERLAY;
         final JDialog selectedOverlayFrame = new JDialog((JFrame)null, "Select overlay", true);
         selectedOverlayFrame.setPreferredSize(new Dimension(240, 100));
@@ -3081,6 +3215,7 @@ public class MapTab extends JPanel{
     
     private void fogIconAction()
     {
+        hideDistrictPanel();
         //map.brush.mode = Brush.MODE_TERRAIN;
         final JDialog fogFrame = new JDialog((JFrame)null, "Add or remove fog?", true);
         fogFrame.setPreferredSize(new Dimension(240, 100));
@@ -3112,7 +3247,7 @@ public class MapTab extends JPanel{
                 map.triggerUpdates();
                 fogFrame.setVisible(false);
                 map.setMapCursor(map.brush.mode);
-                setBrushImages(5);
+                setBrushImages(6);
             }
         });
         cmdRemoveFog.addActionListener(new java.awt.event.ActionListener()
@@ -3124,7 +3259,7 @@ public class MapTab extends JPanel{
                 map.triggerUpdates();
                 fogFrame.setVisible(false);
                 map.setMapCursor(map.brush.mode);
-                setBrushImages(5);
+                setBrushImages(6);
             }
         });
 
@@ -3152,13 +3287,315 @@ public class MapTab extends JPanel{
         }
     }
     
+    public void handleDistrictClick(int x, int y)
+    {
+        alertToSquarePress(x, y);
+        ensureDistrictDefinitions();
+        if (selectedTile == null)
+            return;
+        if (!selectedTile.hasDistrict()) {
+            selectedTile.setDistrict(DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID, TILE.DISTRICT_STATE_COMPLETED);
+            if (selectedTile.getDistrictData() != null && selectedTile.getDistrictData().wonderInfo != null)
+                selectedTile.getDistrictData().wonderInfo.state = TILE.WDS_COMPLETED;
+            map.triggerUpdates();
+        }
+        districtPanel.setVisible(true);
+        updateDistrictPanel();
+    }
+
+    private void ensureDistrictDefinitions()
+    {
+        if (districtDefinitions != null)
+            return;
+        File installDir = null;
+        try {
+            if (Main.settings != null && Main.settings.civInstallDir != null && Main.settings.civInstallDir.length() > 0)
+                installDir = new File(Main.settings.civInstallDir);
+        }
+        catch (Exception e) {
+            logger.debug("Unable to resolve civ install dir", e);
+        }
+        districtDefinitions = DistrictDefinitions.load(installDir);
+        districtListModel.clear();
+        for (DistrictDefinitions.DistrictDefinition def : districtDefinitions.getDistricts()) {
+            districtListModel.addElement(def);
+        }
+    }
+
+    private void activateDistrictMode()
+    {
+        ensureDistrictDefinitions();
+        map.brush.mode = Brush.MODE_DISTRICT;
+        map.setMapCursor(map.brush.mode);
+        setBrushImages(5);
+        districtPanel.setVisible(true);
+        updateDistrictPanel();
+    }
+
+    private void hideDistrictPanel()
+    {
+        if (districtPanel != null) {
+            districtPanel.setVisible(false);
+        }
+    }
+
+    private void updateDistrictPanel()
+    {
+        if (!districtPanel.isVisible()) {
+            updatingDistrictSelection = true;
+            lstDistricts.clearSelection();
+            updatingDistrictSelection = false;
+            btnAssignWonder.setEnabled(false);
+            btnDeleteDistrict.setEnabled(false);
+            lblDistrictHeader.setText("Districts");
+            lblWonderAssignment.setText("");
+            return;
+        }
+
+        ensureDistrictDefinitions();
+        if (selectedTile == null) {
+            updatingDistrictSelection = true;
+            lstDistricts.clearSelection();
+            updatingDistrictSelection = false;
+            btnAssignWonder.setEnabled(false);
+            btnDeleteDistrict.setEnabled(false);
+            lblDistrictHeader.setText("Districts");
+            lblWonderAssignment.setText("No tile selected");
+            return;
+        }
+
+        lblDistrictHeader.setText("District @ " + selectedTile.xPos + ", " + selectedTile.yPos);
+        TILE.DistrictData data = selectedTile.getDistrictData();
+        if (data == null || data.districtType < 0 || data.districtType >= districtListModel.size()) {
+            updatingDistrictSelection = true;
+            lstDistricts.clearSelection();
+            updatingDistrictSelection = false;
+            btnAssignWonder.setEnabled(false);
+            btnAssignWonder.setVisible(false);
+            btnDeleteDistrict.setEnabled(false);
+            lblWonderAssignment.setText("No district");
+            return;
+        }
+
+        updatingDistrictSelection = true;
+        lstDistricts.setSelectedIndex(data.districtType);
+        lstDistricts.ensureIndexIsVisible(data.districtType);
+        updatingDistrictSelection = false;
+        btnDeleteDistrict.setEnabled(true);
+
+        if (data.districtType == DistrictDefinitions.WONDER_DISTRICT_ID) {
+            btnAssignWonder.setVisible(true);
+            btnAssignWonder.setEnabled(true);
+            if (data.wonderInfo == null)
+                data.wonderInfo = new TILE.WonderDistrictInfo();
+            String wonderName = getWonderName(data.wonderInfo.wonderIndex);
+            if (data.wonderInfo.wonderIndex >= 0 && wonderName != null) {
+                String cityName = (data.wonderInfo.cityId >= 0 && data.wonderInfo.cityId < biq.city.size()) ? biq.city.get(data.wonderInfo.cityId).getName() : "Unknown City";
+                lblWonderAssignment.setText("Wonder: " + wonderName + " (" + cityName + ")");
+            } else {
+                lblWonderAssignment.setText("Wonder: None");
+            }
+        } else {
+            btnAssignWonder.setEnabled(false);
+            btnAssignWonder.setVisible(false);
+            lblWonderAssignment.setText("");
+            if (data.wonderInfo != null)
+                data.wonderInfo = new TILE.WonderDistrictInfo();
+        }
+    }
+
+    private void setDistrictForSelectedTile(int districtId)
+    {
+        if (selectedTile == null)
+            return;
+        ensureDistrictDefinitions();
+        if (districtId < 0 || districtId >= districtListModel.size())
+            return;
+        TILE.DistrictData data = selectedTile.ensureDistrictData();
+        data.districtType = districtId;
+        data.state = TILE.DISTRICT_STATE_COMPLETED;
+        if (data.wonderInfo == null)
+            data.wonderInfo = new TILE.WonderDistrictInfo();
+        if (districtId == DistrictDefinitions.WONDER_DISTRICT_ID) {
+            data.wonderInfo.state = TILE.WDS_COMPLETED;
+        } else {
+            data.wonderInfo = new TILE.WonderDistrictInfo();
+        }
+        map.triggerUpdates();
+        updateDistrictPanel();
+    }
+
+    private void deleteSelectedDistrict()
+    {
+        if (selectedTile == null)
+            return;
+        selectedTile.clearDistrict();
+        map.triggerUpdates();
+        updateDistrictPanel();
+    }
+
+    private void handleWonderAssignment()
+    {
+        if (selectedTile == null)
+            return;
+        ensureDistrictDefinitions();
+        List<WonderOption> options = collectWonderOptions(selectedTile);
+        if (options.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No eligible wonders found near this district.", "Assign Wonder", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        WonderOption selection = (WonderOption)JOptionPane.showInputDialog(this,
+                "Select a wonder to associate with this district:",
+                "Assign Wonder",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options.toArray(new WonderOption[0]),
+                options.get(0));
+        if (selection == null)
+            return;
+
+        TILE.DistrictData data = selectedTile.ensureDistrictData();
+        if (data.wonderInfo == null)
+            data.wonderInfo = new TILE.WonderDistrictInfo();
+        data.wonderInfo.state = TILE.WDS_COMPLETED;
+        if (selection.isNone) {
+            data.wonderInfo.cityId = -1;
+            data.wonderInfo.wonderIndex = -1;
+        } else {
+            data.wonderInfo.cityId = selection.cityIndex;
+            data.wonderInfo.wonderIndex = selection.definition.index;
+        }
+        map.triggerUpdates();
+        updateDistrictPanel();
+    }
+
+    private List<WonderOption> collectWonderOptions(TILE tile)
+    {
+        List<WonderOption> options = new ArrayList<WonderOption>();
+        options.add(WonderOption.noneOption());
+        if (tile == null)
+            return options;
+
+        Set<Integer> usedWonders = new HashSet<Integer>();
+        for (TILE t : biq.tile) {
+            if (t == null || t == tile)
+                continue;
+            TILE.DistrictData data = t.getDistrictData();
+            if (data != null && data.districtType == DistrictDefinitions.WONDER_DISTRICT_ID && data.wonderInfo != null && data.wonderInfo.wonderIndex >= 0)
+                usedWonders.add(Integer.valueOf(data.wonderInfo.wonderIndex));
+        }
+
+        Set<String> seenPairs = new HashSet<String>();
+        if (tile.citiesWithInfluence != null) {
+            for (Integer indexObj : tile.citiesWithInfluence) {
+                if (indexObj == null)
+                    continue;
+                int cityIndex = indexObj.intValue();
+                if (cityIndex < 0 || cityIndex >= biq.city.size())
+                    continue;
+                CITY city = biq.city.get(cityIndex);
+                for (DistrictDefinitions.WonderDefinition wonder : districtDefinitions.getWonders()) {
+                    if (usedWonders.contains(Integer.valueOf(wonder.index)))
+                        continue;
+                    int buildingId = findBuildingIdByName(wonder.name);
+                    String key = wonder.name + ":" + cityIndex;
+                    if (buildingId >= 0 && city.hasBuilding(buildingId) && seenPairs.add(key)) {
+                        options.add(new WonderOption(wonder, city, cityIndex));
+                    }
+                }
+            }
+        }
+        return options;
+    }
+
+    private int findBuildingIdByName(String name)
+    {
+        if (name == null)
+            return -1;
+        for (int i = 0; i < biq.buildings.size(); i++) {
+            String bName = biq.buildings.get(i).getName();
+            if (bName != null && bName.equalsIgnoreCase(name))
+                return i;
+        }
+        return -1;
+    }
+
+    private String getWonderName(int wonderIndex)
+    {
+        if (districtDefinitions == null)
+            return null;
+        if (wonderIndex < 0 || wonderIndex >= districtDefinitions.getWonders().size())
+            return null;
+        return districtDefinitions.getWonders().get(wonderIndex).name;
+    }
+
+    private BufferedImage createDistrictIcon(boolean active)
+    {
+        BufferedImage img = new BufferedImage(24, 24, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = img.createGraphics();
+        try {
+            Color background = active ? new Color(70, 130, 180) : new Color(96, 96, 96);
+            g2.setColor(background);
+            g2.fillRect(0, 0, 24, 24);
+            g2.setColor(Color.WHITE);
+            Font base = g2.getFont();
+            if (base != null)
+                g2.setFont(base.deriveFont(Font.BOLD, 14f));
+            FontMetrics fm = g2.getFontMetrics();
+            String label = "D";
+            int tx = (24 - fm.stringWidth(label)) / 2;
+            int ty = (24 - fm.getHeight()) / 2 + fm.getAscent();
+            g2.drawString(label, tx, ty);
+        }
+        finally {
+            g2.dispose();
+        }
+        return img;
+    }
+
+    private static class WonderOption {
+        final DistrictDefinitions.WonderDefinition definition;
+        final CITY city;
+        final int cityIndex;
+        final boolean isNone;
+
+        WonderOption(DistrictDefinitions.WonderDefinition def, CITY city, int cityIndex) {
+            this.definition = def;
+            this.city = city;
+            this.cityIndex = cityIndex;
+            this.isNone = false;
+        }
+
+        WonderOption() {
+            this.definition = null;
+            this.city = null;
+            this.cityIndex = -1;
+            this.isNone = true;
+        }
+
+        static WonderOption noneOption() {
+            return new WonderOption();
+        }
+
+        @Override
+        public String toString() {
+            if (isNone)
+                return "None";
+            String wonderName = (definition != null) ? definition.name : "";
+            String cityName = (city != null && city.getName() != null) ? city.getName() : "";
+            if (cityName.length() == 0)
+                return wonderName;
+            return wonderName + " (" + cityName + ")";
+        }
+    }
+
     void setBrushImages(int active) {
         active = active - 1;
-        BufferedImage[]inactivePNGs = {selectPNG, terrainPNG, overlayPNG, cityPNG, fogPNG};
-        BufferedImage[]activePNGs = {selectActive, terrainActive, overlayActive, cityActive, fogActive};
-        IconPanel[]iconPanels = {selectIcon, terrainIcon, overlayIcon, cityIcon, fogIcon};
+        BufferedImage[]inactivePNGs = {selectPNG, terrainPNG, overlayPNG, cityPNG, districtPNG, fogPNG};
+        BufferedImage[]activePNGs = {selectActive, terrainActive, overlayActive, cityActive, districtActive, fogActive};
+        IconPanel[]iconPanels = {selectIcon, terrainIcon, overlayIcon, cityIcon, districtIcon, fogIcon};
         
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < iconPanels.length; i++) {
             BufferedImage image = (i == active ? activePNGs[i] : inactivePNGs[i]);
             IconPanel panel = iconPanels[i];
             Graphics graph = panel.getGraphics();

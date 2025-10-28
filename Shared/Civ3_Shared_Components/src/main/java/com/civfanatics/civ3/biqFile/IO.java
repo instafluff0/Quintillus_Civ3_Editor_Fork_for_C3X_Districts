@@ -10,6 +10,8 @@ package com.civfanatics.civ3.biqFile;
  */
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.*;
 import javax.swing.JOptionPane;
 import org.apache.log4j.*;
@@ -150,6 +152,8 @@ public class IO
     public int numCivilizations;
     public List<RACE> civilization = new ArrayList<RACE>();
     public int dataInputted;
+
+    private static final byte[] C3X_SEGMENT_BOOKEND = new byte[] {0x22, 0x43, 0x33, 0x58};
     
     //conversion variables
     public int convertToConquests = 0;
@@ -694,43 +698,36 @@ public class IO
                 logger.info("data inputted: " + dataInputted);
             }
 
-            boolean isDone = false;
-            if (fromSAV) {
-                //detect if LEAD
-                ins[0].mark(4);
-                ins[0].read(inputFour, 0, 4);
-                dataInputted += 4;
-                temp = new String(inputFour, currentCharset);
-                if (!temp.equals("LEAD")) {
-                    isDone = true;
+            boolean needLeadSection = false;
+            if (fileLength > dataInputted) {
+                if (fromSAV) {
+                    ins[0].mark(4);
+                    ins[0].read(inputFour, 0, 4);
+                    String nextChunk = new String(inputFour, currentCharset);
+                    ins[0].reset();
+                    if ("LEAD".equals(nextChunk)) {
+                        needLeadSection = true;
+                    }
+                } else {
+                    needLeadSection = true;
                 }
-                ins[0].reset();
             }
-            
-            //TODO: Make clearer when I'm less tired
-            if ((fileLength <= dataInputted && !fromSAV) || isDone)
-            {
-                long end = System.nanoTime();
-                long duration = end - start;
-                if (logger.isInfoEnabled())
-                    logger.info("Time to input BIQ: " + duration/1000000 + " milliseconds");
-                if (convertToConquests > 0)
-                    version = civ3Version.CONQUESTS;
-                return true;
-            }   //inherent else - if otherwise, input custom player data
 
-            //LEAD Section - MAY NOT EXIST!!!!!!!!!!!!!!!!!!!!!!!!!!
-            ins[0].read(inputFour, 0, 4);
-            String tempLEAD = new String(inputFour, currentCharset);
-            dataInputted += 4;
-            if (!(tempLEAD.equals("LEAD")))
-            {
-                logger.error("Could not input file - failed at LEAD header.  Header is " + temp + "; bytes inputted: " + dataInputted);
-                return false;
+            if (needLeadSection) {
+                ins[0].read(inputFour, 0, 4);
+                String tempLEAD = new String(inputFour, currentCharset);
+                if (!(tempLEAD.equals("LEAD")))
+                {
+                    logger.error("Could not input file - failed at LEAD header.  Header is " + temp + "; bytes inputted: " + dataInputted);
+                    return false;
+                }
+                dataInputted += 4;
+                inputLEAD(ins[0]);
+                if (logger.isDebugEnabled())
+                    logger.debug("finished custom player data");
             }
-            inputLEAD(ins[0]);
-            if (logger.isDebugEnabled())
-                logger.debug("finished custom player data");
+
+            consumeC3XModData(ins[0], fileLength);
 
             if (logger.isInfoEnabled())
                 logger.info("final input:  " + dataInputted);
@@ -3999,6 +3996,7 @@ public class IO
                 if (logger.isDebugEnabled())
                     logger.debug("Finished exporting LEAD section");
             }
+            appendC3XModData(out);
             //end of file
         }
         catch (Exception e)
@@ -4007,6 +4005,307 @@ public class IO
             return false;
         }
         return true;
+    }
+
+    private void consumeC3XModData(LittleEndianDataInputStream in, long fileLength)
+    {
+        long remaining = fileLength - dataInputted;
+        if (remaining <= 0) {
+            return;
+        }
+
+        if (remaining > Integer.MAX_VALUE) {
+            logger.warn("C3X mod data segment larger than supported; skipping.");
+            try {
+                long skipped = 0;
+                while (skipped < remaining) {
+                    long skip = in.skip(remaining - skipped);
+                    if (skip <= 0) {
+                        break;
+                    }
+                    skipped += skip;
+                }
+            }
+            catch (IOException e) {
+                logger.warn("Failed to skip oversized C3X mod data segment", e);
+            }
+            dataInputted = (int)Math.min(fileLength, Integer.MAX_VALUE);
+            return;
+        }
+
+        int bytesToRead = (int)remaining;
+        byte[] segment = new byte[bytesToRead];
+        try {
+            in.readFully(segment);
+        }
+        catch (IOException e) {
+            logger.error("Failed reading C3X mod data segment", e);
+            return;
+        }
+        dataInputted += bytesToRead;
+
+        int minLength = (C3X_SEGMENT_BOOKEND.length * 2) + 4;
+        if (bytesToRead < minLength) {
+            return;
+        }
+        if (!matchesBookend(segment, 0) || !matchesBookend(segment, bytesToRead - C3X_SEGMENT_BOOKEND.length)) {
+            return;
+        }
+        int lengthOffset = bytesToRead - C3X_SEGMENT_BOOKEND.length - 4;
+        int segSize = getLittleEndianInt(segment, lengthOffset);
+        if (segSize <= 0 || segSize > bytesToRead - minLength) {
+            return;
+        }
+        int dataOffset = C3X_SEGMENT_BOOKEND.length;
+        byte[] modData = Arrays.copyOfRange(segment, dataOffset, dataOffset + segSize);
+        parseC3XModData(modData);
+    }
+
+    private boolean matchesBookend(byte[] data, int offset)
+    {
+        if (offset < 0 || offset + C3X_SEGMENT_BOOKEND.length > data.length)
+            return false;
+        for (int i = 0; i < C3X_SEGMENT_BOOKEND.length; i++) {
+            if (data[offset + i] != C3X_SEGMENT_BOOKEND[i])
+                return false;
+        }
+        return true;
+    }
+
+    private int getLittleEndianInt(byte[] data, int offset)
+    {
+        if (offset < 0 || offset + 4 > data.length)
+            return 0;
+        return (data[offset] & 0xFF) |
+               ((data[offset + 1] & 0xFF) << 8) |
+               ((data[offset + 2] & 0xFF) << 16) |
+               ((data[offset + 3] & 0xFF) << 24);
+    }
+
+    private void parseC3XModData(byte[] modDataBytes)
+    {
+        if (modDataBytes == null || modDataBytes.length == 0)
+            return;
+
+        for (TILE t : tile) {
+            t.clearDistrict();
+        }
+
+        ByteBuffer buffer = ByteBuffer.wrap(modDataBytes).order(ByteOrder.LITTLE_ENDIAN);
+        while (buffer.hasRemaining()) {
+            String chunkName = readAlignedString(buffer);
+            if (chunkName == null || chunkName.length() == 0)
+                break;
+
+            if ("district_tile_map".equals(chunkName)) {
+                if (buffer.remaining() < Integer.BYTES)
+                    break;
+                int entryCount = buffer.getInt();
+                for (int i = 0; i < entryCount; i++) {
+                    if (buffer.remaining() < 7 * Integer.BYTES) {
+                        buffer.position(buffer.limit());
+                        break;
+                    }
+                    int x = buffer.getInt();
+                    int y = buffer.getInt();
+                    int districtId = buffer.getInt();
+                    int state = buffer.getInt();
+                    int wonderState = buffer.getInt();
+                    int wonderCityId = buffer.getInt();
+                    int wonderIndex = buffer.getInt();
+                    int tileIndex = calculateTileIndex(x, y);
+                    if (tileIndex >= 0 && tileIndex < tile.size()) {
+                        TILE targetTile = tile.get(tileIndex);
+                        TILE.DistrictData data = new TILE.DistrictData();
+                        data.districtType = districtId;
+                        data.state = state;
+                        TILE.WonderDistrictInfo info = new TILE.WonderDistrictInfo();
+                        info.state = wonderState;
+                        info.cityId = wonderCityId;
+                        info.wonderIndex = wonderIndex;
+                        data.wonderInfo = info;
+                        targetTile.setDistrictData(data);
+                    }
+                }
+            }
+            else if ("district_pending_requests".equals(chunkName)) {
+                if (buffer.remaining() < Integer.BYTES)
+                    break;
+                int entryCount = buffer.getInt();
+                skipInts(buffer, entryCount * 5);
+            }
+            else if ("building_pending_orders".equals(chunkName)) {
+                if (buffer.remaining() < Integer.BYTES)
+                    break;
+                int entryCount = buffer.getInt();
+                skipInts(buffer, entryCount * 2);
+            }
+            else if ("distribution_hub_records".equals(chunkName)) {
+                if (buffer.remaining() < Integer.BYTES)
+                    break;
+                int entryCount = buffer.getInt();
+                skipInts(buffer, entryCount * 4);
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    private String readAlignedString(ByteBuffer buffer)
+    {
+        if (!buffer.hasRemaining())
+            return null;
+
+        int startPos = buffer.position();
+        int storedLen = 0;
+        boolean foundTerminator = false;
+
+        while (buffer.hasRemaining()) {
+            byte b = buffer.get();
+            storedLen++;
+            if (b == 0) {
+                foundTerminator = true;
+                break;
+            }
+        }
+
+        if (!foundTerminator) {
+            return null;
+        }
+
+        int totalLen = storedLen;
+        byte[] raw = new byte[totalLen];
+        buffer.position(startPos);
+        buffer.get(raw);
+
+        int paddedLen = (totalLen + 3) & ~3;
+        int skip = paddedLen - totalLen;
+        if (skip > 0) {
+            if (buffer.remaining() >= skip)
+                buffer.position(buffer.position() + skip);
+            else
+                buffer.position(buffer.limit());
+        }
+
+        int strLen = Math.max(totalLen - 1, 0);
+        try {
+            return new String(raw, 0, strLen, currentCharset);
+        }
+        catch (UnsupportedEncodingException e) {
+            return new String(raw, 0, strLen);
+        }
+    }
+
+    private void skipInts(ByteBuffer buffer, int count)
+    {
+        if (count <= 0) {
+            return;
+        }
+        int bytes = count * Integer.BYTES;
+        if (bytes <= 0) {
+            return;
+        }
+        if (buffer.remaining() < bytes) {
+            buffer.position(buffer.limit());
+        }
+        else {
+            buffer.position(buffer.position() + bytes);
+        }
+    }
+
+    private void appendC3XModData(LittleEndianDataOutputStream out)
+    {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        LittleEndianDataOutputStream modOut = new LittleEndianDataOutputStream(buffer);
+
+        boolean wroteChunk = false;
+        try {
+            wroteChunk = writeDistrictTileMapChunk(modOut);
+            modOut.flush();
+        }
+        catch (IOException e) {
+            logger.error("Failed to prepare C3X district data chunk", e);
+        }
+        byte[] modBytes = buffer.toByteArray();
+
+        if (!wroteChunk || modBytes.length == 0) {
+            try {
+                modOut.close();
+            }
+            catch (IOException ignored) {
+            }
+            return;
+        }
+
+        try {
+            out.write(C3X_SEGMENT_BOOKEND);
+            out.write(modBytes);
+            writeInt(modBytes.length, out);
+            out.write(C3X_SEGMENT_BOOKEND);
+        }
+        catch (IOException e) {
+            logger.error("Failed to write C3X district data chunk", e);
+        }
+        finally {
+            try {
+                modOut.close();
+            }
+            catch (IOException ignored) {
+            }
+        }
+    }
+
+    private boolean writeDistrictTileMapChunk(LittleEndianDataOutputStream modOut) throws IOException
+    {
+        int entryCount = 0;
+        for (TILE t : tile) {
+            TILE.DistrictData data = t.getDistrictData();
+            if (data != null && data.districtType >= 0) {
+                entryCount++;
+            }
+        }
+
+        if (entryCount == 0) {
+            return false;
+        }
+
+        writeAlignedString(modOut, "district_tile_map");
+        writeInt(entryCount, modOut);
+
+        for (TILE t : tile) {
+            TILE.DistrictData data = t.getDistrictData();
+            if (data == null || data.districtType < 0)
+                continue;
+            writeInt(t.xPos, modOut);
+            writeInt(t.yPos, modOut);
+            writeInt(data.districtType, modOut);
+            writeInt(data.state, modOut);
+            TILE.WonderDistrictInfo info = data.wonderInfo != null ? data.wonderInfo : new TILE.WonderDistrictInfo();
+            writeInt(info.state, modOut);
+            writeInt(info.cityId, modOut);
+            writeInt(info.wonderIndex, modOut);
+        }
+        return true;
+    }
+
+    private void writeAlignedString(LittleEndianDataOutputStream out, String text) throws IOException
+    {
+        if (text == null)
+            text = "";
+        byte[] bytes;
+        try {
+            bytes = text.getBytes(currentCharset);
+        }
+        catch (UnsupportedEncodingException e) {
+            bytes = text.getBytes();
+        }
+        int lenWithNull = bytes.length + 1;
+        int paddedLen = (lenWithNull + 3) & ~3;
+        byte[] data = new byte[paddedLen];
+        System.arraycopy(bytes, 0, data, 0, bytes.length);
+        data[bytes.length] = 0;
+        out.write(data);
     }
 
     public void writeInt(int number, LittleEndianDataOutputStream out)

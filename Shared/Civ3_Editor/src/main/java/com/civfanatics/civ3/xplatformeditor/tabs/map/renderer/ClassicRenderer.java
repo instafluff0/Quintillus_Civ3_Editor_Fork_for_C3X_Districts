@@ -50,6 +50,14 @@ public class ClassicRenderer extends Renderer {
     Logger logger = Logger.getLogger(this.getClass());
     
     Random rnd = new Random();  //for display variety
+    private static final Color[] DISTRICT_COLORS = new Color[] {
+        new Color(70, 130, 180),
+        new Color(218, 112, 214),
+        new Color(60, 179, 113),
+        new Color(255, 165, 0),
+        new Color(106, 90, 205),
+        new Color(176, 196, 222)
+    };
         
     private List<TILE> tiles = null;
     private WMAP wmap = null;
@@ -120,6 +128,25 @@ public class ClassicRenderer extends Renderer {
             drawGrid(xIndex, yIndex, bufferGraphics);
         }
         
+    }
+
+    private void drawDistrictPlaceholder(TILE tile, int defaultXPosition, int defaultYPosition, Graphics canvas)
+    {
+        TILE.DistrictData data = tile.getDistrictData();
+        if (data == null || data.districtType < 0)
+            return;
+
+        Color old = canvas.getColor();
+        Color color = DISTRICT_COLORS[data.districtType % DISTRICT_COLORS.length];
+        int ovalX = defaultXPosition + 48;
+        int ovalY = defaultYPosition + 12;
+        canvas.setColor(new Color(0, 0, 0, 120));
+        canvas.fillOval(ovalX - 2, ovalY - 2, 20, 14);
+        canvas.setColor(color);
+        canvas.fillOval(ovalX, ovalY, 16, 10);
+        canvas.setColor(Color.BLACK);
+        canvas.drawOval(ovalX, ovalY, 16, 10);
+        canvas.setColor(old);
     }
 
     private void drawLargeRuinGraphics(List<TILE> visibleTiles, Graphics bufferGraphics) {
@@ -485,6 +512,9 @@ public class ClassicRenderer extends Renderer {
                 canvas.drawImage(assets.resourceGraphics[resource.get(tile.resourceInt).getIcon()], defaultXPosition + 40, defaultYPosition + 9, null);
             }
         }
+
+        if (tile.hasDistrict())
+            drawDistrictPlaceholder(tile, defaultXPosition, defaultYPosition, canvas);
 
         if (settings.unitsEnabled)
             drawUnits(tile, horizScrollPosition, vertScrollPosition, canvas);

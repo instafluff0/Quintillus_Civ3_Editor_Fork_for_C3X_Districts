@@ -57,6 +57,42 @@ public class TILE extends BIQSection{
     public final static int[]c3cOverlayMasks = {ROAD_MASK, RAILROAD_MASK, MINE_MASK, IRRIGATION_MASK,
         FORT_MASK, GOODY_HUT_MASK, POLLUTION_MASK, BARBARIAN_CAMP_MASK, CRATER_MASK, BARRICADE_MASK};
 
+    public static final int DISTRICT_STATE_UNDER_CONSTRUCTION = 0;
+    public static final int DISTRICT_STATE_COMPLETED = 1;
+
+    public static final int WDS_UNUSED = 0;
+    public static final int WDS_UNDER_CONSTRUCTION = 1;
+    public static final int WDS_COMPLETED = 2;
+    public static final int WDS_RUINED = 3;
+
+    public static class WonderDistrictInfo {
+        public int state = WDS_UNUSED;
+        public int cityId = -1;
+        public int wonderIndex = -1;
+
+        public WonderDistrictInfo copy() {
+            WonderDistrictInfo info = new WonderDistrictInfo();
+            info.state = state;
+            info.cityId = cityId;
+            info.wonderIndex = wonderIndex;
+            return info;
+        }
+    }
+
+    public static class DistrictData {
+        public int districtType = -1;
+        public int state = DISTRICT_STATE_COMPLETED;
+        public WonderDistrictInfo wonderInfo = new WonderDistrictInfo();
+
+        public DistrictData copy() {
+            DistrictData data = new DistrictData();
+            data.districtType = districtType;
+            data.state = state;
+            data.wonderInfo = wonderInfo != null ? wonderInfo.copy() : null;
+            return data;
+        }
+    }
+
     public int resource = -1;
     /**
      * Documentation for file and image.
@@ -165,6 +201,7 @@ public class TILE extends BIQSection{
     public int index;   //index in the list of TILEs
     public List<Integer>unitsOnTile = new ArrayList<Integer>();
     public int unitWithBestDefence = -1;
+    private DistrictData districtData;
 
     public TILE(IO baselink)
     {
@@ -197,6 +234,45 @@ public class TILE extends BIQSection{
         this.c3cRealTerrain = (byte)terrain;
         this.c3cBaseTerrain = (byte)terrain;
         this.C3CRealBaseTerrain = (byte)(((byte)(c3cRealTerrain) << 4) | (byte)c3cBaseTerrain);
+    }
+
+    public boolean hasDistrict() {
+        return districtData != null && districtData.districtType >= 0;
+    }
+
+    public DistrictData getDistrictData() {
+        return districtData;
+    }
+
+    public DistrictData ensureDistrictData() {
+        if (districtData == null) {
+            districtData = new DistrictData();
+        }
+        if (districtData.wonderInfo == null) {
+            districtData.wonderInfo = new WonderDistrictInfo();
+        }
+        return districtData;
+    }
+
+    public void setDistrict(int districtType, int state) {
+        DistrictData data = ensureDistrictData();
+        data.districtType = districtType;
+        data.state = state;
+        if (data.wonderInfo == null) {
+            data.wonderInfo = new WonderDistrictInfo();
+        }
+    }
+
+    public void clearDistrict() {
+        districtData = null;
+    }
+
+    public void setDistrictData(DistrictData data) {
+        if (data == null) {
+            districtData = null;
+        } else {
+            districtData = data.copy();
+        }
     }
     public int getDataLength()
     {
