@@ -43,6 +43,8 @@ public class IO
     public static final int VANILLA_2_TILE_LENGTH = 0x16 + 4;
     public static final int CONT_LENGTH = 12;
     public static final int SLOC_LENGTH = 20;
+    private static final byte[] C3X_SAVE_SEGMENT_BOOKEND = new byte[] {(byte)0x22, (byte)'C', (byte)'3', (byte)'X'};
+    private static final String C3X_DISTRICT_CHUNK_NAME = "district_tile_map";
     private boolean hasCustomRules;
     private boolean hasCustomMap;
     private boolean hasCustomPlayerData;
@@ -626,10 +628,12 @@ public class IO
                 temp = new String(inputFour, currentCharset);
                 
                 //TODO: Some of the above should be moved into post-processing
-                performMapPostProcessing();
-            }   //inherent else
-            //if there was no map, the inherent else is taken and you end up here
-            //if there was a map, that's done now, and you have to import stuff here too
+				performMapPostProcessing();
+			}   //inherent else
+			//if there was no map, the inherent else is taken and you end up here
+			//if there was a map, that's done now, and you have to import stuff here too
+
+			loadDistrictsFromC3XSegment(buffer);
 
             //GAME Section
             //temp will already be ready
@@ -4107,17 +4111,25 @@ public class IO
 
             if (logger.isDebugEnabled())
                 logger.debug("Finished exporting GAME section");
-            if (hasCustomPlayerData)
-            {
-                outputLEAD(out);
-                if (logger.isDebugEnabled())
-                    logger.debug("Finished exporting LEAD section");
-            }
-            //end of file
-        }
-        catch (Exception e)
-        {
-            logger.error("Exception while outputting file", e);
+			if (hasCustomPlayerData)
+			{
+				outputLEAD(out);
+				if (logger.isDebugEnabled())
+					logger.debug("Finished exporting LEAD section");
+			}
+
+			byte[] districtChunk = buildDistrictTileChunk();
+			if (districtChunk.length > 0) {
+				out.write(C3X_SAVE_SEGMENT_BOOKEND);
+				out.write(districtChunk);
+				writeInt(districtChunk.length, out);
+				out.write(C3X_SAVE_SEGMENT_BOOKEND);
+			}
+			//end of file
+		}
+		catch (Exception e)
+		{
+			logger.error("Exception while outputting file", e);
             return false;
         }
         return true;
@@ -4147,11 +4159,11 @@ public class IO
         }
     }
 
-    public void writeString(String string, int length, LittleEndianDataOutputStream out)
-    {
-        //Got a bug log report with a crash on the len line, apparently string was null
-        //That was with units, which do default to "" rather than null.
-        //Nevertheless, taking a precaution here
+	public void writeString(String string, int length, LittleEndianDataOutputStream out)
+	{
+		//Got a bug log report with a crash on the len line, apparently string was null
+		//That was with units, which do default to "" rather than null.
+		//Nevertheless, taking a precaution here
         if (string == null)
             string = "";
         int len = string.length();
@@ -4168,13 +4180,196 @@ public class IO
         catch (Exception e)
         {
             logger.error("Error while writing a string: " + e);
-        }
-    }
+		}
+	}
 
-    private int inputHeader(LittleEndianDataInputStream in, String toMatch) throws HeaderFailedException
-    {
-        try{
-            in.read(inputFour, 0, 4);
+	private byte[] encodeWithCurrentCharset(String text) {
+		try {
+			return text.getBytes(currentCharset);
+		} catch (UnsupportedEncodingException e) {
+			logger.warn("Unsupported charset " + currentCharset + " when encoding '" + text + "'. Falling back to default.", e);
+			return text.getBytes();
+		}
+	}
+
+	private int alignedLength(int length) {
+		return (length + 4) & ~3;
+	}
+
+	private void writeAlignedBytes(LittleEndianDataOutputStream out, byte[] textBytes) throws IOException {
+		out.write(textBytes);
+		int padding = alignedLength(textBytes.length) - textBytes.length;
+		for (int i = 0; i < padding; i++)
+			out.write(0);
+	}
+
+	private int readIntLE(byte[] buffer, int offset) {
+		if ((buffer == null) || (offset < 0) || (offset + 4 > buffer.length))
+			return 0;
+		return (buffer[offset] & 0xFF) |
+		       ((buffer[offset + 1] & 0xFF) << 8) |
+		       ((buffer[offset + 2] & 0xFF) << 16) |
+		       ((buffer[offset + 3] & 0xFF) << 24);
+	}
+
+	private boolean matchesBookend(byte[] buffer, int offset) {
+		if ((buffer == null) || (offset < 0) || (offset + C3X_SAVE_SEGMENT_BOOKEND.length > buffer.length))
+			return false;
+		for (int i = 0; i < C3X_SAVE_SEGMENT_BOOKEND.length; i++)
+			if (buffer[offset + i] != C3X_SAVE_SEGMENT_BOOKEND[i])
+				return false;
+		return true;
+	}
+
+	private int findChunk(byte[] buffer, int start, int end, byte[] chunkNameBytes) {
+		if ((buffer == null) || (chunkNameBytes == null) || (chunkNameBytes.length == 0))
+			return -1;
+		for (int i = start; i <= end - chunkNameBytes.length; i++) {
+			boolean matches = true;
+			for (int j = 0; j < chunkNameBytes.length; j++) {
+				if (buffer[i + j] != chunkNameBytes[j]) {
+					matches = false;
+					break;
+				}
+			}
+			if (matches) {
+				int terminator = i + chunkNameBytes.length;
+				if ((terminator < end) && buffer[terminator] == 0)
+					return i;
+			}
+		}
+		return -1;
+	}
+
+	private void clearAllDistrictData() {
+		if (tile == null)
+			return;
+		for (TILE t : tile)
+			t.clearDistrict();
+	}
+
+	private void loadDistrictsFromC3XSegment(byte[] buffer) {
+		if ((buffer == null) || (buffer.length < 12))
+			return;
+		if ((tile == null) || tile.isEmpty())
+			return;
+		if ((worldMap == null) || worldMap.isEmpty())
+			return;
+
+		clearAllDistrictData();
+
+		int tailOffset = buffer.length - C3X_SAVE_SEGMENT_BOOKEND.length;
+		if (!matchesBookend(buffer, tailOffset))
+			return;
+
+		int segmentSize = readIntLE(buffer, buffer.length - 8);
+		if (segmentSize <= 0)
+			return;
+		if (segmentSize + 12 > buffer.length)
+			return;
+
+		int headerOffset = buffer.length - segmentSize - 12;
+		if (!matchesBookend(buffer, headerOffset))
+			return;
+
+		int dataStart = headerOffset + C3X_SAVE_SEGMENT_BOOKEND.length;
+		int dataEnd = dataStart + segmentSize;
+
+		byte[] chunkNameBytes = encodeWithCurrentCharset(C3X_DISTRICT_CHUNK_NAME);
+		int chunkStart = findChunk(buffer, dataStart, dataEnd, chunkNameBytes);
+		if (chunkStart < 0)
+			return;
+
+		int chunkDataStart = chunkStart + alignedLength(chunkNameBytes.length);
+		if (chunkDataStart + 4 > dataEnd)
+			return;
+
+		int entryCount = readIntLE(buffer, chunkDataStart);
+		if (entryCount <= 0)
+			return;
+
+		int cursor = chunkDataStart + 4;
+		int bytesNeeded = entryCount * 7 * 4;
+		if (cursor + bytesNeeded > dataEnd)
+			return;
+
+		for (int i = 0; i < entryCount; i++) {
+			int x = readIntLE(buffer, cursor); cursor += 4;
+			int y = readIntLE(buffer, cursor); cursor += 4;
+			int districtType = readIntLE(buffer, cursor); cursor += 4;
+			int stateValue = readIntLE(buffer, cursor); cursor += 4;
+			int wonderState = readIntLE(buffer, cursor); cursor += 4;
+			int wonderCityId = readIntLE(buffer, cursor); cursor += 4;
+			int wonderIndex = readIntLE(buffer, cursor); cursor += 4;
+
+			if (districtType < 0)
+				continue;
+
+			TILE target = getTileAt(x, y);
+			if (target == null)
+				continue;
+
+			TILE.DistrictData data = target.ensureDistrictData();
+			data.districtType = districtType;
+			data.districtId = districtType;
+			data.state = (stateValue == 1) ? TILE.DISTRICT_STATE_COMPLETED : stateValue;
+
+			if (data.wonderInfo == null)
+				data.wonderInfo = new TILE.WonderDistrictInfo();
+			data.wonderInfo.state = wonderState;
+			data.wonderInfo.cityId = wonderCityId;
+			data.wonderInfo.wonderIndex = wonderIndex;
+		}
+	}
+
+	private byte[] buildDistrictTileChunk() throws IOException {
+		if ((tile == null) || tile.isEmpty())
+			return new byte[0];
+
+		List<TILE> entries = new ArrayList<TILE>();
+		for (TILE t : tile) {
+			TILE.DistrictData data = t.getDistrictData();
+			if ((data != null) && (data.districtType >= 0))
+				entries.add(t);
+		}
+
+		if (entries.isEmpty())
+			return new byte[0];
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		LittleEndianDataOutputStream modOut = new LittleEndianDataOutputStream(buffer);
+
+		byte[] chunkNameBytes = encodeWithCurrentCharset(C3X_DISTRICT_CHUNK_NAME);
+		writeAlignedBytes(modOut, chunkNameBytes);
+		writeInt(entries.size(), modOut);
+
+		for (TILE t : entries) {
+			TILE.DistrictData data = t.getDistrictData();
+			writeInt(t.getXPos(), modOut);
+			writeInt(t.getYPos(), modOut);
+			writeInt(data.districtType, modOut);
+			int cState = (data.state == TILE.DISTRICT_STATE_COMPLETED) ? 1 : 0;
+			writeInt(cState, modOut);
+			TILE.WonderDistrictInfo info = data.wonderInfo;
+			if (info == null) {
+				writeInt(0, modOut);
+				writeInt(-1, modOut);
+				writeInt(-1, modOut);
+			} else {
+				writeInt(info.state, modOut);
+				writeInt(info.cityId, modOut);
+				writeInt(info.wonderIndex, modOut);
+			}
+		}
+
+		modOut.flush();
+		return buffer.toByteArray();
+	}
+
+	private int inputHeader(LittleEndianDataInputStream in, String toMatch) throws HeaderFailedException
+	{
+		try{
+			in.read(inputFour, 0, 4);
             dataInputted += 4;
             String temp = new String(inputFour, currentCharset);
             if (!(temp.equals(toMatch)))
@@ -4425,6 +4620,7 @@ public class IO
                 temp = new String(inputFour, currentCharset);
                 
                 performMapPostProcessing();
+                loadDistrictsFromC3XSegment(buffer);
             }   //inherent else
             //if there was no map, the inherent else is taken and you end up here
             //if there was a map, that's done now, and you have to import stuff here too

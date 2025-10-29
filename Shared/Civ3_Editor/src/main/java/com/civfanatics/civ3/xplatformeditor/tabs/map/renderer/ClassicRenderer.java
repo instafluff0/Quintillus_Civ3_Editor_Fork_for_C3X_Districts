@@ -192,15 +192,73 @@ public class ClassicRenderer extends Renderer {
         int variant = 0;
         int era = 0;
 
-        int civIdForTerritory = resolveCivilizationId(tile);
-        if (def != null && civIdForTerritory >= 0 && civIdForTerritory < civ.size()) {
+        // Find the nearest city and use its culture/era
+        // This matches how cities themselves are rendered
+        CITY nearestCity = null;
+
+        // First check if there's a city on this tile
+        if (tile.getCity() >= 0 && tile.getCity() < city.size()) {
+            nearestCity = city.get(tile.getCity());
+        }
+        // Otherwise check cities with influence over this tile
+        else if (tile.citiesWithInfluence != null && !tile.citiesWithInfluence.isEmpty()) {
+            for (Integer cityId : tile.citiesWithInfluence) {
+                if (cityId != null && cityId >= 0 && cityId < city.size()) {
+                    nearestCity = city.get(cityId);
+                    break; // Use the first valid city
+                }
+            }
+        }
+
+        // If we found a city, use its culture and era (matching drawCities logic)
+        int cultureGroup = 0;
+        int cityAge = 0;
+
+        if (nearestCity != null) {
+            switch (nearestCity.getOwnerType()) {
+                case CITY.OWNER_CIV:
+                    int civId = nearestCity.getOwner();
+                    if (civId >= 0 && civId < civ.size()) {
+                        cultureGroup = civ.get(civId).getCultureGroup();
+                        // Look up era from player data if available
+                        if (biq.hasCustomPlayerData()) {
+                            for (int p = 0; p < player.size(); p++) {
+                                if (player.get(p).civ == civId) {
+                                    cityAge = player.get(p).initialEra == 4 ? 3 : player.get(p).initialEra;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case CITY.OWNER_PLAYER:
+                    if (nearestCity.getOwner() > -1 && nearestCity.getOwner() < player.size()) {
+                        if (biq.hasCustomPlayerData()) {
+                            int playerCivId = player.get(nearestCity.getOwner()).civ;
+                            if (playerCivId > -1 && playerCivId < civ.size()) {
+                                cultureGroup = civ.get(playerCivId).getCultureGroup();
+                            } else {
+                                // Default to Mediterranean (2) to match Firaxis behavior
+                                cultureGroup = 2;
+                            }
+                            cityAge = player.get(nearestCity.getOwner()).initialEra == 4 ? 3 : player.get(nearestCity.getOwner()).initialEra;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // Set cultureGroup to 0 if invalid to avoid errors
+        if (cultureGroup == -1) {
+            cultureGroup = 0;
+        }
+
+        if (def != null && nearestCity != null) {
             if (def.isVaryByCulture()) {
-                int cultureGroup = civ.get(civIdForTerritory).getCultureGroup();
                 variant = clamp(cultureGroup, 0, Math.max(0, set.getVariantCount() - 1));
             }
             if (def.isVaryByEra()) {
-                int resolvedEra = resolveEraForCivilization(civIdForTerritory);
-                era = clamp(resolvedEra, 0, Math.max(0, set.getEraCount() - 1));
+                era = clamp(cityAge, 0, Math.max(0, set.getEraCount() - 1));
             }
         } else if (districtId == DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID && set.getVariantCount() > 1) {
             variant = set.getVariantCount() - 1; // abandoned art
@@ -269,37 +327,44 @@ public class ClassicRenderer extends Renderer {
         if (tile == null)
             return -1;
         if (tile.ownerType == CITY.OWNER_CIV) {
-            if (tile.owner >= 0 && tile.owner < civ.size())
-                return tile.owner;
+            int civId = tile.owner;
+            if (civId >= 0 && civId < civ.size())
+                return civId;
         } else if (tile.ownerType == CITY.OWNER_PLAYER) {
-            int playerId = tile.owner;
-            if (playerId >= 0 && playerId < player.size()) {
-                LEAD leader = player.get(playerId);
-                if (leader != null && leader.getCiv() >= 0)
-                    return leader.getCiv();
-            }
+            int civId = resolvePlayerCivilization(tile.owner);
+            if (civId >= 0)
+                return civId;
         }
 
-        short cityId = tile.getCity();
-        if (cityId >= 0 && cityId < city.size()) {
-            CITY cityOnTile = city.get(cityId);
-            if (cityOnTile != null) {
-                int ownerType = cityOnTile.getOwnerType();
-                if (ownerType == CITY.OWNER_CIV) {
-                    int cityCiv = cityOnTile.getOwner();
-                    if (cityCiv >= 0 && cityCiv < civ.size())
-                        return cityCiv;
-                } else if (ownerType == CITY.OWNER_PLAYER) {
-                    int playerId = cityOnTile.getOwner();
-                    if (playerId >= 0 && playerId < player.size()) {
-                        LEAD leader = player.get(playerId);
-                        if (leader != null && leader.getCiv() >= 0)
-                            return leader.getCiv();
-                    }
+        int fallbackCiv = -1;
+        if (tile.citiesWithInfluence != null && !tile.citiesWithInfluence.isEmpty()) {
+            for (Integer cityId : tile.citiesWithInfluence) {
+                if (cityId == null)
+                    continue;
+                if (cityId.intValue() < 0 || cityId.intValue() >= city.size())
+                    continue;
+                CITY influencingCity = city.get(cityId.intValue());
+                int civId = resolveCityCivilization(influencingCity);
+                if (civId < 0)
+                    continue;
+                if (tile.ownerType == CITY.OWNER_CIV && tile.owner == civId)
+                    return civId;
+                if (tile.ownerType == CITY.OWNER_PLAYER) {
+                    int ownerCiv = resolvePlayerCivilization(tile.owner);
+                    if (ownerCiv == civId)
+                        return civId;
                 }
+                if (fallbackCiv < 0)
+                    fallbackCiv = civId;
             }
         }
-        return -1;
+        short cityId = tile.getCity();
+        if (cityId >= 0 && cityId < city.size()) {
+            int civId = resolveCityCivilization(city.get(cityId));
+            if (civId >= 0)
+                return civId;
+        }
+        return fallbackCiv;
     }
 
     private int resolveEraForCivilization(int civId) {
@@ -319,6 +384,29 @@ public class ClassicRenderer extends Renderer {
         }
         civEraCache.put(Integer.valueOf(civId), Integer.valueOf(era));
         return era;
+    }
+
+    private int resolvePlayerCivilization(int playerId) {
+        if (playerId < 0 || playerId >= player.size())
+            return -1;
+        LEAD leader = player.get(playerId);
+        if (leader == null)
+            return -1;
+        int civId = leader.getCiv();
+        return civId >= 0 ? civId : -1;
+    }
+
+    private int resolveCityCivilization(CITY cityEntry) {
+        if (cityEntry == null)
+            return -1;
+        if (cityEntry.getOwnerType() == CITY.OWNER_CIV) {
+            int civId = cityEntry.getOwner();
+            if (civId >= 0 && civId < civ.size())
+                return civId;
+        } else if (cityEntry.getOwnerType() == CITY.OWNER_PLAYER) {
+            return resolvePlayerCivilization(cityEntry.getOwner());
+        }
+        return -1;
     }
 
     private int getNeighborhoodColumn(int tileX, int tileY, int columnCount) {
