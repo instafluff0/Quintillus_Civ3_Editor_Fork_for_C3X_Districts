@@ -12,7 +12,7 @@ Output:
 
 The installation requirements and steps are exactly the same as those described in the [main Cross-Platform Civ3 Editor instructions in Civfanatics](https://forums.civfanatics.com/resources/cross-platform-civ3-editor.15288/). 
 
-The only difference is the location to download the Editor itself, which can be found [here under Releases](https://github.com/instafluff0/Quintillus_Civ3_Editor_Fork_for_C3X_Districts/releases) under the name ` conquests_editor_w_districts-1.6.zip`. The Editor and download link will be moved to CivFanatics relatively soon.
+The only difference is the location to download the Editor itself, which can be found [here under Releases](https://github.com/instafluff0/Quintillus_Civ3_Editor_Fork_for_C3X_Districts/releases) under the name `conquests_editor_w_districts-1.6.zip`. The Editor and download link will be moved to CivFanatics relatively soon.
 
 ## Usage
 
