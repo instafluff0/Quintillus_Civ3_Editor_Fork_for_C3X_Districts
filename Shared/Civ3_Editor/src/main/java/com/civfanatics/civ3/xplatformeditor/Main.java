@@ -95,6 +95,7 @@ import com.civfanatics.civ3.xplatformeditor.tabs.map.BMPSizeCalculator;
 import com.civfanatics.civ3.xplatformeditor.tabs.map.MapFromBMPForm;
 import com.civfanatics.civ3.xplatformeditor.tabs.map.PolarBearForm;
 import com.civfanatics.civ3.xplatformeditor.undoRedo.UndoStack;
+import com.civfanatics.civ3.xplatformeditor.districts.DistrictScenarioSerializer;
 import java.awt.AWTEvent;
 import java.awt.Color;
 import java.awt.FileDialog;
@@ -1056,6 +1057,17 @@ public class Main extends javax.swing.JFrame implements ApplicationListener{
         return null;
     }
 
+    private File getCivInstallDirFile() {
+        try {
+            if (settings != null && settings.civInstallDir != null && settings.civInstallDir.length() > 0)
+                return new File(settings.civInstallDir);
+        }
+        catch (Exception ex) {
+            logger.debug("Unable to resolve civ install dir", ex);
+        }
+        return null;
+    }
+
     /**
      * Handles the low-level inputting of the BIQ file, and updating of indices.
      * Does not do anything with the GUI.
@@ -1115,7 +1127,12 @@ public class Main extends javax.swing.JFrame implements ApplicationListener{
             JOptionPane.showMessageDialog(null, "<html>The script file could not be read.  While the editor will still work, tech blurbs cannot be displayed.<br/><br/>It is recommended to upload your scenario (including the Text folder) to the CFC thread so the issue can be diagnosed.</html>",
                     "Error reading script file", JOptionPane.WARNING_MESSAGE);
         }
-        
+
+        if (successfulInput) {
+            File civInstallDirFile = getCivInstallDirFile();
+            DistrictScenarioSerializer.loadDistrictScenario(biqFile.get(biqIndex), file, civInstallDirFile);
+        }
+
         return successfulInput;
     }
     
@@ -1566,6 +1583,11 @@ public class Main extends javax.swing.JFrame implements ApplicationListener{
         {
             logger.error("Failed to successfully output file");
             JOptionPane.showMessageDialog(null, "Failed to successfully output file");
+        }
+        else
+        {
+            File civInstallDirFile = getCivInstallDirFile();
+            DistrictScenarioSerializer.saveDistrictScenario(biqFile.get(biqIndex), file, civInstallDirFile);
         }
         restoreTitle();
         return successfulExport;
