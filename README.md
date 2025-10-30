@@ -27,10 +27,10 @@ You can find the "Districts mode" `D` button in the top right. Selecting that wi
 
 ### District Configurations and Images loaded in the Editor
 
-Just like in C3X, the Editor will search for and parse (if found)
+Just like in C3X, the Editor will search for and parse
 
-1) `default.districts_config.txt` (under `/C3X`)
-2) `custom.districts_config.txt`  (optional, under `/C3X`)
+1) `default.districts_config.txt`  (under `/C3X`)
+2) `custom.districts_config.txt`   (optional, under `/C3X`)
 3) `scenario.districts_config.txt` (optional, in the same folder as your scenario BIQ file)
 
 If any config files are found, the values override entries from the previous one. The District art image, in turn, is loaded based on your config values (see the [C3X District documentation](https://github.com/instafluff0/C3X_Districts/blob/master/README.md#configuration) for details).
@@ -41,7 +41,7 @@ The editor introduces a very simple human-readable file format for saving Distri
 
 <img width="338" height="432" alt="image" src="https://github.com/user-attachments/assets/85d9f32b-401f-440a-8a33-ca883e6bfe10" />
 
-The Editor will save the file with **exactly the same name as your scenario**, and **this is what C3X expects as well**. So if you save a scenario called `my_scenario`, you will see output files in the same folder for both the BIQ and *.c3x.txt files:
+The Editor will save the file with **exactly the same name as your scenario**, and **this is what C3X expects as well**. So if you save a scenario called `my_scenario`, you will see output files in the same folder for both the BIQ and `<scenario>.c3x.txt` files:
 
 <img width="702" height="62" alt="image" src="https://github.com/user-attachments/assets/3d9f8c71-9f30-4460-a8c4-0d7a8fc9b983" />
 
@@ -57,7 +57,7 @@ In the upcoming release of C3X, Civ 3 will automatically read and add your Distr
 
 <img width="698" height="555" alt="image" src="https://github.com/user-attachments/assets/03aab1c0-cde5-49fa-93f0-946b7cc18b14" />
 
-If you don't have a *.c3x.txt file, that's fine too and Districts will not be added. C3X will also notify you of any issues it has in parsing the file, skipping district entries with errors:
+If you don't have a `<scenario>.c3x.txt` file, that's fine too and Districts will not be added. C3X will also notify you of any issues it has in parsing the file, skipping district entries with errors:
 
 <img width="266" height="72" alt="image" src="https://github.com/user-attachments/assets/25b1a8ad-d24f-45f4-b2e2-1ed34a64c842" />
 
