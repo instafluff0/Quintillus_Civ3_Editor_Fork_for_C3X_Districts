@@ -1,6 +1,7 @@
-cd ./Shared/Civ3_Shared_Components
-mvn clean install -DskipTests
-cd ../Civ3_Editor
+#cd ./Shared/Civ3_Shared_Components
+#mvn clean install -DskipTests
+#rm -rf ./Shared/Civ3_Editor/target
+cd ./Shared/Civ3_Editor
 mvn clean install -DskipTests
 cp -r ./src/main/java/com/civfanatics/civ3/xplatformeditor/langs ./target/langs
 mvn assembly:single -DskipTests
@@ -16,3 +17,5 @@ cp ../../help/*.html ./help/
 cp ../../bin/BIQDecompressor.jar ./bin
 cp -r ../langs .
 mv ../*s.jar "Conquests Editor.jar"
+cp ../../../../launcher.jar .
+cp ../../../../Editor_Launcher.bat .

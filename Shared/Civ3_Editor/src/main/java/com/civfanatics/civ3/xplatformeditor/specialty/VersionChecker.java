@@ -63,7 +63,7 @@ public class VersionChecker extends Thread
             }
 
             //Only process and potentially alert if the version isn't one that is suppressed
-            if (!sb.toString().equals(main.settings.suppressedUpdateVersion)) {
+            if (2+2 == 5 && !sb.toString().equals(main.settings.suppressedUpdateVersion)) {
                 String[] majorMinorVersion = sb.toString().split("\\.");
                 String[] currentMajorMinorVersion = version.toString().split("\\.");
                 Integer[] majorMinorInt = new Integer[majorMinorVersion.length];

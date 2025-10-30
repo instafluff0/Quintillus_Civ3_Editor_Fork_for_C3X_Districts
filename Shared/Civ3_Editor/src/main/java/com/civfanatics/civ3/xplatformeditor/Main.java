@@ -182,8 +182,8 @@ public class Main extends javax.swing.JFrame implements ApplicationListener{
     static final boolean defaultFile = false;
     public static final String newline = System.getProperty("line.separator");
     public static String fileSlash = System.getProperty("file.separator");
-    public static final String VERSION = "1.51";
-    static final String TITLE = "Conquests Editor " + VERSION;
+    public static final String VERSION = "1.6";
+    static final String TITLE = "Conquests Editor " + VERSION + " (Districts version)";
     public static boolean GRAPHICS_ENABLED = true;
     String titleRemainder = "";
     static String fontChoice = "Tahoma";  //also LucidaSansRegular, Tahoma, Trebuchet MS
