@@ -66,6 +66,7 @@ public class ClassicRenderer extends Renderer {
         new Color(106, 90, 205),
         new Color(176, 196, 222)
     };
+    private static final int ABANDONED_VARIANT_INDEX = 5;
     private static final int[][] WORK_RADIUS_OFFSETS = new int[][] {
         {0, 0},
         {1, -1}, {2, 0}, {1, 1}, {0, 2}, {-1, 1}, {-2, 0}, {-1, -1}, {0, -2},
@@ -191,6 +192,13 @@ public class ClassicRenderer extends Renderer {
         int ownerId = tile.owner;
         int variant = 0;
         int era = 0;
+        boolean tileHasTerritoryOwner = tile.ownerType != CITY.OWNER_NONE;
+        boolean forceBaseColumn = false;
+        boolean isCompletedWonder = false;
+        if (districtId == DistrictDefinitions.WONDER_DISTRICT_ID && data.wonderInfo != null) {
+            isCompletedWonder = (data.wonderInfo.state == TILE.WDS_COMPLETED);
+        }
+        DistrictSpriteSet renderSet = set;
 
         // Find the nearest city and use its culture/era
         // This matches how cities themselves are rendered
@@ -253,27 +261,34 @@ public class ClassicRenderer extends Renderer {
             cultureGroup = 0;
         }
 
-        if (def != null && nearestCity != null) {
+        if (!tileHasTerritoryOwner && !isCompletedWonder) {
+            renderSet = resolveAbandonedSet(set);
+            variant = resolveAbandonedVariant(renderSet);
+            era = 0;
+            forceBaseColumn = true;
+        } else if (def != null && nearestCity != null) {
             if (def.isVaryByCulture()) {
-                variant = clamp(cultureGroup, 0, Math.max(0, set.getVariantCount() - 1));
+                variant = clamp(cultureGroup, 0, Math.max(0, renderSet.getVariantCount() - 1));
             }
             if (def.isVaryByEra()) {
-                era = clamp(cityAge, 0, Math.max(0, set.getEraCount() - 1));
+                era = clamp(cityAge, 0, Math.max(0, renderSet.getEraCount() - 1));
             }
-        } else if (districtId == DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID && set.getVariantCount() > 1) {
-            variant = set.getVariantCount() - 1; // abandoned art
+        } else if (districtId == DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID && renderSet.getVariantCount() > 1) {
+            variant = renderSet.getVariantCount() - 1; // abandoned art
         }
 
         int column = 0;
-        if (districtId == DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID) {
-            column = getNeighborhoodColumn(tile.xPos, tile.yPos, Math.max(1, set.getColumnCount()));
+        if (forceBaseColumn) {
+            column = 0;
+        } else if (districtId == DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID) {
+            column = getNeighborhoodColumn(tile.xPos, tile.yPos, Math.max(1, renderSet.getColumnCount()));
         } else if (def != null && def.getDependentImprovementCount() > 0) {
-            column = countDependentBuildings(tile, ownerId, def, Math.max(1, set.getColumnCount()));
+            column = countDependentBuildings(tile, ownerId, def, Math.max(1, renderSet.getColumnCount()));
         }
 
-        BufferedImage sprite = set.getSprite(variant, era, column);
+        BufferedImage sprite = renderSet.getSprite(variant, era, column);
         if (sprite == null) {
-            sprite = fallbackSprite(set);
+            sprite = fallbackSprite(renderSet);
         }
         if (sprite == null)
             return false;
@@ -384,6 +399,26 @@ public class ClassicRenderer extends Renderer {
         }
         civEraCache.put(Integer.valueOf(civId), Integer.valueOf(era));
         return era;
+    }
+
+    private DistrictSpriteSet resolveAbandonedSet(DistrictSpriteSet current) {
+        int neighborhoodId = DistrictDefinitions.NEIGHBORHOOD_DISTRICT_ID;
+        if (assets != null && assets.districtSprites != null &&
+            neighborhoodId >= 0 && neighborhoodId < assets.districtSprites.length) {
+            DistrictSpriteSet neighborhood = assets.districtSprites[neighborhoodId];
+            if (neighborhood != null)
+                return neighborhood;
+        }
+        return current;
+    }
+
+    private int resolveAbandonedVariant(DistrictSpriteSet set) {
+        if (set == null)
+            return 0;
+        int variantCount = set.getVariantCount();
+        if (variantCount <= 0)
+            return 0;
+        return clamp(ABANDONED_VARIANT_INDEX, 0, variantCount - 1);
     }
 
     private int resolvePlayerCivilization(int playerId) {
